@@ -49,14 +49,14 @@
             <li class="menu-header">Dashboard</li>
             <li class="{{ setSidebarActive(['admin.dashboard']) }}"><a class="nav-link"
                     href="{{ route('admin.dashboard') }}"><i class="fas fa-fire"></i>
-                    General Dashboard</a>
+                    <span>Dashboard</span></a>
             </li>
 
             <li class="menu-header">Starter</li>
             <li><a class="nav-link"
                 href="#"><i class="fas fa-images"></i> <span>Banners</span></a></li>
                 <li
-                class="dropdown {{ setSidebarActive(['admin.category.*', 'admin.product.*', 'admin.main-category.*', 'admin.sub-category.index']) }}">
+                class="dropdown {{ setSidebarActive(['admin.category.*', 'admin.product.*', 'admin.main-category.*', 'admin.sub-category.*']) }}">
                 <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i
                         class="fas fa-shopping-cart"></i>
                     <span>Manage Products </span></a>

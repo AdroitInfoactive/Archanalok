@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\DataTables\SubCategoryDataTable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\SubCategoryCreateRequest;
+use App\Http\Requests\Admin\SubCategoryUpdateRequest;
 use App\Models\Category;
 use App\Models\MainCategory;
 use App\Models\SubCategory;
@@ -78,9 +79,24 @@ class SubCategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(SubCategoryUpdateRequest $request, string $id)
     {
-        //
+        $subcategory = SubCategory::findOrFail($id);
+        $imagePath = $this->uploadImage($request, 'image', $subcategory->image, '/uploads');
+        $subcategory->name = $request->name;
+        $subcategory->main_category_id = $request->main_category_id;
+        $subcategory->category_id = $request->category_id;
+        $subcategory->slug = generateUniqueSlug('SubCategory', $request->name);
+        $subcategory->image = $imagePath ?: $subcategory->image;
+        $subcategory->description = $request->description;
+        $subcategory->seo_title = $request->seo_title;
+        $subcategory->seo_description = $request->seo_description;
+        $subcategory->status = $request->status;
+        $subcategory->position = $request->position;
+        $subcategory->save();
+        toastr()->success('Product Sub Category Updated Successfully');
+        return to_route('admin.sub-category.index');
+
     }
 
     /**

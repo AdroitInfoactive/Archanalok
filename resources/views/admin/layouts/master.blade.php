@@ -22,22 +22,9 @@
     <script>
         var pusherKey = "{{config('settings.pusher_key') }}";
         var pusherCluster = "{{config('settings.pusher_cluster') }}";
-       
-
     </script>
-    <!-- Start GA -->
-    {{-- <script async src="https://www.googletagmanager.com/gtag/js?id=UA-94034622-3"></script> --}}
-    {{-- <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'UA-94034622-3');
-</script> --}}
-    <!-- /END GA -->
     @vite(['resources/js/app.js'])
 </head>
-
 <body>
     <div id="app">
         <div class="main-wrapper main-wrapper-1">
@@ -50,7 +37,7 @@
             </div>
             <footer class="main-footer">
                 <div class="footer-left">
-                    Copyright &copy; 2023 <div class="bullet"></div> Design By <a href="#">Adroit</a>
+                    Copyright &copy; 2024 <div class="bullet"></div> Design By <a href="#">Adroit</a>
                 </div>
                 <div class="footer-right">
 
@@ -86,6 +73,31 @@
         @endif
     </script>
     <script>
+        // Function to handle going back
+        function goBack() {
+        if (isFormChanged) {
+        Swal.fire({
+        title: 'You have unsaved changes.',
+        text: 'Are you sure you want to leave?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, leave',
+        cancelButtonText: 'Cancel'
+        }).then((result) => {
+        if (result.isConfirmed) {
+        suppressUnloadWarning = true; // Set flag to suppress unload warning
+        // If confirmed, go back
+        window.history.back();
+        }
+        });
+        } else {
+        // Go back directly if no unsaved changes
+        window.history.back();
+        }
+        }
+        
         $.uploadPreview({
             input_field: "#image-upload", // Default: .image-upload
             preview_box: "#image-preview", // Default: .image-preview
@@ -95,8 +107,9 @@
             no_label: false, // Default: false
             success_callback: null // Default: null
         });
-       
         $(document).ready(function() {
+            $('.read-only-field').attr('readonly', true);
+            $('.read-only-field').attr('disabled', true);
             $('body').on('click', '.delete-item', function(e) {
                 e.preventDefault();
                 Swal.fire({
@@ -115,7 +128,7 @@
                             // headers: {
                             //     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                             // },
-                          data:{_token: '{{ csrf_token() }}'},
+                            data:{_token: '{{ csrf_token() }}'},
                             success: function(response) {
                                 if (response.status === 'success') {
                                     toastr.success(response.message);
@@ -128,14 +141,10 @@
                             error: function(error) {
                                 console.error(error);
                             }
-
                         });
-
-                      
                     }
                 });
             })
-
         })
     </script>
     @stack('scripts')

@@ -1,95 +1,220 @@
 @extends('admin.layouts.master')
 @section('content')
-    <section class="section">
-        <div class="section-header">
-            <h1>Product Main Category</h1>
-        </div>
-    </section>
-    <div class="card card-primary">
-        <div class="card-header">
-            <h4>Add Main Category</h4>
+<section class="section">
+    <div class="section-header">
+        <span onclick="goBack()" style="cursor: pointer; font-size: 1.5em;">
+            <i class="fas fa-arrow-left"></i></span>&nbsp;
+        <h1>Add Product Main Category</h1>
+    </div>
+</section>
 
-        </div>
-        <div class="card-body">
-            <form action="{{ route('admin.main-category.store') }}" method="post" enctype="multipart/form-data">
-                @csrf
-
-                <div class="form-group">
-                    <label>Name *</label>
-                    <input type="text" name="name" value="{{ old('name') }}" class="form-control">
+<form action="{{ route('admin.main-category.store') }}" method="post" enctype="multipart/form-data"
+    class="form">
+    @csrf
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card card-primary">
+                <div class="card-header">
+                    <h4>Main Category Details</h4>
                 </div>
-               {{--  <div class="form-group">
-                    <label>Colour</label>
-                    <input type="text" name="colour" value="{{ old('colour') }}" class="form-control">
-                </div> --}}
-                <div class="form-group">
-                    <label> Description</label>
-                    <textarea name="description" class="form-control summernote">{{ old('description') }}</textarea>
-                </div>
-                <div class="form-group">
-                    <label>Seo Title</label>
-                    <input type="text" name="seo_title" value="{{ old('seo_title') }}" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label>Seo Description</label>
-                    <textarea name="seo_description" class="form-control">{{ old('seo_description') }}</textarea>
-                </div>
-                <div class="form-group">
-                    <label>Status</label>
-                    <select name="status" class="form-control">
-                        <option value="1">Active</option>
-                        <option value="0">Inactive</option>
-                    </select>
-                </div>
-                  <div class="form-group">
-                    <label>Proirity</label>
-                    <input type="text" name="position" value="{{ old('position') }}" class="form-control">
-                </div>
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label>Logo *</label>
-                            <div id="image-preview" class="image-preview">
-                                <label for="image-upload" id="image-label">Choose logo</label>
-                                <input type="file" name="logo" id="image-upload" />
-                            </div>
-                        </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>Name *</label>
+                        <input type="text" name="name" id="name" value="{{ old('name') }}"
+                            class="form-control">
+                        <input type="hidden" name="slug" id="slug" value="{{ old('slug') }}">
                     </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label>Image</label>
-                            <div id="image-preview-2" class="image-preview img">
-                                <label for="image-upload-2" id="image-label-2">Choose Image</label>
-                                <input type="file" name="image" id="image-upload-2" />
-                            </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea name="description" id="description"
+                            class="form-control">{{ old('description') }}</textarea>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-6">
+                            <label>Priority</label>
+                            <input type="number" name="position" value="{{ old('position') }}"
+                                class="form-control" min="1">
+                        </div>
+                        <div class="col-md-6">
+                            <label>Status</label>
+                            <select name="status" class="form-control">
+                                <option value="1"
+                                    {{ old('status') == 1 ? 'selected' : '' }}>
+                                    Active</option>
+                                <option value="0"
+                                    {{ old('status') == 0 ? 'selected' : '' }}>
+                                    Inactive</option>
+                            </select>
                         </div>
                     </div>
                 </div>
-                    <button class="btn btn-primary btn-lg" type="submit">Create</button>
-            </form>
+            </div>
+        </div>
 
+        <div class="col-md-3">
+            <div class="card card-primary">
+                <div class="card-header">
+                    <h4>Search Engine Listing</h4>
+                    <button type="button" id="edit-seo-btn" class="btn btn-sm float-right">
+                        <i class="fas fa-pencil-alt"></i> <!-- Pencil icon -->
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="seo-fields" style="display: none;">
+                        <div class="form-group">
+                            <label>SEO Title</label>
+                            <input type="text" name="seo_title" id="seo_title"
+                                value="{{ old('seo_title') }}" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>SEO Description</label>
+                            <textarea name="seo_description" id="seo_description"
+                                class="form-control">{{ old('seo_description') }}</textarea>
+                        </div>
+                    </div>
+                    <div class="seo-preview">
+                        <div class="preview-container">
+                            <p class="preview-url" id="preview-url">
+                                {{ $actual_link = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://".$_SERVER['HTTP_HOST']."/" }}<span
+                                    id="generated-url-preview">{{ old('slug', 'example-category') }}</span>
+                            </p>
+                            <p class="preview-title" id="preview-title">
+                                {{ old('seo_title', 'Sample SEO Title') }}
+                            </p>
+                            <p class="preview-description" id="preview-description">
+                                {{ old('seo_description', 'This is a sample description that appears in search results.') }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5">
+            <div class="card card-primary">
+                <div class="card-header">
+                    <h4>Images</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Logo *</label>
+                                <div id="image-preview" class="image-preview">
+                                    <label for="image-upload" id="image-label">Choose logo</label>
+                                    <input type="file" name="logo" id="image-upload" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Image</label>
+                                <div id="image-preview-2" class="image-preview">
+                                    <label for="image-upload-2" id="image-label-2">Choose Image</label>
+                                    <input type="file" name="image" id="image-upload-2" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+
+    <hr>
+
+    <div class="text-center mt-3">
+        <button class="btn btn-primary" type="submit">Create</button>
+        <button class="btn btn-danger go-back" type="button" onclick="goBack()">Go Back</button>
+    </div>
+</form>
+
 @endsection
+
 @push('scripts')
     <script>
+        const isEditPage = false;
+
+    </script>
+    <script src="{{ asset('admin/assets/js/form-script.js') }}"></script>
+    <script>
+        let seoTitleEdited = false;
+        let seoDescriptionEdited = false;
+
+        // Handle input changes for name and update SEO title and slug if not manually edited
+        document.getElementById('name').addEventListener('input', function () {
+            const nameValue = this.value;
+            const generatedSlug = generateSlug(nameValue);
+            document.getElementById('generated-url-preview').textContent = generatedSlug; // Update preview slug
+            document.getElementById('slug').value = generatedSlug; // Update preview slug
+
+            if (!seoTitleEdited) {
+                document.getElementById('seo_title').value = nameValue; // Update SEO Title
+                document.getElementById('preview-title').textContent = nameValue; // Update preview title
+            }
+        });
+
+        // Handle input changes for description and update SEO Description if not manually edited
+        document.getElementById('description').addEventListener('input', function () {
+            const descriptionValue = this.value;
+
+            if (!seoDescriptionEdited) {
+                document.getElementById('seo_description').value = descriptionValue; // Update SEO Description
+                document.getElementById('preview-description').textContent =
+                    descriptionValue; // Update preview description
+            }
+        });
+
+        // Set flag when SEO Title is manually edited
+        document.getElementById('seo_title').addEventListener('input', function () {
+            seoTitleEdited = true;
+            document.getElementById('preview-title').textContent = this.value;
+
+            // Reset flag if field is empty, so it can auto-update from name again
+            if (this.value.trim() === "") {
+                seoTitleEdited = false;
+                document.getElementById('preview-title').textContent = document.getElementById('name').value;
+            }
+        });
+
+        // Set flag when SEO Description is manually edited
+        document.getElementById('seo_description').addEventListener('input', function () {
+            seoDescriptionEdited = true;
+            document.getElementById('preview-description').textContent = this.value;
+
+            // Reset flag if field is empty, so it can auto-update from description again
+            if (this.value.trim() === "") {
+                seoDescriptionEdited = false;
+                document.getElementById('preview-description').textContent = document.getElementById(
+                    'description').value;
+            }
+        });
+
+        // Toggle SEO fields visibility
+        document.getElementById('edit-seo-btn').addEventListener('click', function () {
+            const seoFields = document.getElementById('seo-fields');
+            seoFields.style.display = seoFields.style.display === 'none' ? 'block' : 'none';
+        });
+
+        // Preview upload images
         $.uploadPreview({
-            input_field: "#image-upload", // Default: .image-upload
-            preview_box: "#image-preview", // Default: .image-preview
-            label_field: "#image-label", // Default: .image-label
-            label_default: "Choose File", // Default: Choose File
-            label_selected: "Change File", // Default: Change File
-            no_label: false, // Default: false
-            success_callback: null // Default: null
+            input_field: "#image-upload",
+            preview_box: "#image-preview",
+            label_field: "#image-label",
+            label_default: "Choose File",
+            label_selected: "Change File",
+            no_label: false,
+            success_callback: null
         });
         $.uploadPreview({
-            input_field: "#image-upload-2", // Default: .image-upload
-            preview_box: "#image-preview-2", // Default: .image-preview
-            label_field: "#image-label-2", // Default: .image-label
-            label_default: "Choose File", // Default: Choose File
-            label_selected: "Change File", // Default: Change File
-            no_label: false, // Default: false
-            success_callback: null // Default: null
+            input_field: "#image-upload-2",
+            preview_box: "#image-preview-2",
+            label_field: "#image-label-2",
+            label_default: "Choose File",
+            label_selected: "Change File",
+            no_label: false,
+            success_callback: null
         });
+
     </script>
 @endpush

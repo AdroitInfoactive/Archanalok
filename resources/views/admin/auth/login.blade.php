@@ -86,7 +86,7 @@
             </div>
 
             <div class="simple-footer">
-              Copyright &copy; Lokesh Palagani 2024
+              Copyright &copy; Adroit Infoactive Services 2024
             </div>
           </div>
         </div>

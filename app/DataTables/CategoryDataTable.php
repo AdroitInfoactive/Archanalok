@@ -37,6 +37,10 @@ class CategoryDataTable extends DataTable
             if ($query->image != null) {
                 return '<img src="' . asset( $query->image) . '" width="100px">';
             }
+        })->addColumn('main_category', function ($query) {
+            if ($query->main_category_id != null) {
+                return $query->mainCategory->name;
+            }
         })
         ->rawColumns(['action', 'status', 'image'])
         ->setRowId('id');
@@ -80,6 +84,7 @@ class CategoryDataTable extends DataTable
         return [
             Column::make('id'),
             Column::make('name'),
+            Column::make(data: 'main_category'),
             Column::make('image'),
             Column::make('status'),
 

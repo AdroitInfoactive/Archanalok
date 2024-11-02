@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\DataTables\MainCategoryDataTable;
+use App\Events\UrlRedirectCreated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\MainCategoryCreateRequest;
 use App\Http\Requests\Admin\MainCategoryUpdateRequest;
@@ -38,7 +39,7 @@ class MainCategoryController extends Controller
         $logoPath = $this->uploadImage($request, 'logo', '', '/uploads/logos');
         $mainCategory = new MainCategory();
         $mainCategory->name = $request->name;
-        $mainCategory->slug = generateUniqueSlug('MainCategory', $request->name);
+        $mainCategory->slug = $request->slug;
         $mainCategory->image = $imagePath;
         $mainCategory->logo = $logoPath;
         $mainCategory->description = $request->description;
@@ -79,7 +80,14 @@ class MainCategoryController extends Controller
         $imagePath = $this->uploadImage($request, 'image', $request->old_image, '/uploads');
         $logoPath = $this->uploadImage($request, 'logo', $request->old_logo, '/uploads/logos');
         $mainCategory->name = $request->name;
-        $mainCategory->slug = generateUniqueSlug('MainCategory', $request->name);
+        // if create-url-redirect is checked
+        if ($request->create_url_redirect) {
+            $mainCategory->slug = $request->slug;
+        }
+        else
+        {
+            $mainCategory->slug = $request->old_slug;
+        }
         // If no new image or logo is uploaded, keep the current path from the hidden input
         $mainCategory->image = $imagePath ?: $request->old_image;
         $mainCategory->logo = $logoPath ?: $request->old_logo;
@@ -90,6 +98,14 @@ class MainCategoryController extends Controller
         $mainCategory->position = $request->position;
 
         $mainCategory->save();
+
+        if ($request->create_url_redirect) {
+            $newUrl = $request->slug;
+            $oldUrl = $request->old_slug;
+
+            // Dispatch the event to save the URL redirect
+            event(new UrlRedirectCreated($oldUrl, $newUrl));
+        }
 
         toastr()->success('Product Main Category updated successfully');
         return to_route('admin.main-category.index');

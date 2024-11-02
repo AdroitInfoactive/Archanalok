@@ -37,6 +37,14 @@ class SubCategoryDataTable extends DataTable
             if ($query->image != null) {
                 return '<img src="' . asset( $query->image) . '" width="100px">';
             }
+        })->addColumn('category', function ($query) {
+            if ($query->category_id != null) {
+                return $query->category->name;
+            }
+        })->addColumn('main_category', function ($query) {
+            if ($query->main_category_id != null) {
+                return $query->mainCategory->name;
+            }
         })
         ->rawColumns(['action', 'status', 'image'])
         ->setRowId('id');
@@ -80,9 +88,10 @@ class SubCategoryDataTable extends DataTable
         return [
             Column::make('id'),
             Column::make('name'),
+            Column::make('main_category'),
+            Column::make('category'),
             Column::make('image'),
             Column::make('status'),
-
             Column::computed('action')
                 ->exportable(false)
                 ->printable(false)

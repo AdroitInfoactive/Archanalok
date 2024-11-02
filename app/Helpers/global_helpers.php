@@ -26,19 +26,15 @@ if (!function_exists('currencyPosition')) {
         }
     }
 }
-
-
 /* admin side bar active */
-    if (!function_exists('setSidebarActive')) {
-        function setSidebarActive(array $routes)
-        {
-            foreach($routes as $route){
-                if(request()->routeIs($route)){
-                    return 'active';
-                }
+if (!function_exists('setSidebarActive')) {
+    function setSidebarActive(array $routes)
+    {
+        foreach($routes as $route){
+            if(request()->routeIs($route)){
+                return 'active';
             }
-            return '';
         }
+        return '';
     }
-
-
+}
