@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\MainCategoryController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\SubCategoryController;
+use App\Http\Controllers\Admin\VariantDetailController;
+use App\Http\Controllers\Admin\VariantMasterController;
 
 Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
   Route::get('dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
@@ -24,6 +26,12 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
   Route::get('get-category/{mainCategoryId}', [SubCategoryController::class, 'getCategoriesByMainCategory'])->name('get-category.getCategoriesByMainCategory');
   Route::resource('sub-category', SubCategoryController::class);
 
+  /** varient Routes */
+  Route::resource('variant-master', VariantMasterController::class);
+  Route::post('variant-master/update-order', [VariantMasterController::class, 'updateOrder'])->name('variant-master.updateOrder');
+
+ /** varient details Routes */
+ Route::resource('variant-details', VariantDetailController::class);
 
   /** Setting Routes */
   Route::get('/setting', [SettingController::class, 'index'])->name('setting.index');

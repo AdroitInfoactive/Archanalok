@@ -12,19 +12,22 @@
     <link rel="stylesheet" href="{{ asset('admin/assets/modules/fontawesome/css/all.min.css') }}">
     <link rel="stylesheet" href="{{ asset('admin/assets/css/toastr.min.css') }}">
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="{{ asset('admin/assets/modules/bootstrap-timepicker/css/bootstrap-timepicker.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('admin/assets/modules/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css') }}">
+    <link rel="stylesheet"
+        href="{{ asset('admin/assets/modules/bootstrap-timepicker/css/bootstrap-timepicker.min.css') }}">
+    <link rel="stylesheet"
+        href="{{ asset('admin/assets/modules/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css') }}">
     <link rel="stylesheet" href="{{ asset('admin/assets/modules/select2/dist/css/select2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('admin/assets/modules/summernote/summernote-bs4.css') }}">
     <!-- Template CSS -->
     <link rel="stylesheet" href="{{ asset('admin/assets/css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('admin/assets/css/components.css') }}">
     <script>
-        var pusherKey = "{{config('settings.pusher_key') }}";
-        var pusherCluster = "{{config('settings.pusher_cluster') }}";
+        var pusherKey = "{{ config('settings.pusher_key') }}";
+        var pusherCluster = "{{ config('settings.pusher_cluster') }}";
     </script>
     @vite(['resources/js/app.js'])
 </head>
+
 <body>
     <div id="app">
         <div class="main-wrapper main-wrapper-1">
@@ -64,6 +67,8 @@
     <script src="{{ asset('admin/assets/js/custom.js') }}"></script>
     <script src="{{ asset('admin/assets/js/toastr.min.js') }}"></script>
     <script src="{{ asset('admin/assets/modules/upload-preview/assets/js/jquery.uploadPreview.min.js') }}"></script>
+
+
     <script>
         toastr.options.progressBar = true;
         @if ($errors->any())
@@ -75,29 +80,29 @@
     <script>
         // Function to handle going back
         function goBack() {
-        if (isFormChanged) {
-        Swal.fire({
-        title: 'You have unsaved changes.',
-        text: 'Are you sure you want to leave?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, leave',
-        cancelButtonText: 'Cancel'
-        }).then((result) => {
-        if (result.isConfirmed) {
-        suppressUnloadWarning = true; // Set flag to suppress unload warning
-        // If confirmed, go back
-        window.history.back();
+            if (isFormChanged) {
+                Swal.fire({
+                    title: 'You have unsaved changes.',
+                    text: 'Are you sure you want to leave?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, leave',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        suppressUnloadWarning = true; // Set flag to suppress unload warning
+                        // If confirmed, go back
+                        window.history.back();
+                    }
+                });
+            } else {
+                // Go back directly if no unsaved changes
+                window.history.back();
+            }
         }
-        });
-        } else {
-        // Go back directly if no unsaved changes
-        window.history.back();
-        }
-        }
-        
+
         $.uploadPreview({
             input_field: "#image-upload", // Default: .image-upload
             preview_box: "#image-preview", // Default: .image-preview
@@ -128,7 +133,9 @@
                             // headers: {
                             //     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                             // },
-                            data:{_token: '{{ csrf_token() }}'},
+                            data: {
+                                _token: '{{ csrf_token() }}'
+                            },
                             success: function(response) {
                                 if (response.status === 'success') {
                                     toastr.success(response.message);

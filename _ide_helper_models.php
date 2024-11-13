@@ -1,6 +1,7 @@
 <?php
 
 // @formatter:off
+// phpcs:ignoreFile
 /**
  * A helper file for your Eloquent Models
  * Copy the phpDocs from this file to the correct Model,
@@ -204,5 +205,58 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|User whereUpdatedAt($value)
  */
 	class User extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * App\Models\VariantDetail
+ *
+ * @property int $id
+ * @property int $variant_master_id
+ * @property string $name
+ * @property string $status
+ * @property int $position
+ * @property string|null $description
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\VariantMaster $variantMaster
+ * @method static \Illuminate\Database\Eloquent\Builder|VariantDetail newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|VariantDetail newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|VariantDetail query()
+ * @method static \Illuminate\Database\Eloquent\Builder|VariantDetail whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|VariantDetail whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|VariantDetail whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|VariantDetail whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|VariantDetail wherePosition($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|VariantDetail whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|VariantDetail whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|VariantDetail whereVariantMasterId($value)
+ */
+	class VariantDetail extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * App\Models\VariantMaster
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $status
+ * @property int $position
+ * @property string|null $description
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder|VariantMaster newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|VariantMaster newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|VariantMaster query()
+ * @method static \Illuminate\Database\Eloquent\Builder|VariantMaster whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|VariantMaster whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|VariantMaster whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|VariantMaster whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|VariantMaster wherePosition($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|VariantMaster whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|VariantMaster whereUpdatedAt($value)
+ */
+	class VariantMaster extends \Eloquent {}
 }
 

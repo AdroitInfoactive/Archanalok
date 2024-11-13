@@ -56,7 +56,7 @@
             <li><a class="nav-link"
                 href="#"><i class="fas fa-images"></i> <span>Banners</span></a></li>
                 <li
-                class="dropdown {{ setSidebarActive(['admin.category.*', 'admin.product.*', 'admin.main-category.*', 'admin.sub-category.*']) }}">
+                class="dropdown {{ setSidebarActive(['admin.category.*', 'admin.product.*', 'admin.main-category.*', 'admin.sub-category.*', 'admin.variant-master.*', 'admin.variant-details.*']) }}">
                 <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i
                         class="fas fa-shopping-cart"></i>
                     <span>Manage Products </span></a>
@@ -65,6 +65,8 @@
                     <li class="{{ setSidebarActive(['admin.category.*']) }}"><a class="nav-link" href="{{ route('admin.category.index') }}">Product Categories</a></li>
                     <li class="{{ setSidebarActive(['admin.sub-category.*']) }}"><a class="nav-link" href="{{ route('admin.sub-category.index') }}">Product Sub Categories</a></li>
                     <li class="{{ setSidebarActive(['admin.product.*']) }}"><a class="nav-link" href="">Products</a></li>
+                    <li class="{{ setSidebarActive(['admin.variant-master.*']) }}"><a class="nav-link" href="{{ route('admin.variant-master.index') }}">Variants</a></li>
+                    <li class="{{ setSidebarActive(['admin.variant-details.*']) }}"><a class="nav-link" href="{{ route('admin.variant-details.index') }}">Variants Details</a></li>
 
                     
                 </ul>
