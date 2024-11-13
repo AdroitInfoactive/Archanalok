@@ -107,3 +107,6 @@
     <button class="btn btn-danger go-back" type="button" onclick="goBack()">Go Back</button>
 </div>
 @endsection
+@push('scripts')
+    <script src="{{ asset('admin/assets/js/form-script.js') }}"></script>
+@endpush

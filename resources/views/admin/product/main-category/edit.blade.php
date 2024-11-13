@@ -74,14 +74,19 @@
                             <input type="text" name="slug" id="slug"
                                 value="{{ old('slug', $maincategory->slug) }}"
                                 class="form-control" />
-                                <input type="hidden" name="old_slug" value="{{ $maincategory->slug }}">
+                            <input type="hidden" name="old_slug" id="old-slug" value="{{ $maincategory->slug }}">
+                            <input type="hidden" name="new_slug" id="new-slug" value="{{ $maincategory->slug }}">
+                            <input type="hidden" name="full_old_slug" id="full-old-slug"
+                                value="{{ $maincategory->slug }}">
+                            <input type="hidden" name="full_new_slug" id="full-new-slug"
+                                value="{{ $maincategory->slug }}">
                             <div style="display: flex; align-items: center;">
                                 <input type="checkbox" id="create-url-redirect" name="create_url_redirect" value="1"
                                     style="display: none; margin-right: 5px;">
                                 <label for="create-url-redirect" id="redirect-label" style="display: none;">
                                     Create a URL redirect for<br>
                                     <strong>{{ old('slug', $maincategory->slug) }} → <span
-                                    id="generated-url"></span></strong>
+                                            id="generated-url"></span></strong>
                                 </label>
                             </div>
                         </div>
@@ -145,97 +150,18 @@
 @endsection
 @push('scripts')
     <script>
-        const isEditPage = true;
-
-    </script>
-    <script src="{{ asset('admin/assets/js/form-script.js') }}"></script>
-    <script>
-        // Original values for comparison
         const originalName = "{{ $maincategory->name }}";
         const originalDescription = "{{ $maincategory->description }}";
         const originalSeoTitle = "{{ $maincategory->seo_title }}";
         const originalSeoDescription = "{{ $maincategory->seo_description }}";
         const originalSlug = "{{ $maincategory->slug }}";
+        const isEditPage = true;
+        const level = 0;
 
-        let seoTitleEdited = false;
-        let seoDescriptionEdited = false;
-
-        document.getElementById('slug').addEventListener('input', function () {
-            const newSlug = this.value;
-
-            // Check if the slug has changed
-            if (newSlug !== originalSlug) {
-                document.getElementById('create-url-redirect').style.display = 'block'; // Show checkbox
-                document.getElementById('create-url-redirect').checked = true; // Check the checkbox
-                document.getElementById('redirect-label').style.display = 'block'; // Show label
-                document.getElementById('generated-url').textContent = newSlug; // Update generated URL
-
-                // Optionally: Add logic to auto-generate a slug from the name input
-                const generatedSlug = generateSlug(document.getElementById('slug').value);
-                if (generatedSlug) {
-                    // document.getElementById('slug').value = generatedSlug; // Update the slug input
-                    document.getElementById('generated-url').textContent = generatedSlug; // Update the generated URL
-                }
-            } else {
-                document.getElementById('create-url-redirect').style.display = 'none'; // Hide checkbox
-                document.getElementById('create-url-redirect').checked = false; // Uncheck the checkbox
-                document.getElementById('redirect-label').style.display = 'none'; // Hide label
-            }
-        });
-
-        // Handle input changes for name and update SEO title and slug if not manually edited
-        document.getElementById('name').addEventListener('input', function () {
-            const nameValue = this.value;
-            // Only update SEO Title if it matches the original name
-            if (originalSeoTitle === originalName) {
-                document.getElementById('seo_title').value = nameValue; // Update SEO Title
-                document.getElementById('preview-title').textContent = nameValue; // Update preview title
-            }
-        });
-
-        // Handle input changes for description and update SEO Description if not manually edited
-        document.getElementById('description').addEventListener('input', function () {
-            const descriptionValue = this.value;
-
-            // Only update SEO Description if it matches the original description
-            if (originalSeoDescription === originalDescription) {
-                document.getElementById('seo_description').value = descriptionValue; // Update SEO Description
-                document.getElementById('preview-description').textContent =
-                    descriptionValue; // Update preview description
-            }
-        });
-
-        // Set flag when SEO Title is manually edited
-        document.getElementById('seo_title').addEventListener('input', function () {
-            seoTitleEdited = true;
-            document.getElementById('preview-title').textContent = this.value;
-
-            // Reset flag if field is empty, so it can auto-update from name again
-            if (this.value.trim() === "") {
-                seoTitleEdited = false;
-                document.getElementById('preview-title').textContent = document.getElementById('name').value;
-            }
-        });
-
-        // Set flag when SEO Description is manually edited
-        document.getElementById('seo_description').addEventListener('input', function () {
-            seoDescriptionEdited = true;
-            document.getElementById('preview-description').textContent = this.value;
-
-            // Reset flag if field is empty, so it can auto-update from description again
-            if (this.value.trim() === "") {
-                seoDescriptionEdited = false;
-                document.getElementById('preview-description').textContent = document.getElementById(
-                    'description').value;
-            }
-        });
-
-        // Toggle SEO fields visibility
-        document.getElementById('edit-seo-btn').addEventListener('click', function () {
-            const seoFields = document.getElementById('seo-fields');
-            seoFields.style.display = seoFields.style.display === 'none' ? 'block' : 'none';
-        });
-
+    </script>
+    <script src="{{ asset('admin/assets/js/form-script.js') }}"></script>
+    <script src="{{ asset('admin/assets/js/seo-handler-edit.js') }}"></script>
+    <script>
         // Preview upload images
         $.uploadPreview({
             input_field: "#image-upload",

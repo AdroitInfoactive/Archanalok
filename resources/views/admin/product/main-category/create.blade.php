@@ -50,7 +50,6 @@
                 </div>
             </div>
         </div>
-
         <div class="col-md-3">
             <div class="card card-primary">
                 <div class="card-header">
@@ -76,7 +75,7 @@
                         <div class="preview-container">
                             <p class="preview-url" id="preview-url">
                                 {{ $actual_link = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://".$_SERVER['HTTP_HOST']."/" }}<span
-                                    id="generated-url-preview">{{ old('slug', 'example-category') }}</span>
+                                    id="generated-url-preview">{{ old('slug', 'example-main-category') }}</span>
                             </p>
                             <p class="preview-title" id="preview-title">
                                 {{ old('seo_title', 'Sample SEO Title') }}
@@ -89,7 +88,6 @@
                 </div>
             </div>
         </div>
-
         <div class="col-md-5">
             <div class="card card-primary">
                 <div class="card-header">
@@ -134,68 +132,11 @@
 @push('scripts')
     <script>
         const isEditPage = false;
-
+        const level = 0;
     </script>
     <script src="{{ asset('admin/assets/js/form-script.js') }}"></script>
+    <script src="{{ asset('admin/assets/js/seo-handler-create.js') }}"></script>
     <script>
-        let seoTitleEdited = false;
-        let seoDescriptionEdited = false;
-
-        // Handle input changes for name and update SEO title and slug if not manually edited
-        document.getElementById('name').addEventListener('input', function () {
-            const nameValue = this.value;
-            const generatedSlug = generateSlug(nameValue);
-            document.getElementById('generated-url-preview').textContent = generatedSlug; // Update preview slug
-            document.getElementById('slug').value = generatedSlug; // Update preview slug
-
-            if (!seoTitleEdited) {
-                document.getElementById('seo_title').value = nameValue; // Update SEO Title
-                document.getElementById('preview-title').textContent = nameValue; // Update preview title
-            }
-        });
-
-        // Handle input changes for description and update SEO Description if not manually edited
-        document.getElementById('description').addEventListener('input', function () {
-            const descriptionValue = this.value;
-
-            if (!seoDescriptionEdited) {
-                document.getElementById('seo_description').value = descriptionValue; // Update SEO Description
-                document.getElementById('preview-description').textContent =
-                    descriptionValue; // Update preview description
-            }
-        });
-
-        // Set flag when SEO Title is manually edited
-        document.getElementById('seo_title').addEventListener('input', function () {
-            seoTitleEdited = true;
-            document.getElementById('preview-title').textContent = this.value;
-
-            // Reset flag if field is empty, so it can auto-update from name again
-            if (this.value.trim() === "") {
-                seoTitleEdited = false;
-                document.getElementById('preview-title').textContent = document.getElementById('name').value;
-            }
-        });
-
-        // Set flag when SEO Description is manually edited
-        document.getElementById('seo_description').addEventListener('input', function () {
-            seoDescriptionEdited = true;
-            document.getElementById('preview-description').textContent = this.value;
-
-            // Reset flag if field is empty, so it can auto-update from description again
-            if (this.value.trim() === "") {
-                seoDescriptionEdited = false;
-                document.getElementById('preview-description').textContent = document.getElementById(
-                    'description').value;
-            }
-        });
-
-        // Toggle SEO fields visibility
-        document.getElementById('edit-seo-btn').addEventListener('click', function () {
-            const seoFields = document.getElementById('seo-fields');
-            seoFields.style.display = seoFields.style.display === 'none' ? 'block' : 'none';
-        });
-
         // Preview upload images
         $.uploadPreview({
             input_field: "#image-upload",

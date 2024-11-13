@@ -43,19 +43,22 @@
     </div>
     <div class="col-md-3">
         <div class="card card-primary">
-            <div class=" card-header">
-                <h4>SEO Details</h4>
+            <div class="card-header">
+                <h4>Search Engine Listing</h4>
             </div>
             <div class="card-body">
-                <div class="form-group">
-                    <label>SEO Title</label>
-                    <input type="text" name="seo_title" value="{{ $maincategory->seo_title }}"
-                        class="form-control read-only-field">
-                </div>
-                <div class="form-group">
-                    <label>SEO Description</label>
-                    <textarea name="seo_description"
-                        class="form-control read-only-field">{{ $maincategory->seo_description }}</textarea>
+                <div class="seo-preview">
+                    <div class="preview-container">
+                        <p class="preview-url" id="preview-url">
+                            {{ $actual_link = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://".$_SERVER['HTTP_HOST']."/" }}<span
+                                id="generated-url-preview">{{ old('slug', $maincategory->slug) }}</span>
+                        </p>
+                        <p class="preview-title" id="preview-title">
+                            {{ old('seo_title', $maincategory->seo_title) }}</p>
+                        <p class="preview-description" id="preview-description">
+                            {{ old('seo_description', $maincategory->seo_description) }}
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -97,3 +100,6 @@
     <button class="btn btn-danger go-back" type="button" onclick="goBack()">Go Back</button>
 </div>
 @endsection
+@push('scripts')
+    <script src="{{ asset('admin/assets/js/form-script.js') }}"></script>
+@endpush

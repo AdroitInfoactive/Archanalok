@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use App\Events\UrlRedirectCreated;
-use App\Listeners\SaveUrlRedirect;
+use App\Events\UrlRedirectCreateEvent;
+use App\Listeners\SaveUrlRedirectListener;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -20,9 +20,9 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
-        UrlRedirectCreated::class => [
-            SaveUrlRedirect::class,
-        ]
+        UrlRedirectCreateEvent::class => [
+            SaveUrlRedirectListener::class,
+        ],
     ];
 
     /**

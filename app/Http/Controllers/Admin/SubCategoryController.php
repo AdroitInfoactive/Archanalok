@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\DataTables\SubCategoryDataTable;
+use App\Events\UrlRedirectCreateEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\SubCategoryCreateRequest;
 use App\Http\Requests\Admin\SubCategoryUpdateRequest;
@@ -86,7 +87,13 @@ class SubCategoryController extends Controller
         $subcategory->name = $request->name;
         $subcategory->main_category_id = $request->main_category_id;
         $subcategory->category_id = $request->category_id;
-        $subcategory->slug = generateUniqueSlug('SubCategory', $request->name);
+        if ($request->create_url_redirect) {
+            $subcategory->slug = $request->new_slug;
+        }
+        else
+        {
+            $subcategory->slug = $request->old_slug;
+        }
         $subcategory->image = $imagePath ?: $subcategory->image;
         $subcategory->description = $request->description;
         $subcategory->seo_title = $request->seo_title;
@@ -94,6 +101,12 @@ class SubCategoryController extends Controller
         $subcategory->status = $request->status;
         $subcategory->position = $request->position;
         $subcategory->save();
+        if ($request->create_url_redirect) {
+            $from_url = $request->full_old_slug;
+            $to_url = $request->full_new_slug;
+
+            event(new UrlRedirectCreateEvent($from_url, $to_url));
+        }
         toastr()->success('Product Sub Category Updated Successfully');
         return to_route('admin.sub-category.index');
 

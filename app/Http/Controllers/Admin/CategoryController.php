@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\DataTables\CategoryDataTable;
+use App\Events\UrlRedirectCreateEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\CategoryCreateReques;
 use App\Models\Category;
@@ -39,7 +40,7 @@ class CategoryController extends Controller
         $category = new Category();
         $category->name = $request->name;
         $category->main_category_id = $request->main_category_id;
-        $category->slug = generateUniqueSlug('Category', $request->name);
+        $category->slug = $request->slug;
         $category->image = $imagePath;
         $category->description = $request->description;
         $category->seo_title = $request->seo_title;
@@ -79,7 +80,13 @@ class CategoryController extends Controller
         $imagePath = $this->uploadImage($request, 'image', $category->image, '/uploads');
         $category->name = $request->name;
         $category->main_category_id = $request->main_category_id;
-        $category->slug = generateUniqueSlug('Category', $request->name);
+        if ($request->create_url_redirect) {
+            $category->slug = $request->new_slug;
+        }
+        else
+        {
+            $category->slug = $request->old_slug;
+        }
         $category->image = $imagePath ?: $category->image;
         $category->description = $request->description;
         $category->seo_title = $request->seo_title;
@@ -87,6 +94,13 @@ class CategoryController extends Controller
         $category->status = $request->status;
         $category->position = $request->position;
         $category->save();
+
+        if ($request->create_url_redirect) {
+            $from_url = $request->full_old_slug;
+            $to_url = $request->full_new_slug;
+
+            event(new UrlRedirectCreateEvent($from_url, $to_url));
+        }
         toastr()->success('Product Category Updated Successfully');
         return to_route('admin.category.index');
     }

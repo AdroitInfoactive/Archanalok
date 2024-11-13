@@ -34,4 +34,11 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
   Route::put('/appearance-setting', [SettingController::class, 'UpdateAppearanceSetting'])->name('appearance-setting.update');
   Route::put('/seo-setting', [SettingController::class, 'UpdateSeoSetting'])->name('seo-setting.update');
 
+  Route::get('/test-event', function () {
+
+  event(new \App\Events\SimpleEvent());
+
+  return 'Event dispatched';
+  });
+
 });

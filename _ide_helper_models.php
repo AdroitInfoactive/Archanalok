@@ -151,6 +151,27 @@ namespace App\Models{
 
 namespace App\Models{
 /**
+ * App\Models\UrlRedirect
+ *
+ * @property int $id
+ * @property string $from_url
+ * @property string $to_url
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder|UrlRedirect newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|UrlRedirect newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|UrlRedirect query()
+ * @method static \Illuminate\Database\Eloquent\Builder|UrlRedirect whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UrlRedirect whereFromUrl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UrlRedirect whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UrlRedirect whereToUrl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UrlRedirect whereUpdatedAt($value)
+ */
+	class UrlRedirect extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
  * App\Models\User
  *
  * @property int $id

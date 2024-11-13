@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\DataTables\MainCategoryDataTable;
-use App\Events\UrlRedirectCreated;
+use App\Events\UrlRedirectCreateEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\MainCategoryCreateRequest;
 use App\Http\Requests\Admin\MainCategoryUpdateRequest;
@@ -82,7 +82,7 @@ class MainCategoryController extends Controller
         $mainCategory->name = $request->name;
         // if create-url-redirect is checked
         if ($request->create_url_redirect) {
-            $mainCategory->slug = $request->slug;
+            $mainCategory->slug = $request->new_slug;
         }
         else
         {
@@ -96,15 +96,13 @@ class MainCategoryController extends Controller
         $mainCategory->seo_description = $request->seo_description;
         $mainCategory->status = $request->status;
         $mainCategory->position = $request->position;
-
         $mainCategory->save();
 
         if ($request->create_url_redirect) {
-            $newUrl = $request->slug;
-            $oldUrl = $request->old_slug;
+            $from_url = $request->full_old_slug;
+            $to_url = $request->full_new_slug;
 
-            // Dispatch the event to save the URL redirect
-            event(new UrlRedirectCreated($oldUrl, $newUrl));
+            event(new UrlRedirectCreateEvent($from_url, $to_url));
         }
 
         toastr()->success('Product Main Category updated successfully');

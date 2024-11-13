@@ -24,24 +24,27 @@
                     <div class="form-group row">
                         <div class="col-md-6">
                             <label>Main Category</label>
-                            <select name="main_category_id" class="form-control select2">
+                            <select name="main_category_id" id="mainCategorySelect" onchange="generate_full_slug();"
+                                class="form-control select2">
                                 <option value="">Select</option>
                                 @foreach($maincategories as $maincat)
                                     <option value="{{ $maincat->id }}" @selected($category->main_category_id ==
-                                        $maincat->id)>{{ $maincat->name }}</option>
+                                        $maincat->id) data-slug="{{ $maincat->slug }}">{{ $maincat->name }}</option>
                                 @endforeach
                             </select>
+                            <input type="hidden" name="main-categoty-slug" id="main-category-slug"
+                                value="{{ $category->mainCategory->slug }}">
                         </div>
                         <div class="col-md-6">
                             <label>Name *</label>
-                            <input type="text" name="name"
+                            <input type="text" name="name" id="name"
                                 value="{{ old('name', $category->name) }}"
                                 class="form-control">
                         </div>
                     </div>
                     <div class="form-group">
                         <label>Description</label>
-                        <textarea name="description"
+                        <textarea name="description" id="description"
                             class="form-control ">{{ old('description', $category->description) }}</textarea>
                     </div>
                     <div class="form-group row">
@@ -65,19 +68,57 @@
         <div class="col-md-4">
             <div class="card card-primary">
                 <div class="card-header">
-                    <h4>SEO Details</h4>
+                    <h4>Search Engine Listing</h4>
+                    <button type="button" id="edit-seo-btn" class="btn btn-sm float-right">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>
                 </div>
                 <div class="card-body">
-                    <div class="form-group">
-                        <label>SEO Title</label>
-                        <input type="text" name="seo_title"
-                            value="{{ old('seo_title', $category->seo_title) }}"
-                            class="form-control">
+                    <div id="seo-fields" style="display: none;">
+                        <div class="form-group">
+                            <label>SEO Title</label>
+                            <input type="text" name="seo_title" id="seo_title"
+                                value="{{ old('seo_title', $category->seo_title) }}"
+                                class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>SEO Description</label>
+                            <textarea name="seo_description" id="seo_description"
+                                class="form-control">{{ old('seo_description', $category->seo_description) }}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>URL Handle</label>
+                            <input type="text" name="slug" id="slug"
+                                value="{{ old('slug', $category->slug) }}"
+                                class="form-control" />
+                            <input type="hidden" name="old_slug" id="old-slug" value="{{ $category->slug }}">
+                            <input type="hidden" name="new_slug" id="new-slug" value="{{ $category->slug }}">
+                            <input type="hidden" name="full_old_slug" id="full-old-slug" value="{{ $category->slug }}">
+                            <input type="hidden" name="full_new_slug" id="full-new-slug" value="{{ $category->slug }}">
+                            <div style="display: flex; align-items: center;">
+                                <input type="checkbox" id="create-url-redirect" name="create_url_redirect" value="1"
+                                    style="display: none; margin-right: 5px;">
+                                <label for="create-url-redirect" id="redirect-label" style="display: none;">
+                                    Create a URL redirect for<br>
+                                    <strong>{{ old('slug', $category->slug) }} → <span
+                                            id="generated-url"></span></strong>
+                                </label>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>SEO Description</label>
-                        <textarea name="seo_description"
-                            class="form-control">{{ old('seo_description', $category->seo_description) }}</textarea>
+                    <div class="seo-preview">
+                        <div class="preview-container">
+                            <p class="preview-url" id="preview-url">
+                                {{ $actual_link = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://".$_SERVER['HTTP_HOST']."/" }}<span
+                                    id="generated-main-category-url">{{ old('slug', $category->mainCategory->slug) }}</span>/<span
+                                    id="generated-url-preview">{{ old('slug', $category->slug) }}</span>
+                            </p>
+                            <p class="preview-title" id="preview-title">
+                                {{ old('seo_title', $category->seo_title) }}</p>
+                            <p class="preview-description" id="preview-description">
+                                {{ old('seo_description', $category->seo_description) }}
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -109,6 +150,18 @@
 
 @endsection
 @push('scripts')
+    <script>
+        const originalName = "{{ $category->name }}";
+        const originalDescription = "{{ $category->description }}";
+        const originalSeoTitle = "{{ $category->seo_title }}";
+        const originalSeoDescription = "{{ $category->seo_description }}";
+        const originalSlug = "{{ $category->slug }}";
+        const isEditPage = true;
+        const level = 1;
+
+    </script>
+    <script src="{{ asset('admin/assets/js/form-script.js') }}"></script>
+    <script src="{{ asset('admin/assets/js/seo-handler-edit.js') }}"></script>
     <script>
         $(document).ready(function () {
             $('.image-preview').css({

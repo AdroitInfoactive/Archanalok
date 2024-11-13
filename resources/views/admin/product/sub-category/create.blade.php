@@ -5,7 +5,7 @@
         <span onclick="goBack()" style="cursor: pointer; font-size: 1.5em;">
             <i class="fas fa-arrow-left"></i>
         </span>&nbsp;
-        <h1>Add Sub-Category</h1>
+        <h1>Add Product Sub Category</h1>
     </div>
 </section>
 
@@ -16,7 +16,7 @@
         <div class="col-md-4">
             <div class="card card-primary">
                 <div class="card-header">
-                    <h4>Sub-Category Details</h4>
+                    <h4>Sub Category Details</h4>
                 </div>
                 <div class="card-body">
                     <div class="form-group row">
@@ -25,9 +25,11 @@
                             <select name="main_category_id" class="form-control select2" id="mainCategorySelect">
                                 <option value="">Select</option>
                                 @foreach($maincategories as $maincat)
-                                    <option value="{{ $maincat->id }}">{{ $maincat->name }}</option>
+                                    <option value="{{ $maincat->id }}" data-slug="{{ $maincat->slug }}">
+                                        {{ $maincat->name }}</option>
                                 @endforeach
                             </select>
+                            <input type="hidden" name="main-categoty-slug" id="main-category-slug" value="">
                         </div>
                         <div class="col-md-6">
                             <label>Category</label>
@@ -35,15 +37,18 @@
                                 <option value="">Select</option>
                                 <!-- Options will be populated by JavaScript -->
                             </select>
+                            <input type="hidden" name="categoty-slug" id="category-slug" value="">
                         </div>
                     </div>
                     <div class="form-group">
                         <label>Name *</label>
-                        <input type="text" name="name" value="{{ old('name') }}" class="form-control">
+                        <input type="text" name="name" id="name" value="{{ old('name') }}"
+                            class="form-control">
+                        <input type="hidden" name="slug" id="slug" value="{{ old('slug') }}">
                     </div>
                     <div class="form-group">
                         <label>Description</label>
-                        <textarea name="description"
+                        <textarea name="description" id="description"
                             class="form-control">{{ old('description') }}</textarea>
                     </div>
                     <div class="form-group row">
@@ -67,18 +72,39 @@
         <div class="col-md-4">
             <div class="card card-primary">
                 <div class="card-header">
-                    <h4>SEO Details</h4>
+                    <h4>Search Engine Listing</h4>
+                    <button type="button" id="edit-seo-btn" class="btn btn-sm float-right">
+                        <i class="fas fa-pencil-alt"></i> <!-- Pencil icon -->
+                    </button>
                 </div>
                 <div class="card-body">
-                    <div class="form-group">
-                        <label>Seo Title</label>
-                        <input type="text" name="seo_title" value="{{ old('seo_title') }}"
-                            class="form-control">
+                    <div id="seo-fields" style="display: none;">
+                        <div class="form-group">
+                            <label>SEO Title</label>
+                            <input type="text" name="seo_title" id="seo_title"
+                                value="{{ old('seo_title') }}" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>SEO Description</label>
+                            <textarea name="seo_description" id="seo_description"
+                                class="form-control">{{ old('seo_description') }}</textarea>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Seo Description</label>
-                        <textarea name="seo_description"
-                            class="form-control">{{ old('seo_description') }}</textarea>
+                    <div class="seo-preview">
+                        <div class="preview-container">
+                            <p class="preview-url" id="preview-url">
+                                {{ $actual_link = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://".$_SERVER['HTTP_HOST']."/" }}<span
+                                    id="generated-main-category-url">{{ old('slug', 'example-main-category') }}</span>/<span
+                                    id="generated-category-url">{{ old('slug', 'example-category') }}</span>/<span
+                                    id="generated-url-preview">{{ old('slug', 'example-sub-category') }}</span>
+                            </p>
+                            <p class="preview-title" id="preview-title">
+                                {{ old('seo_title', 'Sample SEO Title') }}
+                            </p>
+                            <p class="preview-description" id="preview-description">
+                                {{ old('seo_description', 'This is a sample description that appears in search results.') }}
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -111,6 +137,13 @@
 
 @push('scripts')
     <script>
+        const isEditPage = false;
+        const level = 2;
+
+    </script>
+    <script src="{{ asset('admin/assets/js/form-script.js') }}"></script>
+    <script src="{{ asset('admin/assets/js/seo-handler-create.js') }}"></script>
+    <script>
         $('#mainCategorySelect').on('change', function () {
             var mainCategoryId = this.value;
             if (mainCategoryId) {
@@ -122,7 +155,8 @@
                         $('#categorySelect').empty().append('<option value="">Select</option>');
                         $.each(data, function (key, value) {
                             $('#categorySelect').append('<option value="' + value.id +
-                                '">' + value.name + '</option>');
+                                '" data-slug="' + value.slug + '">' + value.name +
+                                '</option>');
                         });
                     },
                     error: function (data) {
@@ -133,7 +167,6 @@
                 $('#categorySelect').empty().append('<option value="">Select</option>');
             }
         });
-
         $.uploadPreview({
             input_field: "#image-upload", // Default: .image-upload
             preview_box: "#image-preview", // Default: .image-preview
