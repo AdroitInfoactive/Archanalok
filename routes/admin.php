@@ -1,13 +1,23 @@
 <?php
 
+use App\Http\Controllers\Admin\AboutController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\BannerSliderController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\ContactController;
+use App\Http\Controllers\Admin\CounterController;
+use App\Http\Controllers\Admin\FooterInfoController;
+use App\Http\Controllers\Admin\HomeInfoController;
 use App\Http\Controllers\Admin\MainCategoryBannerController;
 use App\Http\Controllers\Admin\MainCategoryController;
+use App\Http\Controllers\Admin\PrivacyPolicyController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\ReturnPolicyController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\ShippingPolicyController;
+use App\Http\Controllers\Admin\SocialLinkController;
 use App\Http\Controllers\Admin\SubCategoryController;
+use App\Http\Controllers\Admin\TermsAndCoditionController;
 use App\Http\Controllers\Admin\VariantDetailController;
 use App\Http\Controllers\Admin\VariantMasterController;
 
@@ -43,7 +53,46 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
   /** Banner Slider Routes */
   Route::resource('banner-slider', BannerSliderController::class);
 
+    /** Counter Routes */
+    Route::get('counter', [CounterController::class, 'index'])->name('counter.index');
+    Route::put('counter', [CounterController::class, 'update'])->name('counter.update');
 
+  /** About Routes */
+  Route::get('about', [AboutController::class, 'index'])->name('about.index');
+  Route::put('about', [AboutController::class, 'update'])->name('about.update');
+
+    /** HomeInfo Routes */
+    Route::get('home-info', [HomeInfoController::class, 'index'])->name('home-info.index');
+    Route::put('home-info', [HomeInfoController::class, 'update'])->name('home-info.update');
+
+  /** Privacy policy Routes */
+  Route::get('privacy-policy', [PrivacyPolicyController::class, 'index'])->name('privacy-policy.index');
+  Route::put('privacy-policy', [PrivacyPolicyController::class, 'update'])->name('privacy-policy.update');
+
+  /** Terms and Conditions Routes */
+  Route::get('terms-and-conditions', [TermsAndCoditionController::class, 'index'])->name('terms-and-conditions.index');
+  Route::put('terms-and-conditions', [TermsAndCoditionController::class, 'update'])->name('terms-and-conditions.update');
+
+  /** Return policy Routes */
+  Route::get('return-policy', [ReturnPolicyController::class, 'index'])->name('return-policy.index');
+  Route::put('return-policy', [ReturnPolicyController::class, 'update'])->name('return-policy.update');
+
+  /** Shipping policy Routes */
+  Route::get('shipping-policy', [ShippingPolicyController::class, 'index'])->name('shipping-policy.index');
+  Route::put('shipping-policy', [ShippingPolicyController::class, 'update'])->name('shipping-policy.update');
+
+  /** Contact Routes */
+  Route::get('contact', [ContactController::class, 'index'])->name('contact.index');
+  Route::put('contact', [ContactController::class, 'update'])->name('contact.update');
+
+  
+  /** Social Links Routes */
+  Route::resource('social-link', SocialLinkController::class);
+
+      /** Footer Routes */
+      Route::get('footer-info', [FooterInfoController::class, 'index'])->name('footer-info.index');
+      Route::put('footer-info', [FooterInfoController::class, 'update'])->name('footer-info.update');
+  
 
   /** Setting Routes */
   Route::get('/setting', [SettingController::class, 'index'])->name('setting.index');

@@ -1,0 +1,50 @@
+/*!
+*    ______ _       _   _
+*    |  ____| |     | | (_)
+*    | |__  | | __ _| |_ _  ___ ___  _ __
+*    |  __| | |/ _` | __| |/ __/ _ \| '_ \
+*    | |    | | (_| | |_| | (_| (_) | | | |
+*    |_|    |_|\__,_|\__|_|\___\___/|_| |_|
+*
+*         https://www.flaticon.com
+*/
+
+@font-face {
+    font-family: "flaticon_mycollection";
+    src: url("../fonts/flaticon_mycollection.woff2?c095bb056957375dc99727071435aa5e") format("woff2"),
+url("../fonts/flaticon_mycollection.woff?c095bb056957375dc99727071435aa5e") format("woff"),
+url("../fonts/flaticon_mycollection.eot?c095bb056957375dc99727071435aa5e#iefix") format("embedded-opentype"),
+url("../fonts/flaticon_mycollection.ttf?c095bb056957375dc99727071435aa5e") format("truetype"),
+url("../fonts/flaticon_mycollection.svg?c095bb056957375dc99727071435aa5e#flaticon_mycollection") format("svg")
+}
+
+i[class^="flaticon-"]:before, i[class*=" flaticon-"]:before {
+    font-family: flaticon_mycollection !important;
+    font-style: normal;
+    font-weight: normal !important;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.flaticon-door:before {
+    content: "\f101";
+}
+.flaticon-floor:before {
+    content: "\f102";
+}
+.flaticon-photo:before {
+    content: "\f103";
+}
+.flaticon-floor-1:before {
+    content: "\f104";
+}
+.flaticon-stationery-stacked-papers:before {
+    content: "\f105";
+}
+.flaticon-pvc:before {
+    content: "\f106";
+}
+

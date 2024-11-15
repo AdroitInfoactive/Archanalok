@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminAuthController;
+use App\Http\Controllers\Frontend\FrontendController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -18,3 +19,5 @@ Route::group(['middleware' => 'guest'], function () {
 
 
 require __DIR__.'/auth.php';
+/** Show Home page */
+Route::get('/', [FrontendController::class, 'index'])->name('home');

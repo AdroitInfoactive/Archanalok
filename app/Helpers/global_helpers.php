@@ -38,3 +38,11 @@ if (!function_exists('setSidebarActive')) {
         return '';
     }
 }
+if (!function_exists('insertBreaks')) {
+    function insertBreaks($text, $wordsPerLine =6)
+    {
+        $words = explode(' ', $text); // Split the string into words
+        $chunks = array_chunk($words, $wordsPerLine); // Split into chunks of 5 words
+        return implode('<br>', array_map(fn($chunk) => implode(' ', $chunk), $chunks));
+    }
+}
