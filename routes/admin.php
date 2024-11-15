@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\BannerSliderController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\MainCategoryBannerController;
 use App\Http\Controllers\Admin\MainCategoryController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\SettingController;
@@ -20,6 +22,11 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
   Route::put('profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
   /** maincategory Routes */
   Route::resource('main-category', MainCategoryController::class);
+
+    /**Product maincategory banners Routes */
+    Route::get('main-category-banner/{product}', [MainCategoryBannerController::class, 'index'])->name('main-category-banner.show.index');
+    Route::resource('main-category-banner', MainCategoryBannerController::class);
+
   /** Category Routes */
   Route::resource('category', CategoryController::class);
   /** subcategory Routes */
@@ -32,6 +39,11 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
 
  /** varient details Routes */
  Route::resource('variant-details', VariantDetailController::class);
+
+  /** Banner Slider Routes */
+  Route::resource('banner-slider', BannerSliderController::class);
+
+
 
   /** Setting Routes */
   Route::get('/setting', [SettingController::class, 'index'])->name('setting.index');

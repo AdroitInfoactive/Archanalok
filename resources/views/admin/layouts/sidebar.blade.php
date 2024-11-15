@@ -40,10 +40,10 @@
 <div class="main-sidebar sidebar-style-2">
     <aside id="sidebar-wrapper">
         <div class="sidebar-brand">
-            <a href="{{ route('admin.dashboard') }}">Home</a>
+            <a href="{{ route('admin.dashboard') }}">Archanlok</a>
         </div>
         <div class="sidebar-brand sidebar-brand-sm">
-            <a href="{{ route('admin.dashboard') }}">Home</a>
+            <a href="{{ route('admin.dashboard') }}">A</a>
         </div>
         <ul class="sidebar-menu">
             <li class="menu-header">Dashboard</li>
@@ -52,28 +52,27 @@
                     <span>Dashboard</span></a>
             </li>
 
-            <li class="menu-header">Starter</li>
-            <li><a class="nav-link"
-                href="#"><i class="fas fa-images"></i> <span>Banners</span></a></li>
+            <li class="menu-header">Archanlok</li>
+            
+                <li class="{{ setSidebarActive(['admin.banner-slider.*']) }}"><a class="nav-link"
+                    href="{{ route('admin.banner-slider.index') }}"><i class="fas fa-images"></i><span>Banner Slider</span></a></li>
                 <li
-                class="dropdown {{ setSidebarActive(['admin.category.*', 'admin.product.*', 'admin.main-category.*', 'admin.sub-category.*', 'admin.variant-master.*', 'admin.variant-details.*']) }}">
+                class="dropdown {{ setSidebarActive(['admin.category.*', 'admin.product.*', 'admin.main-category.*', 'admin.sub-category.*', 'admin.variant-master.*', 'admin.variant-details.*','admin.main-category-banner.*']) }}">
                 <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i
                         class="fas fa-shopping-cart"></i>
                     <span>Manage Products </span></a>
                 <ul class="dropdown-menu">
-                    <li class="{{ setSidebarActive(['admin.main-category.*']) }}"><a class="nav-link" href="{{ route('admin.main-category.index') }}">Product Main Categories</a></li>
+                    <li class="{{ setSidebarActive(['admin.main-category.*', 'admin.main-category-banner.*']) }}"><a class="nav-link" href="{{ route('admin.main-category.index') }}">Product Main Categories</a></li>
                     <li class="{{ setSidebarActive(['admin.category.*']) }}"><a class="nav-link" href="{{ route('admin.category.index') }}">Product Categories</a></li>
                     <li class="{{ setSidebarActive(['admin.sub-category.*']) }}"><a class="nav-link" href="{{ route('admin.sub-category.index') }}">Product Sub Categories</a></li>
-                    <li class="{{ setSidebarActive(['admin.product.*']) }}"><a class="nav-link" href="">Products</a></li>
+                   
                     <li class="{{ setSidebarActive(['admin.variant-master.*']) }}"><a class="nav-link" href="{{ route('admin.variant-master.index') }}">Variants</a></li>
                     <li class="{{ setSidebarActive(['admin.variant-details.*']) }}"><a class="nav-link" href="{{ route('admin.variant-details.index') }}">Variants Details</a></li>
 
                     
                 </ul>
             </li>
-          {{--  <li class="{{ setSidebarActive(['admin.slider.*']) }}"><a class="nav-link"
-                    href="{{ route('admin.slider.index') }}"><i class="fas fa-images"></i>
-                    <span>Slider</span></a></li> --}}
+          
       
                     <li class="{{ setSidebarActive(['admin.setting.index']) }}"><a class="nav-link"
                         href="{{ route('admin.setting.index') }}"><i class="fas fa-cogs"></i>
