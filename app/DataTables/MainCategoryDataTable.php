@@ -23,10 +23,19 @@ class MainCategoryDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
         ->addColumn('action', function ($query) {
-            $view = '<a href="' . route('admin.main-category.show', $query->id) . '" class="btn btn-success btn-sm"><i class="fa fa-eye"></i></a>';
-            $edit = '<a href="' . route('admin.main-category.edit', $query->id) . '" class="btn btn-primary btn-sm ml-2 mr-2"><i class="fa fa-edit"></i></a>';
-            $delete = '<a href="' . route('admin.main-category.destroy', $query->id) . '" class="btn btn-danger delete-item btn-sm "><i class="fa fa-trash"></i></a>';
-            return $view. $edit . $delete;
+            $view = '<a href="' . route('admin.main-category.show', $query->id) . '" class="btn btn-success btn-sm mr-1"><i class="fa fa-eye"></i></a>';
+            $edit = '<a href="' . route('admin.main-category.edit', $query->id) . '" class="btn btn-primary btn-sm mr-1"><i class="fa fa-edit"></i></a>';
+            $delete = '<a href="' . route('admin.main-category.destroy', $query->id) . '" class="btn btn-danger btn-sm delete-item"><i class="fa fa-trash"></i></a>';
+            
+            $more = '<div class="btn-group dropleft ml-1">
+                        <button type="button" class="btn btn-dark btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="' . route('admin.main-category-banner.show', $query->id) . '">Banners</a>
+                        </div>
+                     </div>';
+            return '<div class="d-flex align-items-center">' . $view . $edit . $delete . $more . '</div>';
         })->addColumn('status', function ($query) {
             if ($query->status == 1) {
                 return '<span class="badge badge-success">Active</span>';

@@ -1,0 +1,117 @@
+@font-face {
+  font-family: 'icomoon';
+  src:  url('../fonts/icomoon0695.eot?jgm5da');
+  src:  url('../fonts/icomoon0695.eot?jgm5da#iefix') format('embedded-opentype'),
+    url('../fonts/icomoon0695.ttf?jgm5da') format('truetype'),
+    url('../fonts/icomoon0695.woff?jgm5da') format('woff'),
+    url('../fonts/icomoon0695.svg?jgm5da#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^="fishto-"], [class*=" fishto-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'icomoon';
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.fishto-bag1fishto:before {
+  content: "\e900";
+}
+.fishto-fish1fishto:before {
+  content: "\e901";
+}
+.fishto-clown-fishfishto:before {
+  content: "\e902";
+}
+.fishto-bucketfishto:before {
+  content: "\e903";
+}
+.fishto-fish-foodfishto:before {
+  content: "\e904";
+}
+.fishto-hookfishto:before {
+  content: "\e905";
+}
+.fishto-fishing-netfishto:before {
+  content: "\e906";
+}
+.fishto-rodfishto:before {
+  content: "\e907";
+}
+.fishto-fishfishto:before {
+  content: "\e908";
+}
+.fishto-fuelfishto:before {
+  content: "\e909";
+}
+.fishto-diving-gogglesfishto:before {
+  content: "\e90a";
+}
+.fishto-tridentfishto:before {
+  content: "\e90b";
+}
+.fishto-meshfishto:before {
+  content: "\e90c";
+}
+.fishto-fishing-baitsfishto:before {
+  content: "\e90d";
+}
+.fishto-reelfishto:before {
+  content: "\e90e";
+}
+.fishto-lobsterfishto:before {
+  content: "\e90f";
+}
+.fishto-pliersfishto:before {
+  content: "\e910";
+}
+.fishto-rod1fishto:before {
+  content: "\e911";
+}
+.fishto-reel1fishto:before {
+  content: "\e912";
+}
+.fishto-fishing-baits1fishto:before {
+  content: "\e913";
+}
+.fishto-bootfishto:before {
+  content: "\e914";
+}
+.fishto-pondfishto:before {
+  content: "\e915";
+}
+.fishto-swordfishfishto:before {
+  content: "\e916";
+}
+.fishto-vestfishto:before {
+  content: "\e917";
+}
+.fishto-bagfishto:before {
+  content: "\e918";
+}
+.fishto-fishing-baits3fishto:before {
+  content: "\e919";
+}
+.fishto-fishing-baits2fishto:before {
+  content: "\e91a";
+}
+.fishto-boatfishto:before {
+  content: "\e91b";
+}
+.fishto-fishing-net1fishto:before {
+  content: "\e91c";
+}
+.fishto-earthwormfishto:before {
+  content: "\e91d";
+}
