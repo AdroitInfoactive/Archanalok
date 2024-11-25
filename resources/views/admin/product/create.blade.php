@@ -1,89 +1,103 @@
 @extends('admin.layouts.master')
-@section('content')
-    <section class="section">
-        <div class="section-header">
-            <h1> Products</h1>
-        </div>
-    </section>
-    <div class="card card-primary">
-        <div class="card-header">
-            <h4>Add Product</h4>
 
-        </div>
-        <div class="card-body">
-            <form action="{{ route('admin.product.store') }}" method="post" enctype="multipart/form-data">
-                @csrf
+@section('content')
+<div class="container">
+    <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        <!-- Product Details -->
+        <div class="card mb-4">
+            <div class="card-header">Product Details</div>
+            <div class="card-body">
                 <div class="form-group">
-                    <div id="image-preview" class="image-preview">
-                        <label for="image-upload" id="image-label">Choose File</label>
-                        <input type="file" name="image" id="image-upload" />
+                    <label for="title">Title</label>
+                    <input type="text" name="title" id="title" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea name="description" id="description" class="form-control"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="media">Media</label>
+                    <input type="file" name="media[]" id="media" class="form-control" multiple>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pricing and Inventory -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">Pricing</div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="price">Price</label>
+                            <input type="number" name="price" id="price" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="compare_at_price">Compare-at Price</label>
+                            <input type="number" name="compare_at_price" id="compare_at_price" class="form-control">
+                        </div>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label>Name</label>
-                    <input type="text" name="name" value="{{ old('name') }}" class="form-control">
+            </div>
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">Inventory</div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="quantity">Quantity</label>
+                            <input type="number" name="quantity" id="quantity" class="form-control" required>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" name="track_inventory" id="track_inventory" class="form-check-input" checked>
+                            <label for="track_inventory" class="form-check-label">Track Inventory</label>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Category</label>
-                    <select name="category" class="form-control select2">
-                        <option value="">Select</option>
-                        @foreach ($categories as $category)
-                            <option value="{{ $category->id }}">{{ $category->name }}</option>
-                        @endforeach
-
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Price</label>
-                    <input type="text" name="price" value="{{ old('price') }}" class="form-control">
-                </div>
-
-                <div class="form-group">
-                    <label>Offer Price</label>
-                    <input type="text" name="offer_price" value="{{ old('offer_price') }}" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label>Quantity</label>
-                    <input type="text" name="quantity" value="{{ old('quantity') }}" class="form-control">
-                </div>
-
-                <div class="form-group">
-                    <label>Short Description</label>
-                    <textarea name="short_description"  class="form-control">{{ old('short_description') }}</textarea>
-                </div>
-                <div class="form-group">
-                    <label>Long Description</label>
-                    <textarea name="long_description"  class="form-control summernote">{{ old('long_description') }}</textarea>
-                </div>
-                <div class="form-group">
-                    <label>Sku</label>
-                    <input type="text" name="sku" value="{{ old('sku') }}" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label>Seo Title</label>
-                    <input type="text" name="seo_title" value="{{ old('seo_title') }}" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label>Seo Description</label>
-                    <textarea name="seo_description" class="form-control">{{ old('seo_description') }}</textarea>
-                </div>
-                <div class="form-group">
-                    <label>Show At Home</label>
-                    <select name="show_at_home" class="form-control">
-                        <option value="1">Yes</option>
-                        <option selected value="0">No</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Status</label>
-                    <select name="status" class="form-control">
-                        <option value="1">Active</option>
-                        <option value="0">Inactive</option>
-                    </select>
-                </div>
-                <button class="btn btn-primary btn-lg" type="submit">Create</button>
-            </form>
-
+            </div>
         </div>
-    </div>
+
+        <!-- Variants Section -->
+        <div class="card mb-4">
+            <div class="card-header">Variants</div>
+            <div class="card-body">
+                <div id="variant-container">
+                    <!-- Variants will be dynamically added here -->
+                </div>
+                <button type="button" class="btn btn-primary" id="add-variant">Add Variant</button>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-success">Save Product</button>
+    </form>
+</div>
+@endsection
+
+@section('scripts')
+<script>
+    $(document).ready(function() {
+        // Add new variant dynamically
+        $('#add-variant').on('click', function() {
+            let variantHtml = `
+                <div class="form-group row">
+                    <div class="col-md-4">
+                        <input type="text" name="variant_names[]" class="form-control" placeholder="Variant Name">
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" name="variant_values[]" class="form-control" placeholder="Variant Value">
+                    </div>
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-danger remove-variant">Remove</button>
+                    </div>
+                </div>
+            `;
+            $('#variant-container').append(variantHtml);
+        });
+
+        // Remove a variant
+        $(document).on('click', '.remove-variant', function() {
+            $(this).closest('.form-group').remove();
+        });
+    });
+</script>
 @endsection

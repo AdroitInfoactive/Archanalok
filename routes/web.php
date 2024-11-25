@@ -21,3 +21,6 @@ Route::group(['middleware' => 'guest'], function () {
 require __DIR__.'/auth.php';
 /** Show Home page */
 Route::get('/', [FrontendController::class, 'index'])->name('home');
+
+/** Newsletter Routes */
+Route::post('/subscribe-newsletter', [FrontendController::class, 'subscribeNewsletter'])->name('subscribe-newsletter');

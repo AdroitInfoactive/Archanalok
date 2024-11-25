@@ -58,7 +58,7 @@
                     href="{{ route('admin.banner-slider.index') }}"><i class="fas fa-images"></i><span>Banner
                         Slider</span></a></li>
             <li
-                class="dropdown {{ setSidebarActive(['admin.category.*', 'admin.product.*', 'admin.main-category.*', 'admin.sub-category.*', 'admin.variant-master.*', 'admin.variant-details.*', 'admin.main-category-banner.*']) }}">
+                class="dropdown {{ setSidebarActive(['admin.category.*', 'admin.product.*', 'admin.main-category.*', 'admin.sub-category.*', 'admin.variant-master.*', 'admin.variant-details.*', 'admin.main-category-banner.*', 'admin.products.*']) }}">
                 <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i
                         class="fas fa-shopping-cart"></i>
                     <span>Manage Products </span></a>
@@ -75,6 +75,9 @@
                             href="{{ route('admin.variant-master.index') }}">Variants</a></li>
                     <li class="{{ setSidebarActive(['admin.variant-details.*']) }}"><a class="nav-link"
                             href="{{ route('admin.variant-details.index') }}">Variants Details</a></li>
+
+                    <li class="{{ setSidebarActive(['admin.products.*']) }}"><a class="nav-link"
+                            href="{{ route('admin.products.index') }}">Products</a></li>
 
 
                 </ul>
@@ -101,6 +104,10 @@
 
                 </ul>
             </li>
+            <li class="{{ setSidebarActive(['admin.news-letter.index']) }}"><a class="nav-link"
+                href="{{ route('admin.news-letter.index') }}"><i class="fas fa-newspaper"></i>
+                <span>News Letter</span></a></li>
+
             <li
             class="dropdown {{ setSidebarActive(['admin.counter.*','admin.home-info.*']) }}">
             <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-stream"></i>

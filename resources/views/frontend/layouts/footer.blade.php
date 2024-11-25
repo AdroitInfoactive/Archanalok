@@ -2,7 +2,7 @@
 <footer class="footer light-bg">
     <div class="container">
         <div class="row">
-            <div class="col-lg-3 col-md-6 col-6">
+            <div class="col-12 col-sm-6 col-md-3">
                 <aside class="widget">
                     @if (@$footerInfo->short_info)
                     <h3 class="widget-title">{{ @$footerInfo->short_info }}</h3>
@@ -30,7 +30,7 @@
                     @endif
                 </aside>
             </div>
-            <div class="col-lg-2 col-md-6">
+            <div class="col-12 col-sm-6 col-md-2">
                 <aside class="widget">
                     <h3 class="widget-title">Quick Links</h3>
                     <ul>
@@ -45,7 +45,7 @@
                     </ul>
                 </aside>
             </div>
-            <div class="col-lg-3 col-md-6 col-6">
+            <div class="col-12 col-sm-6 col-md-2">
                 <aside class="widget">
                     <h3 class="widget-title">Products</h3>
                     <ul>
@@ -57,12 +57,25 @@
                     </ul>
                 </aside>
             </div>
-            <div class="col-lg-3 col-md-6 col-6">
+            <div class="col-12 col-sm-6 col-md-2">
+                <aside class="widget">
+                    <h3 class="widget-title">Policies</h3>
+                    <ul>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Return Policy</a></li>
+                        <li><a href="#">Shipping Policy</a></li>
+                        <li><a href="#">Terms & Conditions</a></li>
+                       
+                    </ul>
+                </aside>
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
                 <aside class="widget widget_mc4wp_form_widget">
                     <h3 class="widget-title">Subscribe</h3>
-                    <form class="mc4wp-form" method="post">
-                        <input type="email" name="EMAIL" placeholder="Email" required="">
-                        <input type="submit" value="Subscribe">
+                    <form class="mc4wp-form subscribe_form" method="post">
+                        @csrf
+                        <input type="email" name="email" placeholder="Email" >
+                        <button type="submit" class="subscribe_btn">Subscribe</button>
                     </form>
                 </aside>
                 <p>Get the latest updates via email. Any time you may unsubscribe</p>
@@ -84,6 +97,7 @@
         <!-- Copryrgint End -->
     </div>
 </footer>
+
 <div class="sbuttons">
     <a href="#" target="_blank" class="sbutton whatsapp" tooltip="WhatsApp"><i
             class="fab fa-whatsapp"></i></a>
@@ -95,3 +109,42 @@
             class="fab fa-instagram"></i></a>
     <a target="_blank" class="sbutton mainsbutton" tooltip="Share"><i class="fas fa-share-alt"></i></a>
 </div>
+@push('scripts')
+    <script>
+        $(document).ready(function(){
+            $('.subscribe_form').on('submit', function(e) {
+                e.preventDefault();
+                let formData = $(this).serialize();
+                $.ajax({
+                    method: 'POST',
+                    url: '{{ route("subscribe-newsletter") }}',
+                    data: formData,
+                    beforeSend: function(){
+                        $('.subscribe_btn').attr('disabled', true);
+                        $('.subscribe_btn').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
+                    },
+                    success: function(response) {
+                        $('.subscribe_form').trigger("reset");
+                        $('.subscribe_btn').attr('disabled', false);
+                        $('.subscribe_btn').html('Subscribe');
+                        toastr.success(response.message);
+                    },
+                    error: function(xhr, status, error) {
+                        let errors = xhr.responseJSON.errors;
+
+                        $.each(errors, function(index, value){
+                            toastr.error(value);
+                        });
+
+                        $('.subscribe_btn').attr('disabled', true);
+                        $('.subscribe_btn').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
+                    },
+                    complete: function(){
+                        $('.subscribe_btn').attr('disabled', false);
+                        $('.subscribe_btn').html('Subscribe');
+                    }
+                })
+            })
+        })
+    </script>
+@endpush

@@ -10,7 +10,9 @@ use App\Http\Controllers\Admin\FooterInfoController;
 use App\Http\Controllers\Admin\HomeInfoController;
 use App\Http\Controllers\Admin\MainCategoryBannerController;
 use App\Http\Controllers\Admin\MainCategoryController;
+use App\Http\Controllers\Admin\NewsLetterController;
 use App\Http\Controllers\Admin\PrivacyPolicyController;
+use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\ReturnPolicyController;
 use App\Http\Controllers\Admin\SettingController;
@@ -49,6 +51,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
 
  /** varient details Routes */
  Route::resource('variant-details', VariantDetailController::class);
+
+ /** Product Routes */
+ Route::resource('products', ProductController::class);
 
   /** Banner Slider Routes */
   Route::resource('banner-slider', BannerSliderController::class);
@@ -93,6 +98,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
       Route::get('footer-info', [FooterInfoController::class, 'index'])->name('footer-info.index');
       Route::put('footer-info', [FooterInfoController::class, 'update'])->name('footer-info.update');
   
+        /** News letter Routes */
+  Route::get('news-letter', [NewsLetterController::class, 'index'])->name('news-letter.index');
+  Route::post('news-letter', [NewsLetterController::class, 'sendNewsLetter'])->name('news-letter.send');
 
   /** Setting Routes */
   Route::get('/setting', [SettingController::class, 'index'])->name('setting.index');

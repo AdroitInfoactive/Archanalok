@@ -21,6 +21,7 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('frontend/css/flaticon_mycollection.css') }}">
     <link rel="stylesheet" href="{{ asset('frontend/css/theme.css') }}">
     <link rel="stylesheet" href="{{ asset('frontend/css/responsive.css') }}">
+    <link rel="stylesheet" href="{{ asset('frontend/css/toastr.min.css') }}">
     <!-- End Include All CSS -->
     <link  rel="shortcut icon" type="image/png" href="{{ asset('frontend/images/favicon.ico') }}">
     <link rel="apple-touch-icon" href="apple-touch-icon.png" />
@@ -146,7 +147,24 @@
     <script src="{{ asset('frontend/js/jquery-ui.js') }}"></script>
     <script src="{{ asset('frontend/js/theme.js') }}"></script>
     <!-- End Include All JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('frontend/js/toastr.min.js') }}"></script>
+    <script>
+        toastr.options.progressBar = true;
+        @if ($errors->any())
+            @foreach ($errors->all() as $error)
+                toastr.error("{{ $error }}");
+            @endforeach
+        @endif
+        // set csrf token as a header
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+    </script>
     @include('frontend.layouts.global-scripts')
+    
     @stack('scripts')
 </body>
 </html>

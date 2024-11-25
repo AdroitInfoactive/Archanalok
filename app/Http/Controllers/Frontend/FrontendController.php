@@ -7,8 +7,11 @@ use App\Models\BannerSlider;
 use App\Models\Counter;
 use App\Models\FooterInfo;
 use App\Models\HomeInfo;
+use App\Models\Subscriber;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Mail;
 
 class FrontendController extends Controller
 {
@@ -71,4 +74,16 @@ class FrontendController extends Controller
     {
         //
     }
+    function subscribeNewsletter(Request $request) : Response
+{
+    $request->validate([
+        'email' => ['required', 'email', 'max:255', 'unique:subscribers,email']
+    ], ['email.unique' => 'Email is already subscribed!']);
+
+    $subscriber = new Subscriber();
+    $subscriber->email = $request->email;
+    $subscriber->save();
+
+    return response(['status' => 'success', 'message' => 'Subscribed Successfully!']);
+}
 }
