@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\VariantMaster;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -20,7 +21,17 @@ class ProductController extends Controller
      */
     public function create()
     {
-        return view('admin.product.create');
+        $variantMasters = VariantMaster::with('details')->get();
+        return view('admin.product.create', compact('variantMasters'));
+    }
+    public function uploadMedia(Request $request)
+    {
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $path = $file->store('uploads', 'public');
+            return response()->json(['path' => $path], 200);
+        }
+        return response()->json(['error' => 'No file uploaded'], 400);
     }
 
     /**

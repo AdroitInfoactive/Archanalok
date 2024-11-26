@@ -13,4 +13,5 @@ class VariantDetail extends Model
     {
         return $this->belongsTo(VariantMaster::class);
     }
+   
 }

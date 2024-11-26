@@ -12,4 +12,9 @@ class VariantMaster extends Model
     protected $fillable = [
         'name',
     ];
+    public function details()
+{
+    return $this->hasMany(VariantDetail::class, 'variant_master_id');
 }
+}
+

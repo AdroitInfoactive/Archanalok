@@ -54,6 +54,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
 
  /** Product Routes */
  Route::resource('products', ProductController::class);
+ Route::post('/products/upload-media', [ProductController::class, 'uploadMedia'])->name('products.uploadMedia');
 
   /** Banner Slider Routes */
   Route::resource('banner-slider', BannerSliderController::class);
