@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AboutController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\BannerSliderController;
+use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\CounterController;
@@ -45,6 +46,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
   Route::get('get-category/{mainCategoryId}', [SubCategoryController::class, 'getCategoriesByMainCategory'])->name('get-category.getCategoriesByMainCategory');
   Route::resource('sub-category', SubCategoryController::class);
 
+  /** Brand Routes */
+  Route::resource('brand', BrandController::class);
+  
   /** varient Routes */
   Route::resource('variant-master', VariantMasterController::class);
   Route::post('variant-master/update-order', [VariantMasterController::class, 'updateOrder'])->name('variant-master.updateOrder');
