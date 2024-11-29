@@ -35,9 +35,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
   /** maincategory Routes */
   Route::resource('main-category', MainCategoryController::class);
 
-    /**Product maincategory banners Routes */
-    Route::get('main-category-banner/{product}', [MainCategoryBannerController::class, 'index'])->name('main-category-banner.show.index');
-    Route::resource('main-category-banner', MainCategoryBannerController::class);
+  /**Product maincategory banners Routes */
+  Route::get('main-category-banner/{product}', [MainCategoryBannerController::class, 'index'])->name('main-category-banner.show.index');
+  Route::resource('main-category-banner', MainCategoryBannerController::class);
 
   /** Category Routes */
   Route::resource('category', CategoryController::class);
@@ -49,27 +49,30 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
   Route::resource('variant-master', VariantMasterController::class);
   Route::post('variant-master/update-order', [VariantMasterController::class, 'updateOrder'])->name('variant-master.updateOrder');
 
- /** varient details Routes */
- Route::resource('variant-details', VariantDetailController::class);
+  /** varient details Routes */
+  Route::resource('variant-details', VariantDetailController::class);
 
  /** Product Routes */
- Route::resource('products', ProductController::class);
- Route::post('/products/upload-media', [ProductController::class, 'uploadMedia'])->name('products.uploadMedia');
+  Route::resource('products', ProductController::class);
+  Route::post('/products/update-image-order', [ProductController::class,
+  'updateImageOrder'])->name('products.updateImageOrder');
+  Route::post('/products/delete-image', [ProductController::class, 'deleteImage'])->name('products.deleteImage');
+
 
   /** Banner Slider Routes */
   Route::resource('banner-slider', BannerSliderController::class);
 
-    /** Counter Routes */
-    Route::get('counter', [CounterController::class, 'index'])->name('counter.index');
-    Route::put('counter', [CounterController::class, 'update'])->name('counter.update');
+  /** Counter Routes */
+  Route::get('counter', [CounterController::class, 'index'])->name('counter.index');
+  Route::put('counter', [CounterController::class, 'update'])->name('counter.update');
 
   /** About Routes */
   Route::get('about', [AboutController::class, 'index'])->name('about.index');
   Route::put('about', [AboutController::class, 'update'])->name('about.update');
 
-    /** HomeInfo Routes */
-    Route::get('home-info', [HomeInfoController::class, 'index'])->name('home-info.index');
-    Route::put('home-info', [HomeInfoController::class, 'update'])->name('home-info.update');
+  /** HomeInfo Routes */
+  Route::get('home-info', [HomeInfoController::class, 'index'])->name('home-info.index');
+  Route::put('home-info', [HomeInfoController::class, 'update'])->name('home-info.update');
 
   /** Privacy policy Routes */
   Route::get('privacy-policy', [PrivacyPolicyController::class, 'index'])->name('privacy-policy.index');
@@ -91,15 +94,14 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
   Route::get('contact', [ContactController::class, 'index'])->name('contact.index');
   Route::put('contact', [ContactController::class, 'update'])->name('contact.update');
 
-  
   /** Social Links Routes */
   Route::resource('social-link', SocialLinkController::class);
 
-      /** Footer Routes */
-      Route::get('footer-info', [FooterInfoController::class, 'index'])->name('footer-info.index');
-      Route::put('footer-info', [FooterInfoController::class, 'update'])->name('footer-info.update');
-  
-        /** News letter Routes */
+  /** Footer Routes */
+  Route::get('footer-info', [FooterInfoController::class, 'index'])->name('footer-info.index');
+  Route::put('footer-info', [FooterInfoController::class, 'update'])->name('footer-info.update');
+
+  /** News letter Routes */
   Route::get('news-letter', [NewsLetterController::class, 'index'])->name('news-letter.index');
   Route::post('news-letter', [NewsLetterController::class, 'sendNewsLetter'])->name('news-letter.send');
 
@@ -111,12 +113,5 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
   Route::put('/logo-setting', [SettingController::class, 'UpdateLogoSetting'])->name('logo-setting.update');
   Route::put('/appearance-setting', [SettingController::class, 'UpdateAppearanceSetting'])->name('appearance-setting.update');
   Route::put('/seo-setting', [SettingController::class, 'UpdateSeoSetting'])->name('seo-setting.update');
-
-  Route::get('/test-event', function () {
-
-  event(new \App\Events\SimpleEvent());
-
-  return 'Event dispatched';
-  });
 
 });

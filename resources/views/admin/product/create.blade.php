@@ -1,6 +1,157 @@
 @extends('admin.layouts.master')
 
+
 @section('content')
+<style>
+    /* Media Container */
+    .media-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    /* Media Item */
+    .media-item {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+        overflow: hidden;
+    }
+
+    /* Larger First Image */
+    .media-item-large {
+        width: 200px;
+        height: 200px;
+    }
+
+    /* Smaller Images */
+    .media-item-small,
+    .add-image-placeholder {
+        width: 120px;
+        height: 120px;
+    }
+
+    /* Image Styling */
+    .media-item img {
+        width: 100%;
+        /* Fit inside container */
+        height: 100%;
+        /* Fit inside container */
+        object-fit: cover;
+    }
+
+    /* Checkbox Styling */
+    .image-checkbox {
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        z-index: 10;
+    }
+
+    /* Add Image Placeholder */
+    .add-image-placeholder {
+        border: 2px dashed #ccc;
+        cursor: pointer;
+        background-color: #f9f9f9;
+    }
+
+    /* Delete Button */
+    #delete-selected {
+        position: relative;
+        z-index: 5;
+    }
+
+    /* Media Container */
+    .media-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    /* Media Item */
+    .media-item {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+        overflow: hidden;
+    }
+
+    /* Larger First Image */
+    .media-item-large {
+        width: 200px;
+        height: 200px;
+    }
+
+    /* Smaller Images */
+    .media-item-small,
+    .add-image-placeholder {
+        width: 200px;
+        height: 200px;
+    }
+
+    /* Image Styling */
+    .media-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* Checkbox Styling */
+    .image-checkbox {
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        z-index: 10;
+    }
+
+    /* Add Image Placeholder */
+    .add-image-placeholder {
+        border: 2px dashed #ccc;
+        cursor: pointer;
+        background-color: #f9f9f9;
+    }
+
+    .add-image-placeholder:hover {
+        background-color: #eaeaea;
+    }
+
+    .add-image-icon {
+        width: 100px;
+        /* Fixed size for SVG icon container */
+        height: 40px;
+    }
+
+    .add-image-icon svg {
+        width: 100%;
+        height: 100%;
+    }
+
+    /* Drag-and-Drop Styling */
+    .dropzone {
+        position: relative;
+        min-height: 200px;
+        border: 2px dashed #ccc;
+        border-radius: 10px;
+        padding: 10px;
+        transition: background-color 0.3s ease;
+    }
+
+    .dropzone.dragover {
+        background-color: #f1f8ff;
+        border-color: #007bff;
+    }
+
+</style>
 <section class="section">
     <div class="section-header">
         <h1>Create Product</h1>
@@ -13,7 +164,9 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card mb-4">
-                    <div class="card-header">Product Details</div>
+                    <div class="card-header">
+                        <h4>Product Details</h4>
+                    </div>
                     <div class="card-body">
                         <div class="form-group">
                             <label for="title">Title</label>
@@ -23,62 +176,40 @@
                             <label for="description">Description</label>
                             <textarea name="description" id="description" class="form-control summernote"></textarea>
                         </div>
-                        <div class="form-group">
-                            <label for="media">Media</label>
-                            <div id="media-uploader" class="dropzone">
-                                <div class="dz-message">Drag & drop files here or click to upload</div>
-                            </div>
-                        </div>
-                        
-                        <!-- Hidden file input for selecting multiple images -->
-                        <input type="file" id="file-input" name="media[]" accept="image/*" style="display: none;" multiple>
-                        
-                        
-                        <div class="form-group">
-                            <label for="is_variant">Product Has Variant</label>
-                            <div class="form-check">
-                                <input type="checkbox" name="is_variant" id="is_variant" class="form-check-input">
-                                <label for="is_variant" class="form-check-label">Yes</label>
-                            </div>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5>Images</h5>
+                            <button type="button" id="delete-selected" class="btn btn-danger d-none">Delete
+                                Selected</button>
                         </div>
 
-                        <!-- Price Section -->
-                        <div id="price_section" class="d-none">
-                            <div class="form-group">
-                                <label for="price">Price</label>
-                                <input type="number" name="price" id="price" class="form-control">
-                            </div>
-                        </div>
+                        <!-- Media Container -->
+                        <div id="media-container" class="media-container d-flex flex-wrap gap-3 dropzone">
+                            <!-- Existing images will appear here -->
+                            @if(isset($product) && $product->images)
+                                @foreach($product->images as $image)
+                                    <div class="media-item {{ $loop->first ? 'media-item-large' : 'media-item-small' }}"
+                                        data-id="{{ $image->id }}">
+                                        <input type="checkbox" class="image-checkbox" data-id="{{ $image->id }}">
+                                        <img src="{{ asset('storage/' . $image->path) }}"
+                                            alt="Product Image" class="img-thumbnail">
+                                    </div>
+                                @endforeach
+                            @endif
 
-                        <!-- Variant Selection -->
-                        <div id="variants_section" class="d-none">
-                            <div class="form-group">
-                                <label for="variant_masters">Select Variant Masters</label>
-                                <select name="variant_masters[]" id="variant_masters" class="form-control select2" multiple>
-                                    @foreach ($variantMasters as $variantMaster)
-                                        <option value="{{ $variantMaster->id }}">{{ $variantMaster->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <button type="button" id="generate_variants" class="btn btn-primary btn-sm">Generate Variants</button>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Generated Variants</label>
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>Variant</th>
-                                            <th>Price</th>
-                                            <th>Stock</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="variant_list">
-                                        <!-- Generated rows will appear here -->
-                                    </tbody>
-                                </table>
+                            <!-- Add Image Placeholder -->
+                            <div class="media-item add-image-placeholder" id="add-image-placeholder">
+                                <label for="file-input">
+                                    <div class="add-image-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round" class="svg-icon">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg> or <br> Drap & Drop to Upload Files
+                                    </div>
+                                </label>
+                                <input type="file" id="file-input" name="media[]" class="d-none" accept="image/*"
+                                    multiple>
                             </div>
                         </div>
                     </div>
@@ -92,101 +223,133 @@
 @endsection
 
 @push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const isVariantCheckbox = document.getElementById('is_variant');
-        const priceSection = document.getElementById('price_section');
-        const variantsSection = document.getElementById('variants_section');
-        const generateVariantsBtn = document.getElementById('generate_variants');
-        const variantList = document.getElementById('variant_list');
-        const variantMasters = document.getElementById('variant_masters');
 
-        // Toggle sections based on checkbox
-        isVariantCheckbox.addEventListener('change', function() {
-            if (this.checked) {
-                priceSection.classList.add('d-none');
-                variantsSection.classList.remove('d-none');
-            } else {
-                priceSection.classList.remove('d-none');
-                variantsSection.classList.add('d-none');
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script>
+        const mediaContainer = document.getElementById('media-container');
+        const deleteButton = document.getElementById('delete-selected');
+
+        // Initialize Sortable
+        new Sortable(mediaContainer, {
+            animation: 150,
+            handle: '.media-item',
+            draggable: '.media-item',
+            onEnd: () => {
+                updateImageOrder();
             }
         });
 
-        // Generate variant combinations
-        generateVariantsBtn.addEventListener('click', function() {
-            const selectedOptions = Array.from(variantMasters.selectedOptions).map(option => option.text);
-            
-            if (selectedOptions.length === 0) {
-                alert('Please select at least one variant master.');
+        // File Input Change Handler
+        document.getElementById('file-input').addEventListener('change', (event) => {
+            const files = Array.from(event.target.files);
+
+            files.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const div = document.createElement('div');
+                    div.classList.add('media-item', 'media-item-small');
+                    div.innerHTML = `
+                        <input type="checkbox" class="image-checkbox">
+                        <img src="${e.target.result}" alt="Uploaded Image">
+                    `;
+                    mediaContainer.insertBefore(div, document.getElementById(
+                        'add-image-placeholder'));
+                };
+                reader.readAsDataURL(file);
+            });
+
+            // Clear input to allow same file uploads
+            event.target.value = '';
+        });
+
+        // Handle Checkbox Selection
+        mediaContainer.addEventListener('change', () => {
+            const selectedCheckboxes = document.querySelectorAll('.image-checkbox:checked');
+            deleteButton.classList.toggle('d-none', selectedCheckboxes.length === 0);
+        });
+
+        // Delete Selected Images
+        deleteButton.addEventListener('click', () => {
+            const selected = Array.from(document.querySelectorAll('.image-checkbox:checked')).map(cb => cb
+                .closest('.media-item'));
+
+            if (selected.length === 0) {
+                alert('No images selected!');
                 return;
             }
 
-            variantList.innerHTML = ''; // Clear previous variants
-
-            // Generate combinations (example: Color-Size)
-            const combinations = getCombinations(selectedOptions);
-
-            combinations.forEach(combination => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${combination}</td>
-                    <td><input type="number" name="variant_prices[]" class="form-control" placeholder="Price"></td>
-                    <td><input type="number" name="variant_stocks[]" class="form-control" placeholder="Stock"></td>
-                `;
-                variantList.appendChild(row);
-            });
+            selected.forEach(item => item.remove());
+            deleteButton.classList.add('d-none');
         });
 
-        // Helper function to generate combinations
-        function getCombinations(array) {
-            const result = [];
-            const helper = (prefix, index) => {
-                for (let i = index; i < array.length; i++) {
-                    const current = prefix ? `${prefix}-${array[i]}` : array[i];
-                    result.push(current);
-                    helper(current, i + 1);
-                }
-            };
-            helper('', 0);
-            return result;
-        }
-    });
-    Dropzone.options.mediaUploader = {
-        url: '/your-upload-url', // Set your upload URL here
-        maxFilesize: 2, // Maximum file size in MB
-        acceptedFiles: "image/*", // Only image files allowed
-        autoProcessQueue: false, // Disable automatic file processing on drop
-        addRemoveLinks: true, // Optionally show remove links
-        init: function() {
-            var dz = this;
+        // Update Image Order (AJAX request placeholder)
+        function updateImageOrder() {
+            const order = Array.from(mediaContainer.children)
+                .filter((item) => !item.classList.contains('add-image-placeholder'))
+                .map((item, index) => ({
+                    id: item.dataset.id,
+                    order: index
+                }));
 
-            // Handle when files are added to Dropzone
-            this.on("addedfile", function(file) {
-                // If using the hidden file input, trigger it
-                document.getElementById('file-input').click();
+            console.log('Updated order:', order);
+            // Perform AJAX request if necessary
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const mediaContainer = document.getElementById('media-container');
+            const fileInput = document.getElementById('file-input');
+
+            // Add event listeners for drag-and-drop
+            mediaContainer.addEventListener('dragover', (event) => {
+                event.preventDefault();
+                mediaContainer.classList.add('dragover');
             });
 
-            // Optionally handle success and error cases
-            this.on("success", function(file, response) {
-                // Handle success response, if needed
+            mediaContainer.addEventListener('dragleave', (event) => {
+                event.preventDefault();
+                mediaContainer.classList.remove('dragover');
             });
-        }
-    };
 
-    // Trigger file input click on dropzone click
-    document.getElementById('media-uploader').addEventListener('click', function () {
-        document.getElementById('file-input').click();
-    });
+            mediaContainer.addEventListener('drop', (event) => {
+                event.preventDefault();
+                mediaContainer.classList.remove('dragover');
 
-    // When a file is selected via file input, add it to Dropzone
-    document.getElementById('file-input').addEventListener('change', function (e) {
-        var files = e.target.files;
-        for (var i = 0; i < files.length; i++) {
-            // Manually add the selected files to Dropzone
-            Dropzone.forElement("#media-uploader").addFile(files[i]);
-        }
-    });
+                const files = Array.from(event.dataTransfer.files);
+                handleFiles(files);
+            });
 
-</script>
+            // File Input Change Event
+            fileInput.addEventListener('change', (event) => {
+                const files = Array.from(event.target.files);
+                handleFiles(files);
+            });
+
+            // Function to handle dropped or selected files
+            function handleFiles(files) {
+                files.forEach((file) => {
+                    if (!file.type.startsWith('image/')) {
+                        alert('Only image files are allowed.');
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const div = document.createElement('div');
+                        div.classList.add('media-item', 'media-item-small');
+                        div.innerHTML = `
+        <input type="checkbox" class="image-checkbox">
+        <img src="${e.target.result}" alt="Uploaded Image">
+        `;
+                        mediaContainer.insertBefore(div, document.getElementById(
+                            'add-image-placeholder'));
+                    };
+                    reader.readAsDataURL(file);
+                });
+
+                // Reset the file input to allow re-uploading the same file
+                fileInput.value = '';
+            }
+        });
+
+    </script>
 @endpush
-
