@@ -4,14 +4,14 @@ namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CategoryUpdateReques extends FormRequest
+class CategoryCreateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,12 @@ class CategoryUpdateReques extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => ['required', 'max:255'],
+            'main_category_id' => ['required', 'integer'],
+            'description' => ['nullable'],
+            'image' => ['nullable', 'image'],
+            'status' => ['required', 'boolean'],
+            'position' => ['required', 'integer'],
         ];
     }
 }

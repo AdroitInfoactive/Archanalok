@@ -31,7 +31,7 @@
                     </div>
                     <div class="form-group row">
                         <div class="col-md-6">
-                            <label>Priority</label>
+                            <label>Priority *</label>
                             <input type="number" name="position" value="{{ old('position') }}"
                                 class="form-control" min="1">
                         </div>

@@ -61,6 +61,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
   Route::post('/products/update-image-order', [ProductController::class,
   'updateImageOrder'])->name('products.updateImageOrder');
   Route::post('/products/delete-image', [ProductController::class, 'deleteImage'])->name('products.deleteImage');
+  Route::get('/products/download-sample-import-excel-sheet', [ProductController::class,
+  'generateImportExcelSheet'])->name('products.generateImportExcelSheet');
 
 
   /** Banner Slider Routes */

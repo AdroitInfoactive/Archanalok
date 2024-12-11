@@ -23,7 +23,7 @@
                 <div class="card-body">
                     <div class="form-group row">
                         <div class="col-md-6">
-                            <label>Main Category</label>
+                            <label>Main Category *</label>
                             <select name="main_category_id" id="mainCategorySelect" onchange="generate_full_slug();"
                                 class="form-control select2">
                                 <option value="">Select</option>
@@ -49,7 +49,7 @@
                     </div>
                     <div class="form-group row">
                         <div class="col-md-6">
-                            <label>Priority</label>
+                            <label>Priority *</label>
                             <input type="text" name="position"
                                 value="{{ old('position', $category->position) }}"
                                 class="form-control">

@@ -5,7 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\DataTables\CategoryDataTable;
 use App\Events\UrlRedirectCreateEvent;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\CategoryCreateReques;
+use App\Http\Requests\Admin\CategoryCreateRequest;
+use App\Http\Requests\Admin\CategoryUpdateRequest;
 use App\Models\Category;
 use App\Models\MainCategory;
 use App\Traits\FileUploadTrait;
@@ -34,7 +35,7 @@ class CategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(CategoryCreateReques $request)
+    public function store(CategoryCreateRequest $request)
     {
         $imagePath = $this->uploadImage($request, 'image', '', '/uploads');
         $category = new Category();
@@ -74,7 +75,7 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(CategoryUpdateRequest $request, string $id)
     {
         $category = Category::findOrFail($id);
         $imagePath = $this->uploadImage($request, 'image', $category->image, '/uploads');

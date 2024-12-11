@@ -1,0 +1,340 @@
+.container-custom {
+    max-width: 1600px;
+}
+/* Media Container */
+.media-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+/* Media Item */
+.media-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    overflow: hidden;
+}
+
+/* Larger First Image */
+.media-item-large {
+    width: 200px;
+    height: 200px;
+}
+
+/* Smaller Images */
+.media-item-small,
+.add-image-placeholder {
+    width: 120px;
+    height: 120px;
+}
+
+/* Image Styling */
+.media-item img {
+    width: 100%;
+    /* Fit inside container */
+    height: 100%;
+    /* Fit inside container */
+    object-fit: cover;
+}
+
+/* Checkbox Styling */
+.image-checkbox {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    z-index: 10;
+}
+
+/* Add Image Placeholder */
+.add-image-placeholder {
+    border: 2px dashed #ccc;
+    cursor: pointer;
+    background-color: #f9f9f9;
+}
+
+/* Delete Button */
+#delete-selected {
+    position: relative;
+    z-index: 5;
+}
+
+/* Media Container */
+.media-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+/* Media Item */
+.media-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    overflow: hidden;
+}
+
+/* Larger First Image */
+.media-item-large {
+    width: 200px;
+    height: 200px;
+}
+
+/* Smaller Images */
+.media-item-small,
+.add-image-placeholder {
+    width: 200px;
+    height: 200px;
+}
+
+/* Image Styling */
+.media-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Checkbox Styling */
+.image-checkbox {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    z-index: 10;
+}
+
+/* Add Image Placeholder */
+.add-image-placeholder {
+    border: 2px dashed #ccc;
+    cursor: pointer;
+    background-color: #f9f9f9;
+}
+
+.add-image-placeholder:hover {
+    background-color: #eaeaea;
+}
+
+.add-image-icon {
+    width: 100px;
+    /* Fixed size for SVG icon container */
+    height: 40px;
+}
+
+.add-image-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Drag-and-Drop Styling */
+.dropzone {
+    position: relative;
+    min-height: 200px;
+    border: 2px dashed #ccc;
+    border-radius: 10px;
+    padding: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.dropzone.dragover {
+    background-color: #f1f8ff;
+    border-color: #007bff;
+}
+
+/* Remove arrows for number input fields */
+input[type="number"].no-arrows {
+    -moz-appearance: textfield;
+    /* Firefox */
+    -webkit-appearance: none;
+    /* Chrome, Safari, Edge */
+    appearance: none;
+    /* Standard */
+}
+
+input[type="number"].no-arrows::-webkit-inner-spin-button,
+input[type="number"].no-arrows::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+    /* Removes extra margin in WebKit */
+}
+
+.image-upload-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    /* Adjust width for table alignment */
+    height: 80px;
+    /* Adjust height for table alignment */
+    border: 2px dashed #ccc;
+    /* Dashed border */
+    border-radius: 10px;
+    /* Rounded corners */
+    cursor: pointer;
+    /* Pointer cursor on hover */
+    transition: all 0.3s ease;
+    /* Smooth hover transition */
+    position: relative;
+}
+
+.image-upload-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    /* Box width */
+    height: 80px;
+    /* Box height */
+    border: 2px dashed #ccc;
+    /* Dashed border */
+    border-radius: 10px;
+    /* Rounded corners */
+    cursor: pointer;
+    /* Pointer cursor on hover */
+    transition: all 0.3s ease;
+    /* Smooth hover transition */
+    position: relative;
+    overflow: hidden;
+    /* Ensure content doesn't overflow the box */
+    background-color: #f8f9fa;
+    /* Light background color */
+}
+
+.image-upload-box:hover {
+    border-color: #007bff;
+    /* Change border color on hover */
+    background-color: rgba(0, 123, 255, 0.1);
+    /* Light blue background on hover */
+}
+
+.image-upload-box .icon {
+    width: 30px;
+    /* Icon width */
+    height: 30px;
+    /* Icon height */
+    stroke: #007bff;
+    /* Icon color */
+}
+
+.uploaded-image {
+    width: 100%;
+    /* Make the image take full width */
+    height: 100%;
+    /* Make the image take full height */
+    object-fit: cover;
+    /* Ensures the image fits within the box without distortion */
+    position: absolute;
+    /* Position the image inside the box */
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.image-label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    z-index: 2;
+    /* Ensure the icon remains above the image */
+}
+
+/* Hide the file input */
+.d-none {
+    display: none;
+}
+
+.table-responsive {
+    max-width: 100%;
+    overflow-x: auto;
+    /* Horizontal scrolling for smaller screens */
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+}
+
+.table th,
+.table td {
+    text-align: center; /* Center align content */
+    padding: 5px; /* Reduce padding for tighter spacing */
+    vertical-align: middle; /* Align content vertically */
+    font-size: 0.85rem; /* Slightly smaller font size */
+}
+
+.table input[type="text"],
+.table input[type="number"],
+.table select {
+    width: 100%; /* Make inputs full width */
+    font-size: 0.8rem; /* Slightly smaller font size for compact look */
+    padding: 2px 4px; /* Reduce padding inside inputs */
+    margin: 0; /* Remove external margins */
+    border: 1px solid #ddd; /* Subtle border */
+    border-radius: 3px; /* Slightly smaller border radius */
+}
+
+.table .image-upload-box {
+    width: 40px; /* Smaller width for image upload */
+    height: 40px; /* Smaller height for image upload */
+    margin: 0 auto; /* Center align */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px dashed #ddd; /* Adjusted border for compact design */
+    border-radius: 3px; /* Match other fields */
+    overflow: hidden;
+    position: relative;
+}
+
+.table .image-upload-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensure the image fits the box */
+    border-radius: 3px; /* Match the rounded corners */
+}
+
+.table .image-upload-box .icon {
+    width: 20px; /* Smaller icon size */
+    height: 20px; /* Smaller icon size */
+}
+
+@media (max-width: 768px) {
+    .table th,
+    .table td {
+        font-size: 0.75rem; /* Further reduce font size for small screens */
+    }
+
+    .table input[type="text"],
+    .table input[type="number"],
+    .table select {
+        max-width: 75px; /* Further reduce width for small screens */
+    }
+
+    .table .image-upload-box {
+        width: 30px; /* Adjust width for smaller screens */
+        height: 30px; /* Adjust height for smaller screens */
+    }
+
+    .table .image-upload-box .icon {
+        width: 15px; /* Adjust icon size for smaller screens */
+        height: 15px;
+    }
+}
+
+.custom-table td,
+.custom-table th {
+    padding: 0 5px !important; /* Override padding */
+}
+

@@ -13,21 +13,34 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('main_category_id')->constrained('categories')->onDelete('cascade');
-            $table->foreignId('category_id')->constrained()->onDelete('cascade');
-            $table->foreignId('sub_category_id')->constrained()->onDelete('cascade');
-            $table->string('sku')->nullable();
-            $table->string('title');
+            $table->string('sku')->unique();
+            $table->string('name');
+            $table->string('slug')->unique();
+            $table->foreignId('main_category_id')->constrained('main_categories')->onDelete('cascade');
+            $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
+            $table->foreignId('sub_category_id')->nullable();
             $table->text('description')->nullable();
-            $table->decimal('price', 10, 2);
-            $table->decimal('compare_at_price', 10, 2)->nullable();
-            $table->integer('quantity')->nullable( );
-            $table->boolean('track_inventory')->default(1);
-            $table->boolean('charge_shipping')->default(0);
-            $table->boolean('charge_tax')->default(0);
+            $table->text('specification')->nullable();
+            $table->string('brand');
+            $table->string('material');
+            $table->string('units');
+            $table->string('weight_type');
+            $table->string('file')->nullable();
+            $table->string('other_code')->nullable();
+            $table->integer('gst')->nullable();
+            $table->boolean('has_variants');
+            $table->decimal('sale_price', 10, 2)->nullable();
+            $table->decimal('offer_price', 10, 2)->nullable();
+            $table->decimal('distributor_price', 10, 2)->nullable();
+            $table->decimal('wholesale_price', 10, 2)->nullable();
+            $table->integer('min_order_qty')->nullable();
+            $table->decimal('weight', 10, 2)->nullable();
+            $table->integer('qty')->nullable();
+            $table->text('variation_ids')->nullable();
+            $table->string('seo_title')->nullable();
+            $table->text('seo_description')->nullable();
             $table->integer('priority')->default(0);
             $table->boolean('status')->default(1);
-
             $table->timestamps();
         });
     }

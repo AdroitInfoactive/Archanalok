@@ -32,7 +32,7 @@
                             class="form-control">{{ old('description', $maincategory->description) }}</textarea>
                     </div>
                     <div class="form-group">
-                        <label>Priority</label>
+                        <label>Priority *</label>
                         <input type="text" name="position"
                             value="{{ old('position', $maincategory->position) }}"
                             class="form-control">

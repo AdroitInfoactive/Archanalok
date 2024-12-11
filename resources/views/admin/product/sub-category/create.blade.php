@@ -21,7 +21,7 @@
                 <div class="card-body">
                     <div class="form-group row">
                         <div class="col-md-6">
-                            <label>Main Category</label>
+                            <label>Main Category *</label>
                             <select name="main_category_id" class="form-control select2" id="mainCategorySelect">
                                 <option value="">Select</option>
                                 @foreach($maincategories as $maincat)
@@ -32,7 +32,7 @@
                             <input type="hidden" name="main-categoty-slug" id="main-category-slug" value="">
                         </div>
                         <div class="col-md-6">
-                            <label>Category</label>
+                            <label>Category *</label>
                             <select name="category_id" class="form-control select2" id="categorySelect">
                                 <option value="">Select</option>
                                 <!-- Options will be populated by JavaScript -->
@@ -53,7 +53,7 @@
                     </div>
                     <div class="form-group row">
                         <div class="col-md-6">
-                            <label>Priority</label>
+                            <label>Priority *</label>
                             <input type="text" name="position" value="{{ old('position') }}"
                                 class="form-control">
                         </div>

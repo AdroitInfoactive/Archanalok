@@ -69,6 +69,41 @@ namespace App\Models{
 
 namespace App\Models{
 /**
+ * App\Models\Brand
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $slug
+ * @property string|null $description
+ * @property string|null $logo
+ * @property string|null $colour
+ * @property int $status
+ * @property int $position
+ * @property string|null $seo_title
+ * @property string|null $seo_description
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder|Brand newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Brand newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Brand query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Brand whereColour($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Brand whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Brand whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Brand whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Brand whereLogo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Brand whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Brand wherePosition($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Brand whereSeoDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Brand whereSeoTitle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Brand whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Brand whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Brand whereUpdatedAt($value)
+ */
+	class Brand extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
  * App\Models\Category
  *
  * @property int $id
@@ -325,42 +360,65 @@ namespace App\Models{
  * App\Models\Product
  *
  * @property int $id
+ * @property string $sku
+ * @property string $name
+ * @property string $slug
  * @property int $main_category_id
  * @property int $category_id
  * @property int $sub_category_id
- * @property string|null $sku
- * @property string $title
  * @property string|null $description
- * @property string $price
- * @property string|null $compare_at_price
- * @property int|null $quantity
- * @property int $track_inventory
- * @property int $charge_shipping
- * @property int $charge_tax
+ * @property string|null $specification
+ * @property string $brand
+ * @property string|null $file
+ * @property string|null $other_code
+ * @property int|null $gst
+ * @property int $has_variants
+ * @property string $sale_price
+ * @property string|null $offer_price
+ * @property string|null $distributor_price
+ * @property string|null $wholesale_price
+ * @property int|null $min_order_qty
+ * @property string|null $weight
+ * @property int|null $qty
+ * @property string|null $seo_title
+ * @property string|null $seo_description
  * @property int $priority
  * @property int $status
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Category $category
+ * @property-read \App\Models\Category $mainCategory
+ * @property-read \App\Models\Category $subCategory
  * @method static \Illuminate\Database\Eloquent\Builder|Product newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Product newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Product query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereBrand($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereCategoryId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereChargeShipping($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereChargeTax($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereCompareAtPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereDistributorPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereFile($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereGst($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereHasVariants($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereMainCategoryId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product wherePrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereMinOrderQty($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereOfferPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereOtherCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product wherePriority($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereQuantity($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereQty($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereSalePrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereSeoDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereSeoTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereSku($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereSpecification($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereSubCategoryId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereTitle($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereTrackInventory($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereWeight($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereWholesalePrice($value)
  */
 	class Product extends \Eloquent {}
 }
@@ -369,23 +427,9 @@ namespace App\Models{
 /**
  * App\Models\ProductImage
  *
- * @property int $id
- * @property int $product_id
- * @property string $image_path
- * @property int $priority
- * @property int $status
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder|ProductImage newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ProductImage newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ProductImage query()
- * @method static \Illuminate\Database\Eloquent\Builder|ProductImage whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ProductImage whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ProductImage whereImagePath($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ProductImage wherePriority($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ProductImage whereProductId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ProductImage whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ProductImage whereUpdatedAt($value)
  */
 	class ProductImage extends \Eloquent {}
 }
@@ -612,31 +656,9 @@ namespace App\Models{
 /**
  * App\Models\Variant
  *
- * @property int $id
- * @property int $product_id
- * @property string $name
- * @property string $value
- * @property string $price
- * @property string|null $offer_price
- * @property string|null $image_path
- * @property int $priority
- * @property int $status
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder|Variant newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Variant newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Variant query()
- * @method static \Illuminate\Database\Eloquent\Builder|Variant whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Variant whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Variant whereImagePath($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Variant whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Variant whereOfferPrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Variant wherePrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Variant wherePriority($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Variant whereProductId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Variant whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Variant whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Variant whereValue($value)
  */
 	class Variant extends \Eloquent {}
 }
