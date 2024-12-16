@@ -163,9 +163,8 @@
                         <div class="tab-pane fade in active show" id="description" role="tabpanel">
                             <div class="tab-description">
                                 <h3>Features:</h3>
-                                <ul>
-                                    <li>{!! $product->description !!}/li>
-                                </ul>
+                               
+                                <p>{!! $product->description !!}</p>
                             </div>
                         </div>
                         <!-- Additional Info Tab -->
