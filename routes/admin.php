@@ -57,12 +57,11 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
   Route::resource('variant-details', VariantDetailController::class);
 
  /** Product Routes */
+ Route::get('/products/generate-excel-template', [ProductController::class, 'generateExcelTemplate'])->name('products.generateExcelTemplate');
   Route::resource('products', ProductController::class);
   Route::post('/products/update-image-order', [ProductController::class,
   'updateImageOrder'])->name('products.updateImageOrder');
   Route::post('/products/delete-image', [ProductController::class, 'deleteImage'])->name('products.deleteImage');
-  Route::get('/products/download-sample-import-excel-sheet', [ProductController::class,
-  'generateImportExcelSheet'])->name('products.generateImportExcelSheet');
 
 
   /** Banner Slider Routes */

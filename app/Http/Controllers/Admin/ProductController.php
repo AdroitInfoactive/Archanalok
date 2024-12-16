@@ -33,12 +33,23 @@ class ProductController extends Controller
      */
     public function create()
     {
-       /*  $mainCategories = MainCategory::where('status', 1)
+        $mainCategories = MainCategory::where('status', 1)
         ->whereHas('categories', function ($query) {
         $query->where('status', 1)
         ->whereHas('subcategories', function ($query) {
         $query->where('status', 1);
         });
+        })
+        ->with(['categories' => function ($query) {
+        $query->where('status', 1)
+        ->with(['subcategories' => function ($query) {
+        $query->where('status', 1);
+        }]);
+        }])
+        ->get(); */
+        $mainCategories = MainCategory::where('status', 1)
+        ->whereHas('categories', function ($query) {
+        $query->where('status', 1);
         })
         ->with(['categories' => function ($query) {
         $query->where('status', 1)
@@ -228,55 +239,135 @@ class ProductController extends Controller
         return to_route('admin.products.index'); */
     }
 
-    public function generateImportExcelSheet()
+    public function generateExcelTemplate()
     {
-        $spreadsheet = new Spreadsheet();
+        try {
+            $spreadsheet = new Spreadsheet();
 
-        // Create Product Sheet
-        $productSheet = $spreadsheet->setActiveSheetIndex(0);
-        $productSheet->setTitle('Products');
-        $productHeaders = [
-        'sku', 'name', 'slug', 'main_category_id', 'category_id', 'sub_category_id',
-        'description', 'specification', 'brand', 'material', 'units', 'weight_type',
-        'other_code', 'gst', 'has_variants', 'sale_price', 'offer_price',
-        'distributor_price', 'wholesale_price', 'min_order_qty', 'weight', 'qty',
-        'seo_title', 'seo_description', 'status', 'priority'
-        ];
-        $productSheet->fromArray($productHeaders, null, 'A1');
+            // Create Product Sheet
+            $productSheet = $spreadsheet->setActiveSheetIndex(0);
+            $productSheet->setTitle('Products');
+            $productHeaders = [
+                'sku', 'name', 'slug', 'main_category_id', 'category_id', 'sub_category_id',
+                'description', 'specification', 'brand', 'material', 'units', 'weight_type',
+                'other_code', 'gst', 'has_variants', 'sale_price', 'offer_price',
+                'distributor_price', 'wholesale_price', 'min_order_qty', 'weight', 'qty',
+                'seo_title', 'seo_description', 'status', 'priority'
+            ];
+            $productSheet->fromArray($productHeaders, null, 'A1');
 
-        // Create Variant Sheet
-        $variantSheet = $spreadsheet->createSheet();
-        $variantSheet->setTitle('Variants');
-        $variantHeaders = [
-        'product_sku', 'variant_sku', 'variation_code', 'sale_price', 'offer_price',
-        'distributor_price', 'wholesale_price', 'min_order_qty', 'weight', 'qty',
-        'status', 'image_path'
-        ];
-        $variantSheet->fromArray($variantHeaders, null, 'A1');
+            // Create Variant Sheet
+            $variantSheet = $spreadsheet->createSheet();
+            $variantSheet->setTitle('Variants');
+            $variantHeaders = [
+                'product_sku', 'variant_sku', 'variation_code', 'sale_price', 'offer_price',
+                'distributor_price', 'wholesale_price', 'min_order_qty', 'weight', 'qty',
+                'status', 'image_path'
+            ];
+            $variantSheet->fromArray($variantHeaders, null, 'A1');
 
-        // Output Excel file
-        $writer = new Xlsx($spreadsheet);
-        $fileName = 'product_import_template.xlsx';
-        $filePath = storage_path($fileName);
-        $writer->save($filePath);
+            // Output Excel file
+            $writer = new Xlsx($spreadsheet);
+            $fileName = 'product_import_sample.xlsx';
+            $filePath = storage_path('app/' . $fileName); // Use storage/app
 
-        return response()->download($filePath)->deleteFileAfterSend(true);
+            // Ensure directory exists
+            if (!file_exists(storage_path('app'))) {
+                mkdir(storage_path('app'), 0755, true);
+            }
+
+            $writer->save($filePath);
+
+            return response()->download($filePath)->deleteFileAfterSend(true);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to generate Excel sheet: ' . $e->getMessage()], 500);
+        }
     }
     /**
      * Display the specified resource.
      */
     public function show(string $id)
     {
-        //
+        $product = Product::findOrFail($id);
+        return view('admin.product.show', compact('product'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
-    {
-        //
-    }
+   public function edit($id)
+   {
+   $product = Product::with([
+   'mainCategory',
+   'category',
+   'subCategory',
+   'brandName',
+   'images',
+   'variants.images'
+   ])->findOrFail($id);
+
+   /* $mainCategories = MainCategory::where('status', 1)
+   ->whereHas('categories', function ($query) {
+   $query->where('status', 1)
+   ->whereHas('subcategories', function ($query) {
+   $query->where('status', 1);
+   });
+   })
+   ->with(['categories' => function ($query) {
+   $query->where('status', 1)
+   ->with(['subcategories' => function ($query) {
+   $query->where('status', 1);
+   }]);
+   }])
+   ->get(); */
+
+   $mainCategories = MainCategory::where('status', 1)
+   ->whereHas('categories', function ($query) {
+   $query->where('status', 1);
+   })
+   ->with(['categories' => function ($query) {
+   $query->where('status', 1)
+   ->with(['subcategories' => function ($query) {
+   $query->where('status', 1);
+   }]);
+   }])
+   ->get();
+
+   $brands = Brand::where('status', 1)->get();
+
+   $variantMasters = VariantMaster::whereNotIn('name', ['Material', 'Units', 'Weight Type'])
+   ->with('details')
+   ->get();
+
+   $materials = VariantDetail::where('status', 1)
+   ->whereHas('variantMaster', function ($query) {
+   $query->where('name', 'material');
+   })
+   ->get();
+
+   $units = VariantDetail::where('status', 1)
+   ->whereHas('variantMaster', function ($query) {
+   $query->where('name', 'units');
+   })
+   ->get();
+
+   $weightTypes = VariantDetail::where('status', 1)
+   ->whereHas('variantMaster', function ($query) {
+   $query->where('name', 'Weight Type');
+   })
+   ->get();
+
+   return view('admin.product.edit', compact(
+   'product',
+   'brands',
+   'mainCategories',
+   'variantMasters',
+   'materials',
+   'units',
+   'weightTypes'
+   ));
+   }
+
 
     /**
      * Update the specified resource in storage.

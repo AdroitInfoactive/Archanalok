@@ -11,6 +11,10 @@
             <div class="card-header">
               <h4>All Products</h4>
               <div class="card-header-action">
+                 <a href="{{ route('admin.products.generateExcelTemplate') }}"
+                     class="btn btn-danger">
+                     Sample Import Sheet
+                 </a>
                 <a href="{{ route('admin.products.create')  }}" class="btn btn-primary">
                  Create New Product
                 </a>
