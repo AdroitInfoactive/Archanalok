@@ -34,19 +34,40 @@ class ProductController extends Controller
     public function create()
     {
         $mainCategories = MainCategory::where('status', 1)
-            ->whereHas('categories', function ($query) {
+        ->whereHas('categories', function ($query) {
+        $query->where('status', 1)
+        ->whereHas('subcategories', function ($query) {
+        $query->where('status', 1);
+        });
+        })
+        ->with(['categories' => function ($query) {
+        $query->where('status', 1)
+        ->with(['subcategories' => function ($query) {
+        $query->where('status', 1);
+        }]);
+        }])
+        ->get(); */
+        $mainCategories = MainCategory::where('status', 1)
+        ->whereHas('categories', function ($query) {
+        $query->where('status', 1);
+        })
+        ->with(['categories' => function ($query) {
+        $query->where('status', 1)
+        ->with(['subcategories' => function ($query) {
+        $query->where('status', 1);
+        }]);
+        }])
+        ->get(); */
+        $mainCategories = MainCategory::where('status', 1)
+    ->whereHas('categories', function ($query) {
+        $query->where('status', 1);
+    })
+    ->with(['categories' => function ($query) {
+        $query->where('status', 1)
+            ->with(['subcategories' => function ($query) {
                 $query->where('status', 1);
-            })
-            ->with([
-                'categories' => function ($query) {
-                    $query->where('status', 1)
-                        ->with([
-                            'subcategories' => function ($query) {
-                                $query->where('status', 1);
-                            }
-                        ]);
-                }
-            ])->get();
+            }]);
+    }])->get();
         $brands = Brand::where('status', 1)->get();
         $variantMasters = VariantMaster::whereNotIn('name', ['Material', 'Units', 'Weight Type'])
             ->with('details')
