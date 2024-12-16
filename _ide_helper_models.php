@@ -390,9 +390,17 @@ namespace App\Models{
  * @property int $status
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Brand|null $brandName
  * @property-read \App\Models\Category $category
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductImage> $images
+ * @property-read int|null $images_count
  * @property-read \App\Models\Category $mainCategory
+ * @property-read \App\Models\VariantDetail|null $materialDetail
  * @property-read \App\Models\Category|null $subCategory
+ * @property-read \App\Models\VariantDetail|null $unitDetail
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductVariant> $variants
+ * @property-read int|null $variants_count
+ * @property-read \App\Models\VariantDetail|null $weightTypeDetail
  * @method static \Illuminate\Database\Eloquent\Builder|Product newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Product newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Product query()
@@ -626,17 +634,9 @@ namespace App\Models{
 /**
  * App\Models\Subscriber
  *
- * @property int $id
- * @property string $email
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder|Subscriber newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Subscriber newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Subscriber query()
- * @method static \Illuminate\Database\Eloquent\Builder|Subscriber whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Subscriber whereEmail($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Subscriber whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Subscriber whereUpdatedAt($value)
  */
 	class Subscriber extends \Eloquent {}
 }

@@ -11,7 +11,7 @@ class Product extends Model
 
     public function mainCategory()
     {
-    return $this->belongsTo(Category::class, 'main_category_id');
+        return $this->belongsTo(Category::class, 'main_category_id');
     }
 
     public function category()
@@ -21,6 +21,32 @@ class Product extends Model
 
     public function subCategory()
     {
-    return $this->belongsTo(Category::class, 'sub_category_id');
+        return $this->belongsTo(Category::class, 'sub_category_id');
     }
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class, 'product_id');
+    }
+    public function brandName()
+    {
+    return $this->belongsTo(Brand::class, 'brand');
+    }
+      public function materialDetail()
+     {
+     return $this->belongsTo(VariantDetail::class, 'material', 'id');
+     }
+      public function unitDetail()
+      {
+      return $this->belongsTo(VariantDetail::class, 'units', 'id');
+      }
+      public function weightTypeDetail()
+      {
+      return $this->belongsTo(VariantDetail::class, 'weight_type', 'id');
+      }
+      public function variants()
+      {
+      return $this->hasMany(ProductVariant::class);
+      }
+  
+
 }
