@@ -34,31 +34,6 @@ class ProductController extends Controller
     public function create()
     {
         $mainCategories = MainCategory::where('status', 1)
-        ->whereHas('categories', function ($query) {
-        $query->where('status', 1)
-        ->whereHas('subcategories', function ($query) {
-        $query->where('status', 1);
-        });
-        })
-        ->with(['categories' => function ($query) {
-        $query->where('status', 1)
-        ->with(['subcategories' => function ($query) {
-        $query->where('status', 1);
-        }]);
-        }])
-        ->get(); */
-        $mainCategories = MainCategory::where('status', 1)
-        ->whereHas('categories', function ($query) {
-        $query->where('status', 1);
-        })
-        ->with(['categories' => function ($query) {
-        $query->where('status', 1)
-        ->with(['subcategories' => function ($query) {
-        $query->where('status', 1);
-        }]);
-        }])
-        ->get(); */
-        $mainCategories = MainCategory::where('status', 1)
     ->whereHas('categories', function ($query) {
         $query->where('status', 1);
     })

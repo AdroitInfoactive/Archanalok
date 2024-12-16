@@ -390,10 +390,9 @@ namespace App\Models{
  * @property int $status
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Brand|null $brandName
  * @property-read \App\Models\Category $category
  * @property-read \App\Models\Category $mainCategory
- * @property-read \App\Models\Category $subCategory
+ * @property-read \App\Models\Category|null $subCategory
  * @method static \Illuminate\Database\Eloquent\Builder|Product newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Product newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Product query()
@@ -455,6 +454,47 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|ProductImage whereVariantId($value)
  */
 	class ProductImage extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * App\Models\ProductVariant
+ *
+ * @property int $id
+ * @property int $product_id
+ * @property string $variation_code
+ * @property string $sku
+ * @property string|null $sale_price
+ * @property string|null $offer_price
+ * @property string|null $distributor_price
+ * @property string|null $wholesale_price
+ * @property int $min_order_qty
+ * @property string|null $weight
+ * @property int $qty
+ * @property int $status
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductImage> $images
+ * @property-read int|null $images_count
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant query()
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereDistributorPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereMinOrderQty($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereOfferPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereProductId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereQty($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereSalePrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereSku($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereVariationCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereWeight($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereWholesalePrice($value)
+ */
+	class ProductVariant extends \Eloquent {}
 }
 
 namespace App\Models{
@@ -586,9 +626,17 @@ namespace App\Models{
 /**
  * App\Models\Subscriber
  *
+ * @property int $id
+ * @property string $email
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder|Subscriber newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Subscriber newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Subscriber query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Subscriber whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Subscriber whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Subscriber whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Subscriber whereUpdatedAt($value)
  */
 	class Subscriber extends \Eloquent {}
 }
