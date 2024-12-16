@@ -17,4 +17,13 @@ class Category extends Model
     {
         return $this->hasMany(SubCategory::class);
     }
+    /* public function mainCategory()
+    {
+        return $this->belongsTo(MainCategory::class, 'main_category_id');
+    }
+
+    public function subcategories()
+    {
+        return $this->hasMany(SubCategory::class, 'category_id');
+    } */
 }

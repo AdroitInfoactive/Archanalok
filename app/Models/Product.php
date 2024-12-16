@@ -11,16 +11,25 @@ class Product extends Model
 
     public function mainCategory()
     {
-    return $this->belongsTo(Category::class, 'main_category_id');
+        return $this->belongsTo(Category::class, 'main_category_id');
     }
 
     public function category()
     {
-    return $this->belongsTo(Category::class, 'category_id');
+        return $this->belongsTo(Category::class, 'category_id');
     }
 
     public function subCategory()
     {
-    return $this->belongsTo(Category::class, 'sub_category_id');
+        return $this->belongsTo(Category::class, 'sub_category_id');
     }
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class, 'product_id');
+    }
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class, 'brand_id');
+    }
+
 }

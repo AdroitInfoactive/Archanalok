@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>Textile Coated Fabric and PVC Membrane Film Manufacturer | Archanalok Trading Co.&nbsp;|&nbsp;Archanalok
         Trading Co..</title>
@@ -23,7 +24,7 @@
     <link rel="stylesheet" href="{{ asset('frontend/css/responsive.css') }}">
     <link rel="stylesheet" href="{{ asset('frontend/css/toastr.min.css') }}">
     <!-- End Include All CSS -->
-    <link  rel="shortcut icon" type="image/png" href="{{ asset('frontend/images/favicon.ico') }}">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('frontend/images/favicon.ico') }}">
     <link rel="apple-touch-icon" href="apple-touch-icon.png" />
     <link rel="apple-touch-icon" sizes="57x57" href="apple-touch-icon-57x57.png" />
     <link rel="apple-touch-icon" sizes="72x72" href="apple-touch-icon-72x72.png" />
@@ -34,38 +35,38 @@
     <link rel="apple-touch-icon" sizes="152x152" href="apple-touch-icon-152x152.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-180x180.png" />
 </head>
+
 <body>
-       <!-- Header Start -->
-   <header class="header-01  head-sticky header-bg">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-lg-12">
-                <nav class="navbar navbar-expand-lg">
-                    <!-- logo Start-->
-                    <a class="navbar-brand" href="#">
-                        <img src="{{ asset('frontend/images/archanalok-logo-1.png') }}" alt="">
-                    </a>
-                    <!-- logo End-->
-                    <!-- Moblie Btn Start -->
-                    <button class="navbar-toggler" type="button">
-                        <i class="nss-bars1"></i>
-                    </button>
-                    <!-- Moblie Btn End -->
-                    <!-- Nav Menu Start -->
-                    <div class="collapse navbar-collapse">
-                        <ul class="navbar-nav">
-                            <li class="menu-item-has-children">
-                                {{-- <a href="index.html">Home</a> --}}
-                                <a href="javascript:void(0);">Home</a>
-                            </li>
-                            <li>
-                                {{-- <a href="about.html">About</a> --}}
-                                <a href="javascript:void(0);">About</a>
-                            </li>
-                            <li class="menu-item-has-children">
+    <!-- Header Start -->
+    <header class="header-01  head-sticky header-bg">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <nav class="navbar navbar-expand-lg">
+                        <!-- logo Start-->
+                        <a class="navbar-brand" href="#">
+                            <img src="{{ asset('frontend/images/archanalok-logo-1.png') }}" alt="">
+                        </a>
+                        <!-- logo End-->
+                        <!-- Moblie Btn Start -->
+                        <button class="navbar-toggler" type="button">
+                            <i class="nss-bars1"></i>
+                        </button>
+                        <!-- Moblie Btn End -->
+                        <!-- Nav Menu Start -->
+                        <div class="collapse navbar-collapse">
+                            <ul class="navbar-nav">
+                                <li class="menu-item-has-children">
+                                    {{-- <a href="index.html">Home</a> --}}
+                                    <a href="javascript:void(0);">Home</a>
+                                </li>
+                                <li>
+                                    {{-- <a href="about.html">About</a> --}}
+                                    <a href="javascript:void(0);">About</a>
+                                </li>
+                                {{-- <li class="menu-item-has-children">
                                 <a href="javascript:void(0);">Products
                                     <ul class="sub-menu">
-                                        {{-- <li><a href="cat-product-page.html">Pvc Membrane</a></li> --}}
                                         <li><a href="javascript:void(0);">Pvc Membrane</a></li>
                                         <li><a href="#">Synthetic Leather(Rexine)</a></li>
                                         <li><a href="#">Vinyl Flooring</a></li>
@@ -74,52 +75,65 @@
                                         <li><a href="#">PVC Sheeting</a></li>
                                     </ul>
                                 </a>
-                            </li>
-                            <li>
-                                {{-- <a href="contact.html">Contact</a> --}}
-                                <a href="javascript:void(0);">Contact</a>
-                            </li>
-                        </ul>
-                    </div>
-                    <!-- Nav Menu End -->
-                    <!-- Btn -->
-                    <div class="access-btn">
-                        <a href="javascript:void(0);" class="btn-search"><i class="nss-search1"></i></a>
-                        <a href="myaccount.html" class="btn-user"><i class="nss-user1"></i></a>
-                        <a href="cart.html" class="btn-cart"><i class="nss-shopping-cart1"></i><span>1</span></a>
-                    </div>
-                    <!-- Btn -->
-                </nav>
+                            </li> --}}
+                                <li class="menu-item-has-children">
+                                    <a href="javascript:void(0);">Products</a>
+                                    <ul class="sub-menu">
+                                        @foreach ($mainCategory as $category)
+                                            <li>
+                                                <a href="{{ route('maincategory.show', $category->slug) }}">
+                                                    {{ $category->name }}
+                                                </a>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </li>
+
+                                <li>
+                                    {{-- <a href="contact.html">Contact</a> --}}
+                                    <a href="javascript:void(0);">Contact</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- Nav Menu End -->
+                        <!-- Btn -->
+                        <div class="access-btn">
+                            <a href="javascript:void(0);" class="btn-search"><i class="nss-search1"></i></a>
+                            <a href="myaccount.html" class="btn-user"><i class="nss-user1"></i></a>
+                            <a href="cart.html" class="btn-cart"><i class="nss-shopping-cart1"></i><span>1</span></a>
+                        </div>
+                        <!-- Btn -->
+                    </nav>
+                </div>
             </div>
         </div>
-    </div>
-</header>
-<!-- Header End -->
-<!-- Popup Search Start -->
-<section class="popup_search_sec">
-    <div class="popup_search_overlay"></div>
-    <div class="pop_search_background">
-        <div class="middle_search">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-12 text-center">
-                        <div class="popup_search_form">
-                            <form method="get" action="#">
-                                <input type="search" name="s" id="s"
-                                    placeholder="Type Words and Hit Enter">
-                                <button type="submit"><i class="nss-search1"></i></button>
-                            </form>
+    </header>
+    <!-- Header End -->
+    <!-- Popup Search Start -->
+    <section class="popup_search_sec">
+        <div class="popup_search_overlay"></div>
+        <div class="pop_search_background">
+            <div class="middle_search">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 text-center">
+                            <div class="popup_search_form">
+                                <form method="get" action="#">
+                                    <input type="search" name="s" id="s"
+                                        placeholder="Type Words and Hit Enter">
+                                    <button type="submit"><i class="nss-search1"></i></button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
-<!-- Popup Search End -->
+    </section>
+    <!-- Popup Search End -->
     @yield('content')
 
-      <!--=============================
+    <!--=============================
         FOOTER START
     ==============================-->
     @include('frontend.layouts.footer')
@@ -127,7 +141,7 @@
         FOOTER END
     ==============================-->
 
-       <!--=============================
+    <!--=============================
         SCROLL BUTTON START
     ==============================-->
     <a href="#" id="back-to-top">
@@ -164,7 +178,8 @@
         });
     </script>
     @include('frontend.layouts.global-scripts')
-    
+
     @stack('scripts')
 </body>
+
 </html>
