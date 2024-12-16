@@ -34,61 +34,40 @@ class ProductController extends Controller
     public function create()
     {
         $mainCategories = MainCategory::where('status', 1)
-        ->whereHas('categories', function ($query) {
-        $query->where('status', 1)
-        ->whereHas('subcategories', function ($query) {
-        $query->where('status', 1);
-        });
-        })
-        ->with(['categories' => function ($query) {
-        $query->where('status', 1)
-        ->with(['subcategories' => function ($query) {
-        $query->where('status', 1);
-        }]);
-        }])
-        ->get(); */
-        $mainCategories = MainCategory::where('status', 1)
-        ->whereHas('categories', function ($query) {
-        $query->where('status', 1);
-        })
-        ->with(['categories' => function ($query) {
-        $query->where('status', 1)
-        ->with(['subcategories' => function ($query) {
-        $query->where('status', 1);
-        }]);
-        }])
-        ->get(); */
-        $mainCategories = MainCategory::where('status', 1)
-    ->whereHas('categories', function ($query) {
-        $query->where('status', 1);
-    })
-    ->with(['categories' => function ($query) {
-        $query->where('status', 1)
-            ->with(['subcategories' => function ($query) {
+            ->whereHas('categories', function ($query) {
                 $query->where('status', 1);
-            }]);
-    }])->get();
+            })
+            ->with([
+                'categories' => function ($query) {
+                    $query->where('status', 1)
+                        ->with([
+                            'subcategories' => function ($query) {
+                                $query->where('status', 1);
+                            }
+                        ]);
+                }
+            ])->get();
         $brands = Brand::where('status', 1)->get();
         $variantMasters = VariantMaster::whereNotIn('name', ['Material', 'Units', 'Weight Type'])
-        ->with('details')
-        ->get();
+            ->with('details')
+            ->get();
         $materials = VariantDetail::where('status', 1)
-        ->whereHas('variantMaster', function ($query) {
-        $query->where('name', 'material');
-        })
-        ->get();
+            ->whereHas('variantMaster', function ($query) {
+                $query->where('name', 'material');
+            })
+            ->get();
         $units = VariantDetail::where('status', 1)
-        ->whereHas('variantMaster', function ($query) {
-        $query->where('name', 'units');
-        })
-        ->get();
+            ->whereHas('variantMaster', function ($query) {
+                $query->where('name', 'units');
+            })
+            ->get();
         $weightTypes = VariantDetail::where('status', 1)
-        ->whereHas('variantMaster', function ($query) {
-        $query->where('name', 'Weight Type');
-        })
-        ->get();
+            ->whereHas('variantMaster', function ($query) {
+                $query->where('name', 'Weight Type');
+            })
+            ->get();
 
-        return view('admin.product.create', compact('brands','mainCategories', 'variantMasters', 'materials', 'units', 'weightTypes'));
+        return view('admin.product.create', compact('brands', 'mainCategories', 'variantMasters', 'materials', 'units', 'weightTypes'));
     }
 
     /**
@@ -124,9 +103,7 @@ class ProductController extends Controller
             $product->min_order_qty = $request->min_order_qty;
             $product->weight = $request->weight;
             $product->qty = $request->qty;
-        }
-        else
-        {
+        } else {
             $product->variation_ids = $request->variant_master_detail;
         }
         $product->seo_title = $request->seo_title;
@@ -134,7 +111,7 @@ class ProductController extends Controller
         $product->status = $request->status;
         $product->priority = $request->priority;
         $product->file = $filePath;
-        
+
         $product->save();
 
         // insert into product variations if has_variants is 1
@@ -178,7 +155,7 @@ class ProductController extends Controller
 
                     // Rename the file using product slug and variant code
                     $extension = $variantImageFile->getClientOriginalExtension();
-                    $filename = $product->slug . '_'.uniqid() . '.' . $extension;
+                    $filename = $product->slug . '_' . uniqid() . '.' . $extension;
 
                     // Move the file to the target directory
                     $variantImageFile->move($uploadDir, $filename);
@@ -186,14 +163,14 @@ class ProductController extends Controller
                     // Check if the file was moved successfully
                     $filePath = $uploadDir . '/' . $filename;
                     if (file_exists($filePath)) {
-                    // Save image details in the database
-                    $variantImage = new ProductImage();
-                    $variantImage->product_id = $product->id;
-                    $variantImage->variant_id = $variant->id;
-                    $variantImage->image_path = 'uploads/products/' . $filename; // Save relative path
-                    $variantImage->save();
+                        // Save image details in the database
+                        $variantImage = new ProductImage();
+                        $variantImage->product_id = $product->id;
+                        $variantImage->variant_id = $variant->id;
+                        $variantImage->image_path = 'uploads/products/' . $filename; // Save relative path
+                        $variantImage->save();
                     } else {
-                    // Handle error if the file couldn't be moved
+                        // Handle error if the file couldn't be moved
                         throw new \Exception("Failed to move variant image '{$filename}' to {$uploadDir}");
                     }
                 }
@@ -213,7 +190,7 @@ class ProductController extends Controller
 
                 // Generate a unique filename with the product slug and loop index
                 $extension = $image->getClientOriginalExtension();
-                $filename = $productSlug . '_'.uniqid() . '_' . $index . '.' . $extension;
+                $filename = $productSlug . '_' . uniqid() . '_' . $index . '.' . $extension;
 
                 // Move the file to the target directory
                 $image->move($uploadDir, $filename);
@@ -248,11 +225,32 @@ class ProductController extends Controller
             $productSheet = $spreadsheet->setActiveSheetIndex(0);
             $productSheet->setTitle('Products');
             $productHeaders = [
-                'sku', 'name', 'slug', 'main_category_id', 'category_id', 'sub_category_id',
-                'description', 'specification', 'brand', 'material', 'units', 'weight_type',
-                'other_code', 'gst', 'has_variants', 'sale_price', 'offer_price',
-                'distributor_price', 'wholesale_price', 'min_order_qty', 'weight', 'qty',
-                'seo_title', 'seo_description', 'status', 'priority'
+                'sku',
+                'name',
+                'slug',
+                'main_category_id',
+                'category_id',
+                'sub_category_id',
+                'description',
+                'specification',
+                'brand',
+                'material',
+                'units',
+                'weight_type',
+                'other_code',
+                'gst',
+                'has_variants',
+                'sale_price',
+                'offer_price',
+                'distributor_price',
+                'wholesale_price',
+                'min_order_qty',
+                'weight',
+                'qty',
+                'seo_title',
+                'seo_description',
+                'status',
+                'priority'
             ];
             $productSheet->fromArray($productHeaders, null, 'A1');
 
@@ -260,9 +258,18 @@ class ProductController extends Controller
             $variantSheet = $spreadsheet->createSheet();
             $variantSheet->setTitle('Variants');
             $variantHeaders = [
-                'product_sku', 'variant_sku', 'variation_code', 'sale_price', 'offer_price',
-                'distributor_price', 'wholesale_price', 'min_order_qty', 'weight', 'qty',
-                'status', 'image_path'
+                'product_sku',
+                'variant_sku',
+                'variation_code',
+                'sale_price',
+                'offer_price',
+                'distributor_price',
+                'wholesale_price',
+                'min_order_qty',
+                'weight',
+                'qty',
+                'status',
+                'image_path'
             ];
             $variantSheet->fromArray($variantHeaders, null, 'A1');
 
@@ -295,78 +302,82 @@ class ProductController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-   public function edit($id)
-   {
-   $product = Product::with([
-   'mainCategory',
-   'category',
-   'subCategory',
-   'brandName',
-   'images',
-   'variants.images'
-   ])->findOrFail($id);
+    public function edit($id)
+    {
+        $product = Product::with([
+            'mainCategory',
+            'category',
+            'subCategory',
+            'brandName',
+            'images',
+            'variants.images'
+        ])->findOrFail($id);
 
-   /* $mainCategories = MainCategory::where('status', 1)
-   ->whereHas('categories', function ($query) {
-   $query->where('status', 1)
-   ->whereHas('subcategories', function ($query) {
-   $query->where('status', 1);
-   });
-   })
-   ->with(['categories' => function ($query) {
-   $query->where('status', 1)
-   ->with(['subcategories' => function ($query) {
-   $query->where('status', 1);
-   }]);
-   }])
-   ->get(); */
+        /* $mainCategories = MainCategory::where('status', 1)
+        ->whereHas('categories', function ($query) {
+        $query->where('status', 1)
+        ->whereHas('subcategories', function ($query) {
+        $query->where('status', 1);
+        });
+        })
+        ->with(['categories' => function ($query) {
+        $query->where('status', 1)
+        ->with(['subcategories' => function ($query) {
+        $query->where('status', 1);
+        }]);
+        }])
+        ->get(); */
 
-   $mainCategories = MainCategory::where('status', 1)
-   ->whereHas('categories', function ($query) {
-   $query->where('status', 1);
-   })
-   ->with(['categories' => function ($query) {
-   $query->where('status', 1)
-   ->with(['subcategories' => function ($query) {
-   $query->where('status', 1);
-   }]);
-   }])
-   ->get();
+        $mainCategories = MainCategory::where('status', 1)
+            ->whereHas('categories', function ($query) {
+                $query->where('status', 1);
+            })
+            ->with([
+                'categories' => function ($query) {
+                    $query->where('status', 1)
+                        ->with([
+                            'subcategories' => function ($query) {
+                                $query->where('status', 1);
+                            }
+                        ]);
+                }
+            ])
+            ->get();
 
-   $brands = Brand::where('status', 1)->get();
+        $brands = Brand::where('status', 1)->get();
 
-   $variantMasters = VariantMaster::whereNotIn('name', ['Material', 'Units', 'Weight Type'])
-   ->with('details')
-   ->get();
+        $variantMasters = VariantMaster::whereNotIn('name', ['Material', 'Units', 'Weight Type'])
+            ->with('details')
+            ->get();
 
-   $materials = VariantDetail::where('status', 1)
-   ->whereHas('variantMaster', function ($query) {
-   $query->where('name', 'material');
-   })
-   ->get();
+        $materials = VariantDetail::where('status', 1)
+            ->whereHas('variantMaster', function ($query) {
+                $query->where('name', 'material');
+            })
+            ->get();
 
-   $units = VariantDetail::where('status', 1)
-   ->whereHas('variantMaster', function ($query) {
-   $query->where('name', 'units');
-   })
-   ->get();
+        $units = VariantDetail::where('status', 1)
+            ->whereHas('variantMaster', function ($query) {
+                $query->where('name', 'units');
+            })
+            ->get();
 
-   $weightTypes = VariantDetail::where('status', 1)
-   ->whereHas('variantMaster', function ($query) {
-   $query->where('name', 'Weight Type');
-   })
-   ->get();
+        $weightTypes = VariantDetail::where('status', 1)
+            ->whereHas('variantMaster', function ($query) {
+                $query->where('name', 'Weight Type');
+            })
+            ->get();
 
-   return view('admin.product.edit', compact(
-   'product',
-   'brands',
-   'mainCategories',
-   'variantMasters',
-   'materials',
-   'units',
-   'weightTypes'
-   ));
-   }
+        return view('admin.product.edit', compact(
+            'product',
+            'brands',
+            'mainCategories',
+            'variantMasters',
+            'materials',
+            'units',
+            'weightTypes'
+        ));
+    }
 
 
     /**
