@@ -22,5 +22,14 @@ require __DIR__.'/auth.php';
 /** Show Home page */
 Route::get('/', [FrontendController::class, 'index'])->name('home');
 
+// Category Page (MainCategory -> Category -> SubCategory)
+Route::get('/{slug}', [FrontendController::class, 'mainCategoryPage'])->name('maincategory.show');
+
+// SubCategory Page
+// Route::get('/{slug}', [FrontendController::class, 'subCategoryPage'])->name('subcategory.show');
+
+// // Product details Page
+Route::get('/product/{slug}', [FrontendController::class, 'productPage'])->name('product.show');
+
 /** Newsletter Routes */
 Route::post('/subscribe-newsletter', [FrontendController::class, 'subscribeNewsletter'])->name('subscribe-newsletter');
