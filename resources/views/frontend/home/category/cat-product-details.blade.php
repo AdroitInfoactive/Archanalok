@@ -40,7 +40,7 @@
                         <a href="{{ route('home') }}">Home</a> |
                         <a href="{{ route('maincategory.show', $mainCategory->slug) }}">{{ $mainCategory->name }}</a>
                         |
-                        <a href=""></a>{{   $product->category->name }}</a>
+                        <a href=""></a>{{ $product->category->name }}</a>
                         |
                         <span>{{ $product->name }}</span>
                     </div>
@@ -87,48 +87,77 @@
                             @php
                                 $price = $product->has_variants == 0 ? $product->sale_price : $product->price;
                             @endphp
-                            <span class="price"><span>₹{{ number_format($price, 2) }}</span></span>
+
+                            @if ($price == 0 || $price == null)
+                                <span class="price"><span>₹0.00</span></span>
+                            @endif
+
                         </div>
 
                         <div class="metatext"><span>Code:</span> <a href="#">{{ $product->sku ?? 'N/A' }}</a></div>
-                        <div class="metatext"><span>Material:</span> <a href="#">{{ $product->materialDetail->name ?? 'N/A' }}</a></div>
-                        <div class="metatext"><span>Units:</span> <a href="#">{{$product->unitDetail->name ?? 'N/A' }}</a></div>
-                        <div class="metatext"><span>weight type:</span> <a href="#">{{  $product->weightTypeDetail->name ?? 'N/A' }}</a>
+                        <div class="metatext"><span>Material:</span> <a
+                                href="#">{{ $product->materialDetail->name ?? 'N/A' }}</a></div>
+                        <div class="metatext"><span>Units:</span> <a
+                                href="#">{{ $product->unitDetail->name ?? 'N/A' }}</a></div>
+                        <div class="metatext"><span>weight type:</span> <a
+                                href="#">{{ $product->weightTypeDetail->name ?? 'N/A' }}</a>
                         </div>
-                        <div class="metatext"><span>Brand:</span> <a href="#">{{ $product->brandName->name ?? 'N/A' }}</a></div>
-                     
+                        <div class="metatext"><span>Brand:</span> <a
+                                href="#">{{ $product->brandName->name ?? 'N/A' }}</a></div>
+
                         <div class="excerpt">
 
                         </div>
 
-                        <!-- Sizes Dropdown -->
-                        {{-- @if ($product->sizes->isNotEmpty())
-                        <div class="excerpt">
-                            <h4 class="">Sizes</h4>
-                            <div class="dropdown">
-                                <button class="btn btn-secondary" type="button" id="sizeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Select Size
-                                </button>
-                                <div class="dropdown-menu" aria-labelledby="sizeDropdown">
-                                    @foreach ($product->sizes as $size)
-                                        <a class="dropdown-item" href="#">{{ $size }}</a>
-                                    @endforeach
-                                </div>
+                        <section class="product-variants-section">
+                            <div class="container-fluid">
+                                <h2 class="text-center">Product Variants</h2>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Variation Code</th>
+                                            <th>SKU</th>
+                                            <th>Sale Price</th>
+                                            <th>Offer Price</th>
+                                            <th>Distributor Price</th>
+                                            <th>Wholesale Price</th>
+                                            <th>Min Order Qty</th>
+                                            <th>Weight</th>
+                                            <th>Stock Qty</th>
+                                            <th>Status</th>
+                                            <th>Images</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($variants as $index => $variant)
+                                            <tr>
+                                                <td>{{ $index + 1 }}</td>
+                                                <td>{{ $variant->variation_code }}</td>
+                                                <td>{{ $variant->sku }}</td>
+                                                <td>₹{{ number_format($variant->sale_price, 2) }}</td>
+                                                <td>₹{{ number_format($variant->offer_price, 2) }}</td>
+                                                <td>₹{{ number_format($variant->distributor_price, 2) }}</td>
+                                                <td>₹{{ number_format($variant->wholesale_price, 2) }}</td>
+                                                <td>{{ $variant->min_order_qty }}</td>
+                                                <td>{{ $variant->weight }} kg</td>
+                                                <td>{{ $variant->qty }}</td>
+                                                <td>{{ $variant->status == 1 ? 'Active' : 'Inactive' }}</td>
+                                                <td>
+                                                    @php
+                                                        $variantImages = $images->where('variant_id', $variant->id);
+                                                    @endphp
+                                                    @foreach ($variantImages as $image)
+                                                        <img src="{{ asset($image->image_path) }}" alt="Variant Image" style="width: 50px; height: 50px; margin-right: 5px;">
+                                                    @endforeach
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
                             </div>
-                        </div>
-                    @endif
-
-                    <!-- Colors Section -->
-                    @if ($product->colors->isNotEmpty())
-                        <div class="excerpt">
-                            <h4 class="">Available Colors</h4>
-                            <div class="color-options d-flex">
-                                @foreach ($product->colors as $color)
-                                    <div class="color-option" style="background-color: {{ $color }}; width: 50px; height: 50px; margin-right: 10px; cursor: pointer;" title="{{ $color }}"></div>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif --}}
+                        </section>
+                        
 
                         <!-- Quantity Section -->
                         <div class="quantityd clearfix">
@@ -162,7 +191,7 @@
                         <!-- Description Tab -->
                         <div class="tab-pane fade in active show" id="description" role="tabpanel">
                             <div class="tab-description">
-                               
+
                                 <p>{!! $product->description !!}</p>
                             </div>
                         </div>

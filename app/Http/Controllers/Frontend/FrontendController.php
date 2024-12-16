@@ -10,6 +10,8 @@ use App\Models\FooterInfo;
 use App\Models\HomeInfo;
 use App\Models\MainCategory;
 use App\Models\Product;
+use App\Models\ProductImage;
+use App\Models\ProductVariant;
 use App\Models\SubCategory;
 use App\Models\Subscriber;
 use Illuminate\Contracts\View\View;
@@ -180,8 +182,14 @@ public function productPage($slug)
         ->limit(10)
         ->with('images') // Eager load images
         ->get();
+        $variants = ProductVariant::where('product_id', $product->id)->get();
 
-    return view('frontend.home.category.cat-product-details', compact('product', 'mainCategory', 'categories', 'relatedProducts'));
+        // Fetch images for the variants
+        $images = ProductImage::where('product_id', $product->id)
+            ->orderBy('order', 'asc')
+            ->get();
+
+    return view('frontend.home.category.cat-product-details', compact('product', 'mainCategory', 'categories', 'relatedProducts', 'variants', 'images'));
 }
 
 public function categoryPage($slug)
