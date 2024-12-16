@@ -26,7 +26,7 @@ Route::get('/', [FrontendController::class, 'index'])->name('home');
 Route::get('/{slug}', [FrontendController::class, 'mainCategoryPage'])->name('maincategory.show');
 
 // SubCategory Page
-// Route::get('/{slug}', [FrontendController::class, 'subCategoryPage'])->name('subcategory.show');
+Route::get('/{mainCategorySlug}/{categorySlug}/{slug}', [FrontendController::class, 'subCategoryPage'])->name('subcategory.show');
 
 // // Product details Page
 Route::get('/product/{slug}', [FrontendController::class, 'productPage'])->name('product.show');

@@ -105,10 +105,37 @@
                         <div class="metatext"><span>Brand:</span> <a
                                 href="#">{{ $product->brandName->name ?? 'N/A' }}</a></div>
 
-                        <div class="excerpt">
-
-                        </div>
-
+                                <div class="">
+                                    <div class="excerpt">
+                                        <h4 class="">Sizes</h4>
+                                        <div class="dropdown">
+                                            <button class="btn btn-secondary " type="button" id="sizeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                Select Size
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="sizeDropdown">
+                                                <a class="dropdown-item" href="#">850</a>
+                                                <a class="dropdown-item" href="#">1000</a>
+                                                <a class="dropdown-item" href="#">1250</a>
+                                                <!-- <a class="dropdown-item" href="#">Extra Large</a>
+                                                <a class="dropdown-item" href="#">Custom Size</a> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+    
+    
+    
+                                <div class="">
+                                    <div class="excerpt">
+                                        <h4 class="">Available Colors</h4>
+                                        <div class="color-options d-flex">
+                                            <div class="color-option" style="background-color: green; width: 50px; height: 50px; margin-right: 10px; cursor: pointer;" title="Green"></div>
+                                            <div class="color-option" style="background-color: blue; width: 50px; height: 50px; margin-right: 10px; cursor: pointer;" title="Blue"></div>
+                                            <div class="color-option" style="background-color: red; width: 50px; height: 50px; margin-right: 10px; cursor: pointer;" title="Red"></div>
+                                            <div class="color-option" style="background-color: orange; width: 50px; height: 50px; cursor: pointer;" title="Orange"></div>
+                                        </div>
+                                    </div>
+                                </div>
                         <section class="product-variants-section">
                             <div class="container-fluid">
                                 <h2 class="text-center">Product Variants</h2>

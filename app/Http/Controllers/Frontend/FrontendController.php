@@ -78,19 +78,7 @@ class FrontendController extends Controller
     // dd($categories);
         return view('frontend.home.category.index', compact('mainCategory', 'categories'));
     }
-    
 
-    public function subCategoryPage($slug)
-    {
-        $subCategory = SubCategory::where('slug', $slug)->firstOrFail();
-    
-        $products = Product::where('sub_category_id', $subCategory->id)
-            ->where('status', 1)
-            ->get();
-    
-        return view('frontend.category.sub', compact('subCategory', 'products'));
-    }
-    
 /*     public function productPage($slug)
 {
     $product = Product::where('slug', $slug)->firstOrFail();
@@ -213,6 +201,71 @@ public function categoryPage($slug)
 }
 
 
+public function subCategoryPage($mainCategorySlug, $categorySlug, $subCategorySlug)
+{
+    // Fetch main category
+    $mainCategory = MainCategory::where('slug', $mainCategorySlug)->firstOrFail();
+
+    // Fetch category
+    $category = Category::where('slug', $categorySlug)->where('main_category_id', $mainCategory->id)->firstOrFail();
+
+    // Fetch subcategory
+    $subCategory = SubCategory::where('slug', $subCategorySlug)->where('category_id', $category->id)->firstOrFail();
+
+    // Fetch products under the subcategory
+    $products = DB::table('products')
+        ->leftJoin('product_images', 'products.id', '=', 'product_images.product_id')
+        ->select(
+            'products.id',
+            'products.name',
+            'products.slug',
+            'products.sale_price',
+            'products.offer_price',
+            'products.qty',
+            'products.status',
+            DB::raw('MIN(product_images.image_path) as product_image') // Fetch the first image
+        )
+        ->where('products.sub_category_id', '=', $subCategory->id)
+        ->where('products.status', '=', 1) // Only active products
+        ->groupBy('products.id', 'products.name', 'products.slug', 'products.sale_price', 'products.offer_price', 'products.qty', 'products.status')
+        ->orderBy('products.priority', 'asc') // Order by priority
+        ->get();
+        
+    $categories = DB::table('categories')
+        ->leftJoin('sub_categories', function ($join) {
+            $join->on('categories.id', '=', 'sub_categories.category_id')
+                ->where('sub_categories.status', '=', '1'); // Filter active subcategories
+        })
+        ->leftJoin('products', function ($join) {
+            $join->on('categories.id', '=', 'products.category_id')
+                ->where('products.status', '=', '1'); // Filter active products
+        })
+        ->leftJoin('product_images', function ($join) {
+            $join->on('products.id', '=', 'product_images.product_id');
+        })
+        ->select(
+            'categories.id as category_id',
+            'categories.name as category_name',
+            'categories.slug as category_slug',
+            DB::raw('GROUP_CONCAT(DISTINCT sub_categories.id ORDER BY sub_categories.position ASC) as sub_category_ids'),
+            DB::raw('GROUP_CONCAT(DISTINCT sub_categories.name ORDER BY sub_categories.position ASC) as sub_category_names'),
+            DB::raw('GROUP_CONCAT(DISTINCT sub_categories.slug ORDER BY sub_categories.position ASC) as sub_category_slugs'),
+            DB::raw('GROUP_CONCAT(DISTINCT products.id ORDER BY products.priority ASC) as product_ids'),
+            DB::raw('GROUP_CONCAT(DISTINCT products.name ORDER BY products.priority ASC) as product_names'),
+            DB::raw('GROUP_CONCAT(DISTINCT products.slug ORDER BY products.priority ASC) as product_slugs'),
+            DB::raw('GROUP_CONCAT(DISTINCT (
+                SELECT image_path
+                FROM product_images pi
+                WHERE pi.product_id = products.id
+                ORDER BY pi.order ASC LIMIT 1
+            )) as product_images')
+        )
+        ->where('categories.main_category_id', '=', $mainCategory->id) // Filter by main category ID
+        ->groupBy('categories.id', 'categories.name', 'categories.slug')
+        ->get();
+
+    return view('frontend.home.subcategory.index', compact('mainCategory', 'category', 'subCategory', 'products', 'categories'));
+}
 
 
 
