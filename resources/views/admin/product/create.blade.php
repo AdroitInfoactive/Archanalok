@@ -368,7 +368,7 @@
 
     </script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-    <script src="{{ asset('admin/assets/js/product-page.js') }}"></script>
+    <script src="{{ asset('admin/assets/js/product-create-page.js') }}"></script>
     <script src="{{ asset('admin/assets/js/form-script.js') }}"></script>
     <script src="{{ asset('admin/assets/js/seo-handler-create.js') }}"></script>
 @endpush

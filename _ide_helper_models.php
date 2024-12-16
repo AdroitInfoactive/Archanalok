@@ -365,30 +365,42 @@ namespace App\Models{
  * @property string $slug
  * @property int $main_category_id
  * @property int $category_id
- * @property int $sub_category_id
+ * @property int|null $sub_category_id
  * @property string|null $description
  * @property string|null $specification
  * @property string $brand
+ * @property string $material
+ * @property string $units
+ * @property string $weight_type
  * @property string|null $file
  * @property string|null $other_code
  * @property int|null $gst
  * @property int $has_variants
- * @property string $sale_price
+ * @property string|null $sale_price
  * @property string|null $offer_price
  * @property string|null $distributor_price
  * @property string|null $wholesale_price
  * @property int|null $min_order_qty
  * @property string|null $weight
  * @property int|null $qty
+ * @property string|null $variation_ids
  * @property string|null $seo_title
  * @property string|null $seo_description
  * @property int $priority
  * @property int $status
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Brand|null $brandName
  * @property-read \App\Models\Category $category
- * @property-read \App\Models\Category $mainCategory
- * @property-read \App\Models\Category $subCategory
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductImage> $images
+ * @property-read int|null $images_count
+ * @property-read \App\Models\MainCategory $mainCategory
+ * @property-read \App\Models\VariantDetail|null $materialDetail
+ * @property-read \App\Models\SubCategory|null $subCategory
+ * @property-read \App\Models\VariantDetail|null $unitDetail
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductVariant> $variants
+ * @property-read int|null $variants_count
+ * @property-read \App\Models\VariantDetail|null $weightTypeDetail
  * @method static \Illuminate\Database\Eloquent\Builder|Product newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Product newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Product query()
@@ -402,6 +414,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereHasVariants($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereMainCategoryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereMaterial($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereMinOrderQty($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereOfferPrice($value)
@@ -416,8 +429,11 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereSpecification($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereSubCategoryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereUnits($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereVariationIds($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereWeight($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereWeightType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereWholesalePrice($value)
  */
 	class Product extends \Eloquent {}
@@ -427,11 +443,66 @@ namespace App\Models{
 /**
  * App\Models\ProductImage
  *
+ * @property int $id
+ * @property int $product_id
+ * @property int|null $variant_id
+ * @property string $image_path
+ * @property int $order
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder|ProductImage newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ProductImage newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ProductImage query()
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductImage whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductImage whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductImage whereImagePath($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductImage whereOrder($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductImage whereProductId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductImage whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductImage whereVariantId($value)
  */
 	class ProductImage extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * App\Models\ProductVariant
+ *
+ * @property int $id
+ * @property int $product_id
+ * @property string $variation_code
+ * @property string $sku
+ * @property string|null $sale_price
+ * @property string|null $offer_price
+ * @property string|null $distributor_price
+ * @property string|null $wholesale_price
+ * @property int $min_order_qty
+ * @property string|null $weight
+ * @property int $qty
+ * @property int $status
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductImage> $images
+ * @property-read int|null $images_count
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant query()
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereDistributorPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereMinOrderQty($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereOfferPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereProductId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereQty($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereSalePrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereSku($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereVariationCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereWeight($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereWholesalePrice($value)
+ */
+	class ProductVariant extends \Eloquent {}
 }
 
 namespace App\Models{
@@ -650,17 +721,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|User whereUpdatedAt($value)
  */
 	class User extends \Eloquent {}
-}
-
-namespace App\Models{
-/**
- * App\Models\Variant
- *
- * @method static \Illuminate\Database\Eloquent\Builder|Variant newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Variant newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Variant query()
- */
-	class Variant extends \Eloquent {}
 }
 
 namespace App\Models{

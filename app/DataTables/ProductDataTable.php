@@ -23,15 +23,15 @@ class ProductDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
         ->addColumn('action', function ($query) {
-       /*  $view = '<a href="' . route('admin.products.show', $query->id) . '" class="btn btn-success btn-sm mr-1"><i
-                class="fa fa-eye"></i></a>'; */
+        $view = '<a href="' . route('admin.products.show', $query->id) . '" class="btn btn-success btn-sm mr-1"><i
+                class="fa fa-eye"></i></a>';
         $edit = '<a href="' . route('admin.products.edit', $query->id) . '" class="btn btn-primary btn-sm mr-1"><i
                 class="fa fa-edit"></i></a>';
         $delete = '<a href="' . route('admin.products.destroy', $query->id) . '"
             class="btn btn-danger btn-sm delete-item"><i class="fa fa-trash"></i></a>';
 
 
-        return '<div class="d-flex align-items-center">'  . $edit . $delete . '</div>';
+        return '<div class="d-flex align-items-center">' . $view  . $edit . $delete . '</div>';
         })->addColumn('status', function ($query) {
         if ($query->status == 1) {
         return '<span class="badge badge-success">Active</span>';
@@ -84,11 +84,11 @@ class ProductDataTable extends DataTable
         Column::make('sku'),
         Column::make('status'),
 
-       /*  Column::computed('action')
+        Column::computed('action')
         ->exportable(false)
         ->printable(false)
         ->width(150)
-        ->addClass('text-center'), */
+        ->addClass('text-center'),
         ];
     }
 
