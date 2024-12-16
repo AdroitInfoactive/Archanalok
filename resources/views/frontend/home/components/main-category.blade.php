@@ -11,13 +11,13 @@
                     @foreach(@$mainCategory as $category)
                         <div class="product-item-2 text-center">
                             <div class="product-thumb"> 
-                                <a href="cat-product-page.html">
+                                <a href="{{ route('maincategory.show', $category->slug) }}">
                                     <img src="{{ asset(@$category->image ?: @$category->logo) }}" alt="{{ $category->name }}">
                                 </a>
                             </div>
                             <div class="product-details">
                                 <h5>
-                                    <a href="cat-product-page.html">{{ $category->name }}</a>
+                                    <a href="{{ route('maincategory.show', $category->slug) }}">{{ $category->name }}</a>
                                 </h5>
                             </div>
                         </div>

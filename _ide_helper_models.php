@@ -368,7 +368,7 @@ namespace App\Models{
  * @property int|null $sub_category_id
  * @property string|null $description
  * @property string|null $specification
- * @property \App\Models\Brand|null $brand
+ * @property string $brand
  * @property string $material
  * @property string $units
  * @property string $weight_type
@@ -390,11 +390,15 @@ namespace App\Models{
  * @property int $status
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Brand|null $brandName
  * @property-read \App\Models\Category $category
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductImage> $images
  * @property-read int|null $images_count
  * @property-read \App\Models\Category $mainCategory
+ * @property-read \App\Models\VariantDetail|null $materialDetail
  * @property-read \App\Models\Category|null $subCategory
+ * @property-read \App\Models\VariantDetail|null $unitDetail
+ * @property-read \App\Models\VariantDetail|null $weightTypeDetail
  * @method static \Illuminate\Database\Eloquent\Builder|Product newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Product newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Product query()

@@ -27,9 +27,21 @@ class Product extends Model
     {
         return $this->hasMany(ProductImage::class, 'product_id');
     }
-    public function brand()
+    public function brandName()
     {
-        return $this->belongsTo(Brand::class, 'brand_id');
+    return $this->belongsTo(Brand::class, 'brand');
     }
+    public function materialDetail()
+    {
+    return $this->belongsTo(VariantDetail::class, 'material', 'id');
+    }
+     public function unitDetail()
+     {
+     return $this->belongsTo(VariantDetail::class, 'units', 'id');
+     }
+     public function weightTypeDetail()
+     {
+     return $this->belongsTo(VariantDetail::class, 'weight_type', 'id');
+     }
 
 }
