@@ -2,8 +2,18 @@
 @section('content')
 
 @include('frontend.home.category.header')
-@include('frontend.home.category.banner')
- 
+<section class="page_banner" style="background-image: url(assets/images/banner.jpg);">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <h3 class="pb_title">26MM</h3>
+                <div class="page_crumb">
+                    <a href="#">Home</a> | <a href="#">Products</a> | <a href="#">Products</a> | <a href="#">PVC Membrane</a> |  <span>26MM</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section> 
 
 <!-- Popup Search End -->
 <section class="popup_search_sec">
