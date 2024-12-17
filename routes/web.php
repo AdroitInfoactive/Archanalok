@@ -21,6 +21,25 @@ Route::group(['middleware' => 'guest'], function () {
 require __DIR__.'/auth.php';
 /** Show Home page */
 Route::get('/', [FrontendController::class, 'index'])->name('home');
+/** About Routes */
+Route::get('/about', [FrontendController::class, 'about'])->name('about');
+/** Privacy Policy Routes */
+
+
+/** Trams and Conditions Routes */
+Route::get('/terms-and-conditions', [FrontendController::class, 'termsAndConditions'])->name('terms-and-conditions');
+// shippingpolicy
+Route::get('/shipping-policy', [FrontendController::class, 'shippingPolicy'])->name('shipping-policy.index');
+// returnpolicy
+Route::get('/return-policy', [FrontendController::class, 'returnPolicy'])->name('return-policy.index');
+/** Contact Routes */
+Route::get('/contact', [FrontendController::class, 'contact'])->name('contact.index');
+
+Route::get('/privacy-policy', [FrontendController::class, 'privacyPolicy'])->name('privacy-policy.index');
+// testimonials
+Route::get('/testimonials', [FrontendController::class, 'testimonials'])->name('testimonials.index');
+
+
 
 // Category Page (MainCategory -> Category -> SubCategory)
 Route::get('/{slug}', [FrontendController::class, 'mainCategoryPage'])->name('maincategory.show');
@@ -33,3 +52,8 @@ Route::get('/product/{slug}', [FrontendController::class, 'productPage'])->name(
 
 /** Newsletter Routes */
 Route::post('/subscribe-newsletter', [FrontendController::class, 'subscribeNewsletter'])->name('subscribe-newsletter');
+
+
+
+
+

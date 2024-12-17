@@ -19,11 +19,11 @@
                             <ul class="navbar-nav">
                                 <li class="menu-item-has-children">
                                     {{-- <a href="index.html">Home</a> --}}
-                                    <a href="javascript:void(0);">Home</a>
+                                    <a href="{{ url('/') }}">Home</a>
                                 </li>
                                 <li>
                                     {{-- <a href="about.html">About</a> --}}
-                                    <a href="javascript:void(0);">About</a>
+                                    <a href="{{ route('about') }}">About</a>
                                 </li>
                                 <li class="menu-item-has-children">
                                     <a href="javascript:void(0);">{{ $mainCategory->name }}
@@ -39,7 +39,7 @@
 
                                 <li>
                                     {{-- <a href="contact.html">Contact</a> --}}
-                                    <a href="javascript:void(0);">Contact</a>
+                                    <a href="{{ route('contact.index') }}">Contact</a>
                                 </li>
                             </ul>
                         </div>

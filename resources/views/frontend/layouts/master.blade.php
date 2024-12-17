@@ -57,25 +57,12 @@
                         <div class="collapse navbar-collapse">
                             <ul class="navbar-nav">
                                 <li class="menu-item-has-children">
-                                    {{-- <a href="index.html">Home</a> --}}
-                                    <a href="javascript:void(0);">Home</a>
+                                    <a href="{{ url('/') }}">Home</a>
                                 </li>
                                 <li>
-                                    {{-- <a href="about.html">About</a> --}}
-                                    <a href="javascript:void(0);">About</a>
+                                    <a href="{{ route('about') }}">About</a>
                                 </li>
-                                {{-- <li class="menu-item-has-children">
-                                <a href="javascript:void(0);">Products
-                                    <ul class="sub-menu">
-                                        <li><a href="javascript:void(0);">Pvc Membrane</a></li>
-                                        <li><a href="#">Synthetic Leather(Rexine)</a></li>
-                                        <li><a href="#">Vinyl Flooring</a></li>
-                                        <li><a href="#">Laminate Sheet</a></li>
-                                        <li><a href="#">All Other Flooring</a></li>
-                                        <li><a href="#">PVC Sheeting</a></li>
-                                    </ul>
-                                </a>
-                            </li> --}}
+                                
                                 <li class="menu-item-has-children">
                                     <a href="javascript:void(0);">Products</a>
                                     <ul class="sub-menu">
@@ -90,8 +77,7 @@
                                 </li>
 
                                 <li>
-                                    {{-- <a href="contact.html">Contact</a> --}}
-                                    <a href="javascript:void(0);">Contact</a>
+                                    <a href="{{ route('contact.index') }}">Contact</a>
                                 </li>
                             </ul>
                         </div>

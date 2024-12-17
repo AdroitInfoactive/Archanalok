@@ -84,6 +84,7 @@
     @include('frontend.layouts.global-scripts')
 
     @stack('scripts')
+    @stack('styles')
 </body>
 
 </html>
