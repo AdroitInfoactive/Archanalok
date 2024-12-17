@@ -195,7 +195,9 @@
                         </div>
                         <div class="listing-meta">
                             <a class="add-to-cart" href="cart.html"><i class="nss-shopping-cart1"></i>Add To Cart</a>
-                            <a href="wishlist.html" class="whishlist"><i class="nss-heart1"></i></a>
+                            <a href="javascript:;" class="whishlist" onclick="addToWishlist('{{ $product->id }}')">
+                                <i class="nss-heart1"></i>
+                            </a>
                         </div>
                     </div>
                 </div>

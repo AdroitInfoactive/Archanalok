@@ -150,10 +150,17 @@
                                             <div class="product-thumb">
                                                 <img src="{{ asset($product->product_image) }}"
                                                     alt="{{ $product->name }}">
-                                                <div class="product-meta">
+                                                {{-- <div class="product-meta">
                                                     <a href="" class="view"><i class="nss-eye1"></i></a>
                                                     <a href="" class="whishlist"><i class="nss-heart1"></i></a>
+                                                </div> --}}
+                                                <div class="product-meta">
+                                                    <a href="{{ url('product/' . ($product->slug ?? '#')) }}" class="view"><i class="nss-eye1"></i></a>
+                                                    <a href="javascript:;" class="whishlist" onclick="addToWishlist('{{ $product->id }}')">
+                                                        <i class="nss-heart1"></i>
+                                                    </a>
                                                 </div>
+                                                
                                                 <a class="add-to-cart" href=""><i
                                                         class="nss-shopping-cart1"></i>Add To Cart</a>
                                             </div>
@@ -198,8 +205,8 @@
                                                         <div class="listing-meta">
                                                             <a class="add-to-cart" href=""><i
                                                                     class="nss-shopping-cart1"></i>Add To Cart</a>
-                                                            <a href="" class="view"><i class="nss-eye1"></i></a>
-                                                            <a href="" class="whishlist"><i
+                                                            <a href="{{ url('product/' . ($product->slug ?? '#')) }}" class="view"><i class="nss-eye1" ></i></a>
+                                                            <a href="javascript:;" class="whishlist" onclick="addToWishlist('{{ $product->id }}')"><i
                                                                     class="nss-heart1"></i></a>
                                                         </div>
                                                     </div>

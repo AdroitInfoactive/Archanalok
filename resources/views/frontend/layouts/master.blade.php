@@ -85,7 +85,7 @@
                         <!-- Btn -->
                         <div class="access-btn">
                             <a href="javascript:void(0);" class="btn-search"><i class="nss-search1"></i></a>
-                            <a href="myaccount.html" class="btn-user"><i class="nss-user1"></i></a>
+                            <a href="{{ route('dashboard') }}" class="btn-user"><i class="nss-user1"></i></a>
                             <a href="cart.html" class="btn-cart"><i class="nss-shopping-cart1"></i><span>1</span></a>
                         </div>
                         <!-- Btn -->
@@ -166,6 +166,7 @@
     @include('frontend.layouts.global-scripts')
 
     @stack('scripts')
+    @stack('styles')
 </body>
 
 </html>
