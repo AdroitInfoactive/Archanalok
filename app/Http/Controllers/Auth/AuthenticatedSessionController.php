@@ -42,10 +42,20 @@ class AuthenticatedSessionController extends Controller
         }
         return redirect()->intended(RouteServiceProvider::HOME);
     } elseif ($request->user()->status === 'p') {
+        $msg='Your account is pending for approval, Please contact administrator.';
         auth()->logout(); // Logout the user
     }
+    elseif ($request->user()->status === 'i') {
+        $msg='Your account is inactive, Please contact administrator.';
+        auth()->logout(); // Logout the user
+    }
+    elseif ($request->user()->status === 'r') {
+        $msg='Your account is rejected, Please contact administrator.';
+        auth()->logout(); // Logout the user
+        
+    }
     auth()->logout();
-    return redirect()->route('login')->withErrors(['status' => 'Your account is not active.']);
+    return redirect()->route('login')->withErrors(['status' => $msg]);
 }
 
 
