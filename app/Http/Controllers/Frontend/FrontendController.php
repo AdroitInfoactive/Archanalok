@@ -38,14 +38,10 @@ class FrontendController extends BaseController
         $bannerSliders = BannerSlider::where('status', 1)->orderBy('position', 'asc')->get();
         $homeInfo = HomeInfo::first();
         $counter = Counter::first();
-        $footerInfo = FooterInfo::first();
-        $mainCategory = MainCategory::where('status', 1)
-            ->orderBy('position', 'asc')
-            ->get();
 
         // Fetch categories and their related subcategories
 
-        return view('frontend.home.index', compact('bannerSliders', 'homeInfo', 'counter', 'footerInfo', 'mainCategory'));
+        return view('frontend.home.index', compact('bannerSliders', 'homeInfo', 'counter'));
     }
     public function mainCategoryPage($slug)
     {
