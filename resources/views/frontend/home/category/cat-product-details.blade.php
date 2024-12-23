@@ -84,13 +84,42 @@
                     <div class="product-decp">
                         <h4>{{ $product->name }}</h4>
                         <div class="product_price clearfix">
-                            @php
+                          {{--   @php
                                 $price = $product->has_variants == 0 ? $product->sale_price : $product->price;
                             @endphp
 
                             @if ($price == 0 || $price == null)
                                 <span class="price"><span>₹0.00</span></span>
-                            @endif
+                            @endif --}}
+                            @if ($product->has_variants == 0)
+                            @php
+                          
+                                // Handle price for products without variants
+                                $price = $product->sale_price; // Default to sale price
+                                if (auth()->check()) {
+                                    $price = match (auth()->user()->role) {
+                                        'user' => $product->sale_price,
+                                        'ws' => $product->wholesale_price,
+                                        'dr' => $product->distributor_price,
+                                        default => $product->sale_price,
+                                    };
+                                }
+                            @endphp
+                            <span class="price"><span><span>₹</span>{{ number_format($price, 2) }}</span></span>
+                        @else
+                            @php
+                                $price = $variants[0]->sale_price; // Default to sale price
+                                if (auth()->check()) {
+                                    $price = match (auth()->user()->role) {
+                                        'user' => $variants[0]->sale_price ?? $product->sale_price,
+                                        'ws' => $variants[0]->wholesale_price ?? $product->wholesale_price,
+                                        'dr' => $variants[0]->distributor_price ?? $product->distributor_price,
+                                        default => $variants[0]->sale_price ?? $product->sale_price,
+                                    };
+                                }
+                            @endphp
+                            <span class="price"><span><span>₹</span>{{ number_format($price, 2) }}</span></span>
+                        @endif
 
                         </div>
 
@@ -105,10 +134,37 @@
                         <div class="metatext"><span>Brand:</span> <a
                                 href="#">{{ $product->brandName->name ?? 'N/A' }}</a></div>
 
-                        <div class="excerpt">
-
-                        </div>
-
+                                <div class="">
+                                    <div class="excerpt">
+                                        <h4 class="">Sizes</h4>
+                                        <div class="dropdown">
+                                            <button class="btn btn-secondary " type="button" id="sizeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                Select Size
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="sizeDropdown">
+                                                <a class="dropdown-item" href="#">850</a>
+                                                <a class="dropdown-item" href="#">1000</a>
+                                                <a class="dropdown-item" href="#">1250</a>
+                                                <!-- <a class="dropdown-item" href="#">Extra Large</a>
+                                                <a class="dropdown-item" href="#">Custom Size</a> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+    
+    
+    
+                                <div class="">
+                                    <div class="excerpt">
+                                        <h4 class="">Available Colors</h4>
+                                        <div class="color-options d-flex">
+                                            <div class="color-option" style="background-color: green; width: 50px; height: 50px; margin-right: 10px; cursor: pointer;" title="Green"></div>
+                                            <div class="color-option" style="background-color: blue; width: 50px; height: 50px; margin-right: 10px; cursor: pointer;" title="Blue"></div>
+                                            <div class="color-option" style="background-color: red; width: 50px; height: 50px; margin-right: 10px; cursor: pointer;" title="Red"></div>
+                                            <div class="color-option" style="background-color: orange; width: 50px; height: 50px; cursor: pointer;" title="Orange"></div>
+                                        </div>
+                                    </div>
+                                </div>
                         <section class="product-variants-section">
                             <div class="container-fluid">
                                 <h2 class="text-center">Product Variants</h2>
@@ -168,7 +224,9 @@
                         </div>
                         <div class="listing-meta">
                             <a class="add-to-cart" href="cart.html"><i class="nss-shopping-cart1"></i>Add To Cart</a>
-                            <a href="wishlist.html" class="whishlist"><i class="nss-heart1"></i></a>
+                            <a href="javascript:;" class="whishlist" onclick="addToWishlist('{{ $product->id }}')">
+                                <i class="nss-heart1"></i>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -242,54 +300,7 @@
     <!-- Related Products End -->
 @endsection
 
-@push('scripts')
-    <script>
-        $('.slider-for').slick({
-            slidesToShow: 1,
-            slidesToScroll: 1,
-            arrows: false,
-            fade: true,
-            asNavFor: '.slider-nav'
-        });
-        $('.slider-nav').slick({
-            slidesToShow: 4,
-            slidesToScroll: 1,
-            vertical: true,
-            asNavFor: '.slider-for',
-            dots: false,
-            focusOnSelect: true,
-            verticalSwiping: true,
-            responsive: [{
-                    breakpoint: 992,
-                    settings: {
-                        vertical: false,
-                    }
-                },
-                {
-                    breakpoint: 768,
-                    settings: {
-                        vertical: false,
-                    }
-                },
-                {
-                    breakpoint: 580,
-                    settings: {
-                        vertical: false,
-                        slidesToShow: 3,
-                    }
-                },
-                {
-                    breakpoint: 380,
-                    settings: {
-                        vertical: false,
-                        slidesToShow: 2,
-                    }
-                }
-            ]
-        });
-    </script>
-@endpush
-{{-- @push('styles') --}}
+@push('styles')
 <style>
     .vehicle-detail-banner .car-slider-desc {
         max-width: 180px;
@@ -536,4 +547,51 @@
         /* Make it visible */
     }
 </style>
-{{-- @endpush --}}
+@endpush
+@push('scripts')
+    <script>
+        $('.slider-for').slick({
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            arrows: false,
+            fade: true,
+            asNavFor: '.slider-nav'
+        });
+        $('.slider-nav').slick({
+            slidesToShow: 4,
+            slidesToScroll: 1,
+            vertical: true,
+            asNavFor: '.slider-for',
+            dots: false,
+            focusOnSelect: true,
+            verticalSwiping: true,
+            responsive: [{
+                    breakpoint: 992,
+                    settings: {
+                        vertical: false,
+                    }
+                },
+                {
+                    breakpoint: 768,
+                    settings: {
+                        vertical: false,
+                    }
+                },
+                {
+                    breakpoint: 580,
+                    settings: {
+                        vertical: false,
+                        slidesToShow: 3,
+                    }
+                },
+                {
+                    breakpoint: 380,
+                    settings: {
+                        vertical: false,
+                        slidesToShow: 2,
+                    }
+                }
+            ]
+        });
+    </script>
+@endpush

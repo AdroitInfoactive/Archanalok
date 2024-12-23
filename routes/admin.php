@@ -23,16 +23,21 @@ use App\Http\Controllers\Admin\SubCategoryController;
 use App\Http\Controllers\Admin\TermsAndCoditionController;
 use App\Http\Controllers\Admin\VariantDetailController;
 use App\Http\Controllers\Admin\VariantMasterController;
+use App\Http\Controllers\Auth\RegisteredUserController;
 
 Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
   Route::get('dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-  // admin/dashboard and name admin.dashboard
 
 
   /** Profile Routes **/
   Route::get('profile', [ProfileController::class, 'index'])->name('profile');
   Route::put('profile', [ProfileController::class, 'updateProfile'])->name('profile.update');
   Route::put('profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
+
+    /** user Routes */
+    Route::get('users', [RegisteredUserController::class, 'userDetails'])->name('user.status');
+    Route::post('/update-status', [RegisteredUserController::class, 'updateStatus'])->name('user.updateStatus');
+
   /** maincategory Routes */
   Route::resource('main-category', MainCategoryController::class);
 

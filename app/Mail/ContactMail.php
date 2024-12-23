@@ -23,7 +23,7 @@ class ContactMail extends Mailable
     public function __construct($name,$email,$mailSubject,$content)
     {
         $this->name = $name;
-        $this->$mailSubject = $mailSubject;
+        $this->mailSubject = $mailSubject;
         $this->email = $email;
         $this->content = $content;
     }

@@ -105,6 +105,7 @@
 
                 </ul>
             </li>
+            <li  class="{{ setSidebarActive(['admin.user.status']) }}"><a class="nav-link" href="{{ route('admin.user.status') }}"><i class="fas fa-user"></i> <span>Users</span></a></li>
             <li class="{{ setSidebarActive(['admin.news-letter.index']) }}"><a class="nav-link"
                 href="{{ route('admin.news-letter.index') }}"><i class="fas fa-newspaper"></i>
                 <span>News Letter</span></a></li>

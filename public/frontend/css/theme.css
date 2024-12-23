@@ -4731,6 +4731,24 @@ blockquote:after {
     -moz-transition: all 0.4s;
     transition: all 0.4s;
 }
+.submit_btn{
+    display: inline-block;
+    height: 60px;
+    font-size: 15px;
+    line-height: 60px;
+    color: #fff;
+    border: none;
+    text-align: center;
+    text-transform: capitalize;
+    font-weight: 500;
+    background: #f36e2d;
+    width: 100%;
+    border-radius: 3px;
+    outline: none;
+    -webkit-transition: all 0.4s;
+    -moz-transition: all 0.4s;
+    transition: all 0.4s;
+}
 .contact-form input[type="submit"]:hover{
     background: #f36e2d;
 }

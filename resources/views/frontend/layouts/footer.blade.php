@@ -34,14 +34,11 @@
                 <aside class="widget">
                     <h3 class="widget-title">Quick Links</h3>
                     <ul>
-                        <li><a href="#">Home</a></li>
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="#">Testimonials</a></li>
-                        <li><a href="#">Contact Us</a></li>
-                        {{-- <li><a href="index.html">Home</a></li>
-                        <li><a href="about.html">About Us</a></li>
-                        <li><a href="testimonials.html">Testimonials</a></li>
-                        <li><a href="contact.html">Contact Us</a></li> --}}
+                        <li><a href="{{ url('/') }}">Home</a></li>
+                        <li><a href="{{ route('about') }}">About Us</a></li>
+                        <li><a href="{{ route('testimonials.index') }}">Testimonials</a></li>
+                        <li><a href="{{ route('contact.index') }}">Contact Us</a></li>
+                       
                     </ul>
                 </aside>
             </div>
@@ -49,11 +46,13 @@
                 <aside class="widget">
                     <h3 class="widget-title">Products</h3>
                     <ul>
-                        <li><a href="#">Flooring</a></li>
-                        <li><a href="#">Laminates</a></li>
-                        <li><a href="cat-product-page.html">PVC Membrane</a></li>
-                        <li><a href="#">Artificial leather Cloth</a></li>
-                        <li><a href="#">Pre Laminated MDF Board</a></li>
+                        @foreach ($mainCategory as $category)
+                        <li>
+                            <a href="{{ route('maincategory.show', $category->slug) }}">
+                                {{ $category->name }}
+                            </a>
+                        </li>
+                    @endforeach
                     </ul>
                 </aside>
             </div>
@@ -61,11 +60,10 @@
                 <aside class="widget">
                     <h3 class="widget-title">Policies</h3>
                     <ul>
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">Return Policy</a></li>
-                        <li><a href="#">Shipping Policy</a></li>
-                        <li><a href="#">Terms & Conditions</a></li>
-                       
+                        <li><a href="{{ route('privacy-policy.index') }}">Privacy Policy</a></li>
+                        <li><a href="{{ route('return-policy.index') }}">Return Policy</a></li>
+                        <li><a href="{{ route('shipping-policy.index') }}">Shipping Policy</a></li>
+                        <li><a href="{{ route('terms-and-conditions') }}">Terms and Conditions</a></li>                       
                     </ul>
                 </aside>
             </div>

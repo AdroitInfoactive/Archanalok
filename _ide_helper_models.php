@@ -38,6 +38,45 @@ namespace App\Models{
 
 namespace App\Models{
 /**
+ * App\Models\Address
+ *
+ * @property int $id
+ * @property int $user_id
+ * @property string $first_name
+ * @property string|null $last_name
+ * @property string $email
+ * @property string $phone
+ * @property string $address
+ * @property string $city
+ * @property string $state
+ * @property string $country
+ * @property string $zip
+ * @property int $is_default
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder|Address newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Address newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Address query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Address whereAddress($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Address whereCity($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Address whereCountry($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Address whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Address whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Address whereFirstName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Address whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Address whereIsDefault($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Address whereLastName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Address wherePhone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Address whereState($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Address whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Address whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Address whereZip($value)
+ */
+	class Address extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
  * App\Models\BannerSlider
  *
  * @property int $id
@@ -701,6 +740,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $email_verified_at
  * @property mixed $password
  * @property string|null $remember_token
+ * @property string $status
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
@@ -720,6 +760,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|User wherePassword($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereRole($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereUpdatedAt($value)
  */
 	class User extends \Eloquent {}
@@ -778,5 +819,27 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|VariantMaster whereUpdatedAt($value)
  */
 	class VariantMaster extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * App\Models\Wishlist
+ *
+ * @property int $id
+ * @property int $user_id
+ * @property int $product_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Product $product
+ * @method static \Illuminate\Database\Eloquent\Builder|Wishlist newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Wishlist newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Wishlist query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Wishlist whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Wishlist whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Wishlist whereProductId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Wishlist whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Wishlist whereUserId($value)
+ */
+	class Wishlist extends \Eloquent {}
 }
 
