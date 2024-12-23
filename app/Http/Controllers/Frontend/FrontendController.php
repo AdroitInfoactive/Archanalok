@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ContactMail;
 use App\Models\BannerSlider;
 use App\Models\Category;
 use App\Models\Counter;
@@ -26,7 +27,8 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Mail;
 
-class FrontendController extends Controller
+// class FrontendController extends Controller
+class FrontendController extends BaseController
 {
     /**
      * Display a listing of the resource.
@@ -47,6 +49,7 @@ class FrontendController extends Controller
     }
     public function mainCategoryPage($slug)
     {
+        $footerInfo = FooterInfo::first();
         $mainCategory = MainCategory::where('slug', $slug)->firstOrFail();
         $categories = DB::table('categories')
             ->leftJoin('sub_categories', function ($join) {
@@ -82,7 +85,7 @@ class FrontendController extends Controller
             ->groupBy('categories.id', 'categories.name', 'categories.slug') // Group by unique category fields
             ->get();
         // dd($categories);
-        return view('frontend.home.category.index', compact('mainCategory', 'categories'));
+        return view('frontend.home.category.index', compact('mainCategory', 'categories', 'footerInfo'));
     }
 
     /*     public function productPage($slug)
@@ -128,6 +131,7 @@ class FrontendController extends Controller
 
     public function productPage($slug)
     {
+        $footerInfo = FooterInfo::first();
         // Fetch the product based on the slug
         $product = Product::where('slug', $slug)->with(['images'])->firstOrFail();
 
@@ -147,6 +151,7 @@ class FrontendController extends Controller
             ->leftJoin('product_images', function ($join) {
                 $join->on('products.id', '=', 'product_images.product_id');
             })
+        
             ->select(
                 'categories.id as category_id',
                 'categories.name as category_name',
@@ -157,6 +162,7 @@ class FrontendController extends Controller
                 DB::raw('GROUP_CONCAT(DISTINCT products.id ORDER BY products.priority ASC) as product_ids'),
                 DB::raw('GROUP_CONCAT(DISTINCT products.name ORDER BY products.priority ASC) as product_names'),
                 DB::raw('GROUP_CONCAT(DISTINCT products.slug ORDER BY products.priority ASC) as product_slugs'),
+
                 DB::raw('GROUP_CONCAT(DISTINCT (
                 SELECT image_path
                 FROM product_images pi
@@ -183,11 +189,12 @@ class FrontendController extends Controller
             ->orderBy('order', 'asc')
             ->get();
 
-        return view('frontend.home.category.cat-product-details', compact('product', 'mainCategory', 'categories', 'relatedProducts', 'variants', 'images'));
+        return view('frontend.home.category.cat-product-details', compact('product', 'mainCategory', 'categories', 'relatedProducts', 'variants', 'images', 'footerInfo'));
     }
 
     public function categoryPage($slug)
     {
+        $footerInfo = FooterInfo::first();
         // Fetch the category by slug
         $category = Category::where('slug', $slug)->firstOrFail();
         // Fetch subcategories for the category
@@ -203,12 +210,13 @@ class FrontendController extends Controller
                 ->get()
             : collect(); // Empty collection if subcategories exist
 
-        return view('frontend.home.category.index', compact('category', 'subcategories', 'products'));
+        return view('frontend.home.category.index', compact('category', 'subcategories', 'products', 'footerInfo'));
     }
 
 
     public function subCategoryPage($mainCategorySlug, $categorySlug, $subCategorySlug)
     {
+        $footerInfo = FooterInfo::first();
         // Fetch main category
         $mainCategory = MainCategory::where('slug', $mainCategorySlug)->firstOrFail();
 
@@ -221,19 +229,27 @@ class FrontendController extends Controller
         // Fetch products under the subcategory
         $products = DB::table('products')
             ->leftJoin('product_images', 'products.id', '=', 'product_images.product_id')
+            ->leftJoin(('product_variants'), 'products.id', '=', 'product_variants.product_id')
             ->select(
                 'products.id',
                 'products.name',
                 'products.slug',
+                'products.has_variants',
                 'products.sale_price',
                 'products.offer_price',
+                'products.distributor_price',
+                'products.wholesale_price',
                 'products.qty',
                 'products.status',
-                DB::raw('MIN(product_images.image_path) as product_image') // Fetch the first image
+                DB::raw('MIN(product_images.image_path) as product_image') ,// Fetch the first image
+                DB::raw('MIN(product_variants.sale_price) as variant_sale_price'), // Example aggregated field
+                DB::raw('MIN(product_variants.qty) as variant_qty'),
+                DB::raw('MIN(product_variants.distributor_price) as variant_distributor_price'),
+                DB::raw('MIN(product_variants.wholesale_price) as variant_wholesale_price')
             )
             ->where('products.sub_category_id', '=', $subCategory->id)
             ->where('products.status', '=', 1) // Only active products
-            ->groupBy('products.id', 'products.name', 'products.slug', 'products.sale_price', 'products.offer_price', 'products.qty', 'products.status')
+            ->groupBy('products.id', 'products.name', 'products.slug', 'products.sale_price', 'products.offer_price', 'products.qty', 'products.status', 'products.distributor_price', 'products.wholesale_price', 'products.has_variants')
             ->orderBy('products.priority', 'asc') // Order by priority
             ->get();
 
@@ -270,13 +286,8 @@ class FrontendController extends Controller
             ->groupBy('categories.id', 'categories.name', 'categories.slug')
             ->get();
 
-        return view('frontend.home.subcategory.index', compact('mainCategory', 'category', 'subCategory', 'products', 'categories'));
+        return view('frontend.home.subcategory.index', compact('mainCategory', 'category', 'subCategory', 'products', 'categories', 'footerInfo'));
     }
-
-
-
-
-
 
 
     function subscribeNewsletter(Request $request): Response
@@ -291,62 +302,56 @@ class FrontendController extends Controller
 
         return response(['status' => 'success', 'message' => 'Subscribed Successfully!']);
     }
-    function about(): View
+    public function about(): View
     {
         $about = About::first();
-        $mainCategory = MainCategory::where('status', 1)
-        ->orderBy('position', 'asc')
-        ->get();
-        return view('frontend.pages.about', compact('about', 'mainCategory'));
-
+        return view('frontend.pages.about', compact('about'));
     }
-    function testimonials(): View
+
+    public function testimonials(): View
     {
-        $mainCategory = MainCategory::where('status', 1)
-        ->orderBy('position', 'asc')
-        ->get();
-        return view('frontend.pages.testimonial', compact( 'mainCategory'));
-
+        return view('frontend.pages.testimonial');
     }
-    function privacyPolicy(): View
+
+    public function privacyPolicy(): View
     {
         $privacyPolicy = PrivacyPolicy::first();
-        $mainCategory = MainCategory::where('status', 1)
-        ->orderBy('position', 'asc')
-        ->get();
-        return view('frontend.pages.privacy-policy', compact('privacyPolicy', 'mainCategory'));
-    }
-    function returnPolicy(): View
-    {
-        $mainCategory = MainCategory::where('status', 1)
-        ->orderBy('position', 'asc')
-        ->get();
-        $returnPolicy = ReturnPolicy::first();
-        return view('frontend.pages.return-policy', compact('returnPolicy', 'mainCategory'));
-    }
-    function shippingPolicy(): View
-    {
-        $mainCategory = MainCategory::where('status', 1)
-        ->orderBy('position', 'asc')
-        ->get();
-        $shippingPolicy = ShippingPolicy::first();
-        return view('frontend.pages.shipping-policy', compact('shippingPolicy', 'mainCategory'));
-    }
-    function termsAndConditions(): View
-    {
-        $mainCategory = MainCategory::where('status', 1)
-        ->orderBy('position', 'asc')
-        ->get();
-        $termsAndConditions = TermsAndCondition::first();
-        return view('frontend.pages.terms-and-conditions', compact('termsAndConditions', 'mainCategory'));
+        return view('frontend.pages.privacy-policy', compact('privacyPolicy'));
     }
 
-    function contact(): View
+    public function returnPolicy(): View
     {
-        $mainCategory = MainCategory::where('status', 1)
-        ->orderBy('position', 'asc')
-        ->get();
+        $returnPolicy = ReturnPolicy::first();
+        return view('frontend.pages.return-policy', compact('returnPolicy'));
+    }
+
+    public function shippingPolicy(): View
+    {
+        $shippingPolicy = ShippingPolicy::first();
+        return view('frontend.pages.shipping-policy', compact('shippingPolicy'));
+    }
+
+    public function termsAndConditions(): View
+    {
+        $termsAndConditions = TermsAndCondition::first();
+        return view('frontend.pages.terms-and-conditions', compact('termsAndConditions'));
+    }
+
+    public function contact(): View
+    {
         $contact = Contact::first();
-        return view('frontend.pages.contact', compact('contact', 'mainCategory'));
+        return view('frontend.pages.contact', compact('contact'));
+    }
+    function sendContactMessage(Request $request) {
+        $request->validate([
+            'name' => ['required', 'max:50'],
+            'email' => ['required', 'email', 'max:255'],
+            'subject' => ['required', 'max:255'],
+            'message' => ['required', 'max: 1000']
+        ]);
+
+        Mail::send(new ContactMail($request->name, $request->email, $request->subject, $request->message));
+
+        return response(['status' => 'success', 'message' => 'Message Sent Successfully!']);
     }
 }

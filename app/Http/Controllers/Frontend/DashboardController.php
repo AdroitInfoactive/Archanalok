@@ -13,120 +13,74 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 
 
-class DashboardController extends Controller
+class DashboardController extends BaseController
 {
     function index() : View {
-        $footerInfo = FooterInfo::first();
-        $mainCategory = MainCategory::where('status', 1) ->orderBy('position', 'asc')  ->get();
         $wishlist = Wishlist::where('user_id', auth()->user()->id)->latest()->get();
         // $orders = Order::where('user_id', auth()->user()->id)->get();
         // $totalOrders = Order::where('user_id', auth()->user()->id)->count();
         // $totalCompleteOrders = Order::where('user_id', auth()->user()->id)->where('order_status', 'delivered')->count();
         // $totalCancelOrders = Order::where('user_id', auth()->user()->id)->where('order_status', 'declined')->count();
 
-        return view('frontend.dashboard.index', compact('wishlist', 'mainCategory', 'footerInfo'));
+        return view('frontend.dashboard.index', compact('wishlist'));
     }
     function address() : View {
-        $footerInfo = FooterInfo::first();
-        $mainCategory = MainCategory::where('status', 1) ->orderBy('position', 'asc')  ->get();
         $userAddresses = Address::where('user_id', auth()->user()->id)->get();
 
-        return view('frontend.dashboard.sections.address', compact('userAddresses', 'mainCategory', 'footerInfo'));
+        return view('frontend.dashboard.sections.address', compact('userAddresses'));
     }
-/* 
-    public function createAddress(AddressCreateRequest $request)
-    {
-        $address = new Address();
-        $address->user_id = auth()->user()->id;
-        $address->first_name = $request->first_name;
-        $address->last_name = $request->last_name ?? null; // Optional
-        $address->phone = $request->phone;
-        $address->email = $request->email;
-        $address->address = $request->address;
-        $address->city = $request->city;
-        $address->state = $request->state;
-        $address->country = $request->country;
-        $address->zip = $request->zip;
-        $address->is_default = $request->is_default ?? 0;
-    
-        $address->save();
-    
-        return response()->json(['success' => true, 'message' => 'Address added successfully!']);
-    }
-    
 
-    function updateAddress(string $id, AddressCreateRequest $request) {
-        // Fetch the address ensuring it belongs to the authenticated user
-        $address = Address::where('id', $id)
-            ->where('user_id', auth()->id())
-            ->firstOrFail();
-    
-        // Update address fields
-        $address->update([
-            'first_name'   => $request->first_name,
-            'last_name'    => $request->last_name,
-            'email'        => $request->email,
-            'phone'        => $request->phone,
-            'address'      => $request->address,
-            'city'         => $request->city,
-            'state'        => $request->state,
-            'country'      => $request->country,
-            'zip'          => $request->zip,
-            'is_default'   => $request->is_default ?? 0, // Default to 0 if null
+    public function createAddress(Request $request)
+    {
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'nullable|string|max:255',
+            'phone' => 'required|string|max:15',
+            'email' => 'required|email|max:255',
+            'address' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
+            'state' => 'required|string|max:255',
+            'zip' => 'required|string|max:10',
+            'country' => 'required|string|max:255',
+            'is_default' => 'nullable|boolean',
         ]);
     
-        toastr()->success('Address updated successfully.');
-    
-        return response()->json([
-            'status'  => 'success',
-            'message' => 'Address updated successfully.',
-            'data'    => $address,
-        ]);
+        Address::create($validated + ['user_id' => auth()->id()]);
+        return response()->json(['message' => 'Address added successfully!']);
     }
     
-    function destroyAddress(string $id) {
-        // Fetch the address ensuring it belongs to the authenticated user
-        $address = Address::where('id', $id)
-            ->where('user_id', auth()->id())
-            ->first();
     
-        if (!$address) {
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'Address not found or access denied.',
-            ], 404);
-        }
+    public function updateAddress(Request $request, $id)
+{
+    $validated = $request->validate([
+        'first_name' => 'required|string|max:255',
+        'last_name' => 'nullable|string|max:255',
+        'email' => 'required|email|max:255',
+        'phone' => 'required|string|max:15',
+        'address' => 'required|string|max:255',
+        'city' => 'required|string|max:255',
+        'state' => 'required|string|max:255',
+        'zip' => 'required|string|max:10',
+        'country' => 'required|string|max:255',
+        'is_default' => 'nullable|boolean',
+    ]);
+
+    $address = Address::findOrFail($id);
+    $address->update($validated);
+    return response()->json(['message' => 'Address updated successfully!']);
+}
+
     
+function destroyAddress(string $id) {
+    $address = Address::findOrFail($id);
+    if($address && $address->user_id === auth()->user()->id){
         $address->delete();
-    
-        return response()->json([
-            'status'  => 'success',
-            'message' => 'Address deleted successfully.',
-        ]);
-    } */
-    public function createAddress(Request $request) {
-        $validatedData = $request->except('_token'); // Exclude _token field
-    
-        Address::create($validatedData + ['user_id' => auth()->id()]);
-    
-        return response()->json(['success' => true, 'message' => 'Address added successfully!']);
+        return response(['status' => 'success', 'message' => 'Deleted Successfully']);
+
     }
-    
-    
-    public function updateAddress($id, Request $request) {
-        $validatedData = $request->except(['_token', '_method']); // Exclude _token and _method fields
-    
-        $address = Address::findOrFail($id);
-        $address->update($validatedData);
-    
-        return response()->json(['success' => true, 'message' => 'Address updated successfully!']);
-    }
-    
-    
-    public function destroyAddress($id) {
-        Address::findOrFail($id)->delete();
-        return response()->json(['success' => true, 'message' => 'Address deleted successfully!']);
-    }
+    return response(['status' => 'error', 'message' => 'something went wrong!']);
+}
+
     
     
 }

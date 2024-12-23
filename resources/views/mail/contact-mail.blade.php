@@ -9,6 +9,11 @@
 <body>
     Name: {{ $name }},
     <br>
+    Email: {{ $email }},
+    <br>
+    Subject: {{ $mailSubject }},
+    <br>
+    Message: 
     {{ $content }}
 </body>
 </html>

@@ -35,4 +35,12 @@
     <label>Country</label>
     <input type="text" class="form-control" name="country" id="{{ $prefix }}_country">
 </div>
+<div class="form-group">
+    <label for="is_default">Is Default Address</label>
+    <!-- Hidden input ensures a default value of 0 -->
+    <input type="hidden" name="is_default" value="0">
+    <input type="checkbox" name="is_default" id="is_default" value="1" {{ old('is_default') ? 'checked' : '' }}>
+</div>
+
+
 

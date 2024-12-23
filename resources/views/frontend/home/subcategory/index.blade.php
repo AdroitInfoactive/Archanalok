@@ -169,9 +169,36 @@
                                                         href="{{ url('product/' . ($product->slug ?? '#')) }}">{{ $product->name }}</a>
                                                 </h5>
                                                 <div class="product_price clearfix">
-                                                    <span
-                                                        class="price"><span><span>₹</span>{{ number_format($product->sale_price ?? 100, 2) }}</span></span>
+                                                    @if ($product->has_variants == 0)
+                                                        @php
+                                                            // Handle price for products without variants
+                                                            $price = $product->sale_price; // Default to sale price
+                                                            if (auth()->check()) {
+                                                                $price = match (auth()->user()->role) {
+                                                                    'user' => $product->sale_price,
+                                                                    'ws' => $product->wholesale_price,
+                                                                    'dr' => $product->distributor_price,
+                                                                    default => $product->sale_price,
+                                                                };
+                                                            }
+                                                        @endphp
+                                                        <span class="price"><span><span>₹</span>{{ number_format($price, 2) }}</span></span>
+                                                    @else
+                                                        @php
+                                                            $price = $product->sale_price; // Default to sale price
+                                                            if (auth()->check()) {
+                                                                $price = match (auth()->user()->role) {
+                                                                    'user' => $product?->variant_sale_price ?? $product->sale_price,
+                                                                    'ws' => $product?->variant_wholesale_price ?? $product->wholesale_price,
+                                                                    'dr' => $product?->variant_distributor_price ?? $product->distributor_price,
+                                                                    default => $product?->variant_sale_price ?? $product->sale_price,
+                                                                };
+                                                            }
+                                                        @endphp
+                                                        <span class="price"><span><span>₹</span>{{ number_format($price, 2) }}</span></span>
+                                                    @endif
                                                 </div>
+                                                
                                             </div>
                                         </div>
                                     </div>
@@ -199,8 +226,34 @@
                                                                 href="{{ url('product/' . ($product->slug ?? '#')) }}">{{ $product->name }}</a>
                                                         </h5>
                                                         <div class="product_price clearfix">
-                                                            <span
-                                                                class="price"><span><span>₹</span>{{ number_format($product->sale_price ?? 100, 2) }}</span></span>
+                                                            @if ($product->has_variants == 0)
+                                                                @php
+                                                                    // Handle price for products without variants
+                                                                    $price = $product->sale_price; // Default to sale price
+                                                                    if (auth()->check()) {
+                                                                        $price = match (auth()->user()->role) {
+                                                                            'user' => $product->sale_price,
+                                                                            'ws' => $product->wholesale_price,
+                                                                            'dr' => $product->distributor_price,
+                                                                            default => $product->sale_price,
+                                                                        };
+                                                                    }
+                                                                @endphp
+                                                                <span class="price"><span><span>₹</span>{{ number_format($price, 2) }}</span></span>
+                                                            @else
+                                                                @php
+                                                                    $price = $product->sale_price; // Default to sale price
+                                                                    if (auth()->check()) {
+                                                                        $price = match (auth()->user()->role) {
+                                                                            'user' => $product?->variant_sale_price ?? $product->sale_price,
+                                                                            'ws' => $product?->variant_wholesale_price ?? $product->wholesale_price,
+                                                                            'dr' => $product?->variant_distributor_price ?? $product->distributor_price,
+                                                                            default => $product?->variant_sale_price ?? $product->sale_price,
+                                                                        };
+                                                                    }
+                                                                @endphp
+                                                                <span class="price"><span><span>₹</span>{{ number_format($price, 2) }}</span></span>
+                                                            @endif
                                                         </div>
                                                         <div class="listing-meta">
                                                             <a class="add-to-cart" href=""><i

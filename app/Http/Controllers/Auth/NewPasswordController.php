@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\FooterInfo;
+use App\Models\MainCategory;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -19,7 +21,11 @@ class NewPasswordController extends Controller
      */
     public function create(Request $request): View
     {
-        return view('auth.reset-password', ['request' => $request]);
+        $footerInfo = FooterInfo::first();
+        $mainCategory = MainCategory::where('status', 1)
+        ->orderBy('position', 'asc')
+        ->get();
+        return view('auth.reset-password', ['request' => $request], compact('mainCategory', 'footerInfo'));
     }
 
     /**
@@ -49,7 +55,7 @@ class NewPasswordController extends Controller
                 event(new PasswordReset($user));
             }
         );
-
+        toastr('Password reset successfully!', 'success');
         // If the password was successfully reset, we will redirect the user back to
         // the application's home authenticated view. If there is an error we can
         // redirect them back to where they came from with their error message.

@@ -7,67 +7,104 @@
                 <div class="col-lg-12">
                     <h3 class="pb_title">My Account</h3>
                     <div class="page_crumb">
-                        <a href="index.html">Home</a> | <span>My Account</span>
+                        <a href="index.html">Home</a> | <span>My Account</span> | <span>Profile</span>
                     </div>
                 </div>
             </div>
         </div>
     </section>
     <!-- Banner End -->
-
-    <section class="account-section">
-        <div class="container">
-            <div class="row justify-content-center"> <!-- Centering the row -->
-                <div class="col-md-6 col-xl-3 mb-4"> <!-- Profile Box -->
-                    <div class="account-box">
-                        <i class="fas fa-user icon"></i>
-                        <h4>Profile</h4>
-                        <a href="{{ route('profile.index') }}" class="btn">Edit Profile</a>
-                    </div>
-                </div>
-
-                <div class="col-md-6 col-xl-3 mb-4"> <!-- My Orders Box -->
-                    <div class="account-box">
-                        <i class="fas fa-box icon"></i>
-                        <h4>My Orders</h4>
-                        <a href="myorders.html" class="btn">View Orders</a>
-                    </div>
-                </div>
-
-                <div class="col-md-6 col-xl-3 mb-4"> <!-- Wishlist Box -->
-                    <div class="account-box">
-                        <i class="fas fa-heart icon"></i>
-                        <h4>Wishlist</h4>
-                        <a href="{{ route('wishlist.index') }}" class="btn">View Wishlist</a>
-                    </div>
-                </div>
-
-                <div class="col-md-6 col-xl-3 mb-4"> <!-- My Address Box -->
-                    <div class="account-box">
-                        <i class="fas fa-map-marker-alt icon"></i>
-                        <h4>My Address</h4>
-                        <a href="{{ route('address.index') }}" class="btn">Manage Address</a>
-                    </div>
-                </div>
-                <!-- Logout -->
-                <div class="col-md-6 col-xl-3 mb-4">
-                    <div class="account-box">
-                        <i class="fas fa-sign-out-alt icon"></i>
-                        <h4>Logout</h4>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-
-                        <a href="#" onclick="event.preventDefault(); this.closest('form').submit();" class="btn">Logout</a>
-                        </form>
-                    </div>
-                </div>
-                
+    <div class="wrapper">
+        <div class="container-2">
+            <h2>Personal Information</h2>
+            <img src="{{ asset($user->avatar) }}" alt="Profile Picture" class="profile-pic">
+            <label for="upload"><i class="fas fa-camera"></i></label>
+            <form id="avatar_form">
+                <input type="file" id="upload" hidden name="avatar">
+            </form>
+            <form method="POST" action="{{ route('profile.update') }}">
+                @csrf
+                @method('PUT')
+            <div class="info">
+                <p><strong>Name:</strong> <span class="required">*</span> 
+                    <span id="name-display">{{ $user->name }}</span>
+                    <input type="text" id="name-edit" name="name" value="{{ $user->name }}" style="display: none;">
+                </p>
+                <p><strong>Email:</strong> <span class="required">*</span> 
+                    <span id="email-display">{{ $user->email }}</span>
+                    <input type="email" id="email-edit" name="email" value="{{ $user->email }}" style="display: none;">
+                </p>
             </div>
+            <a href="javascript:void(0);" class="btn-edit" id="edit-button">Edit</a>
+            <a href="javascript:void(0);" class="btn-edit" id="save-button" style="display: none;">Save</a>
+            </form>
         </div>
-    </section>
+        
+      
+    </div>
+    <!-- Centered Home Button -->
+    <div class="text-center mt-4 mb-5">
+        <a href="{{ route('dashboard') }}" class="btn btn-primary">Go to My Account</a>
+    </div>
 @endsection
+@push('scripts')
+<script>
+    document.getElementById('edit-button').addEventListener('click', function () {
+        // Toggle visibility of static text and input fields
+        document.getElementById('name-display').style.display = 'none';
+        document.getElementById('email-display').style.display = 'none';
+        document.getElementById('name-edit').style.display = 'block';
+        document.getElementById('email-edit').style.display = 'block';
+
+        // Show "Save" button and hide "Edit" button
+        this.style.display = 'none';
+        document.getElementById('save-button').style.display = 'inline-block';
+    });
+
+    document.getElementById('save-button').addEventListener('click', function () {
+        // Submit the form to the backend
+        this.closest('form').submit();
+    });
+</script>
+
+
+    <script>
+        $(document).ready(function() {
+            $('#upload').on('change', function() {
+                let form = $('#avatar_form')[0];
+                let formData = new FormData(form);
+
+                $.ajax({
+                    method: 'POST',
+                    url: "{{ route('profile.avatar.update') }}",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            toastr.success(response.message);
+                            window.location.reload();
+                        }
+                    },
+                    error: function(error) {
+                        console.error(response);
+                    }
+                })
+            })
+        })
+    </script>
+@endpush
 @push('styles')
     <style>
+        label {
+            display: inline-block;
+            cursor: pointer;
+            font-size: 20px;
+            /* Adjust size */
+            color: #000;
+            /* Adjust color */
+        }
+
         .account-section {
             padding: 50px 0;
             /* Add padding to the section */
@@ -132,6 +169,11 @@
             font-weight: bold;
         }
 
+
+
+
+
+
         .wrapper {
             display: flex;
             justify-content: center;
@@ -143,7 +185,7 @@
         }
 
         .container-2 {
-            /* border: 1px solid #ccc; */
+            border: 1px solid #ccc;
             padding: 20px;
             width: 500px;
             /* Set width for the profile container */
@@ -153,7 +195,8 @@
             /* Background color for the container */
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             /* Subtle shadow */
-            margin-top: 25px;
+            margin-top: 45px;
+            margin-bottom: 45px;
         }
 
         .profile-pic {
@@ -196,6 +239,14 @@
             /* Darker shade on hover */
             font-weight: bold;
             color: #222F5A;
+        }
+
+
+        .required {
+            color: red;
+            /* Color for required field indicator */
+            font-size: 14px;
+            /* Size of the required indicator */
         }
     </style>
 @endpush

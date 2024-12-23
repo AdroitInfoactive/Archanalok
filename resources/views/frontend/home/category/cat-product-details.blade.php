@@ -84,13 +84,42 @@
                     <div class="product-decp">
                         <h4>{{ $product->name }}</h4>
                         <div class="product_price clearfix">
-                            @php
+                          {{--   @php
                                 $price = $product->has_variants == 0 ? $product->sale_price : $product->price;
                             @endphp
 
                             @if ($price == 0 || $price == null)
                                 <span class="price"><span>₹0.00</span></span>
-                            @endif
+                            @endif --}}
+                            @if ($product->has_variants == 0)
+                            @php
+                          
+                                // Handle price for products without variants
+                                $price = $product->sale_price; // Default to sale price
+                                if (auth()->check()) {
+                                    $price = match (auth()->user()->role) {
+                                        'user' => $product->sale_price,
+                                        'ws' => $product->wholesale_price,
+                                        'dr' => $product->distributor_price,
+                                        default => $product->sale_price,
+                                    };
+                                }
+                            @endphp
+                            <span class="price"><span><span>₹</span>{{ number_format($price, 2) }}</span></span>
+                        @else
+                            @php
+                                $price = $variants[0]->sale_price; // Default to sale price
+                                if (auth()->check()) {
+                                    $price = match (auth()->user()->role) {
+                                        'user' => $variants[0]->sale_price ?? $product->sale_price,
+                                        'ws' => $variants[0]->wholesale_price ?? $product->wholesale_price,
+                                        'dr' => $variants[0]->distributor_price ?? $product->distributor_price,
+                                        default => $variants[0]->sale_price ?? $product->sale_price,
+                                    };
+                                }
+                            @endphp
+                            <span class="price"><span><span>₹</span>{{ number_format($price, 2) }}</span></span>
+                        @endif
 
                         </div>
 

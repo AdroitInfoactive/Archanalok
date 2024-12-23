@@ -35,7 +35,8 @@ class AddressUpdateRequest extends FormRequest
             'state'=>['required', 'max:255'],
             'country'=>['required', 'max:255'],
             'zip'=>['required', 'max:255'],
-            'address' => ['required']
+            'address' => ['required'],
+            'is_default' => ['nullable', 'boolean'],
         ];
     }
 }

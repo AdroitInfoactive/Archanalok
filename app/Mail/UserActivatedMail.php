@@ -9,35 +9,26 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class ContactMail extends Mailable
+class UserActivatedMail extends Mailable
 {
     use Queueable, SerializesModels;
-    public $name;
-    public $email;
-    public $mailSubject;
-    public $content;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($name,$email,$mailSubject,$content)
+    public $user;
+    public function __construct($user)
     {
-        $this->name = $name;
-        $this->mailSubject = $mailSubject;
-        $this->email = $email;
-        $this->content = $content;
+        $this->user = $user;
     }
+
 
     /**
      * Get the message envelope.
      */
-    public function envelope(): Envelope
+    public function build()
     {
-        return new Envelope(
-            subject: $this->mailSubject,
-            to: config('settings.mail_receive_address'),
-            from: $this->email,
-        );
+        return $this->subject('Your Account is Now Active');
     }
 
     /**
@@ -46,7 +37,7 @@ class ContactMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'mail.contact-mail',
+            view: 'mail.user_activated',
         );
     }
 

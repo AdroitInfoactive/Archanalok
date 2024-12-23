@@ -12,4 +12,8 @@ class Wishlist extends Model
     function product() : BelongsTo {
         return $this->belongsTo(Product::class);
     }
+    // public function prodct_variant()
+    // {
+    //     return $this->hasMany(ProductVariant::class);
+    // }
 }

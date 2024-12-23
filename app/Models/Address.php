@@ -18,6 +18,7 @@ class Address extends Model
         'state',
         'country',
         'zip',
+        'is_default',
     ];
     
 }

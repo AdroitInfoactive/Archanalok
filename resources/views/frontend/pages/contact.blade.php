@@ -68,13 +68,14 @@
                 </div>
                 <div class="col-md-6">
                     <div class="contact-form">
-                        <form action="#" method="post" id="contact-form">
-                            <input type="text" name="con_name" class="required" placeholder="Your Name">
-                            <input type="email" name="con_email" class="required" placeholder="Your E-mail">
-                            <input type="text" name="con_subject" placeholder="Subject">
-                            <textarea name="con_message" class="required" placeholder="Your Message"></textarea>
-                            <input type="submit" value="Send Message">
-                            <img src="assets/images/ajax.gif" alt="ajax" class="fisto_loader"/>
+                        <form id="contact-form" class="fp__contact_form">
+                            @csrf
+                            <input type="text" name="name"  placeholder="Your Name">
+                            <input type="email" name="email"  placeholder="Your E-mail">
+                            <input type="text" name="subject" placeholder="Subject">
+                            <textarea name="message"  placeholder="Your Message"></textarea>
+                            {{-- <input type="submit" class="submit_btn" value="Send Message"> --}}
+                            <button type="submit" class="submit_btn">Send Message</button>
                             <div class="fisto_con_message"></div>
                         </form>
                     </div>
@@ -88,3 +89,40 @@
 <iframe src="{{ @$contact->map_link }}"></iframe>
 </div>
 @endsection
+@push('scripts')
+    <script>
+        $(document).ready(function(){
+            $('.fp__contact_form').on('submit', function(e){
+                e.preventDefault();
+                let formData = $(this).serialize();
+                $.ajax({
+                    method: 'POST',
+                    url: '{{ route("contact.send-message") }}',
+                    data: formData,
+                    beforeSend: function(){
+                        $('.submit_btn').attr('disabled', true)
+                        $('.submit_btn').html(`
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        Sending...
+                        `);
+                    },
+                    success: function(response) {
+                        toastr.success(response.message);
+                        $('.fp__contact_form').trigger('reset');
+                        $('.submit_btn').attr('disabled', false)
+                        $('.submit_btn').html(`Send Message`);
+                    },
+                    error: function(xhr, status, error){
+                        let errors = xhr.responseJSON.errors;
+                        $.each(errors, function(index, value){
+                            toastr.error(value);
+                        });
+
+                        $('.submit_btn').attr('disabled', false)
+                        $('.submit_btn').html(`Send Message`);
+                    }
+                })
+            })
+        })
+    </script>
+@endpush
