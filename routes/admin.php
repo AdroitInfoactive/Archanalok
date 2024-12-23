@@ -28,15 +28,17 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
   Route::get('dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
+  /** Banner Slider Routes */
+  Route::resource('banner-slider', BannerSliderController::class);
 
   /** Profile Routes **/
   Route::get('profile', [ProfileController::class, 'index'])->name('profile');
   Route::put('profile', [ProfileController::class, 'updateProfile'])->name('profile.update');
   Route::put('profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
 
-    /** user Routes */
-    Route::get('users', [RegisteredUserController::class, 'userDetails'])->name('user.status');
-    Route::post('/update-status', [RegisteredUserController::class, 'updateStatus'])->name('user.updateStatus');
+  /** user Routes */
+  Route::get('users', [RegisteredUserController::class, 'userDetails'])->name('user.status');
+  Route::post('/update-status', [RegisteredUserController::class, 'updateStatus'])->name('user.updateStatus');
 
   /** maincategory Routes */
   Route::resource('main-category', MainCategoryController::class);
@@ -55,7 +57,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
 
   /** Brand Routes */
   Route::resource('brand', BrandController::class);
-  
+
   /** varient Routes */
   Route::resource('variant-master', VariantMasterController::class);
   Route::post('variant-master/update-order', [VariantMasterController::class, 'updateOrder'])->name('variant-master.updateOrder');
@@ -63,15 +65,12 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
   /** varient details Routes */
   Route::resource('variant-details', VariantDetailController::class);
 
- /** Product Routes */
- Route::get('/products/generate-excel-template', [ProductController::class, 'generateExcelTemplate'])->name('products.generateExcelTemplate');
+  /** Product Routes */
+  Route::get('/products/generate-excel-template', [ProductController::class, 'generateExcelTemplate'])->name('products.generateExcelTemplate');
   Route::resource('products', ProductController::class);
   Route::post('/products/update-image-order', [ProductController::class,
   'updateImageOrder'])->name('products.updateImageOrder');
   Route::post('/products/delete-image', [ProductController::class, 'deleteImage'])->name('products.deleteImage');
-
-
-
 
   /** Counter Routes */
   Route::get('counter', [CounterController::class, 'index'])->name('counter.index');

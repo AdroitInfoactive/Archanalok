@@ -13,7 +13,6 @@ class Product extends Model
     {
         return $this->belongsTo(Category::class, 'main_category_id');
     }
-
     public function category()
     {
         return $this->belongsTo(Category::class, 'category_id');
@@ -31,22 +30,20 @@ class Product extends Model
     {
     return $this->belongsTo(Brand::class, 'brand');
     }
-      public function materialDetail()
-     {
-     return $this->belongsTo(VariantDetail::class, 'material', 'id');
-     }
-      public function unitDetail()
-      {
-      return $this->belongsTo(VariantDetail::class, 'units', 'id');
-      }
-      public function weightTypeDetail()
-      {
-      return $this->belongsTo(VariantDetail::class, 'weight_type', 'id');
-      }
-      public function variants()
-      {
-      return $this->hasMany(ProductVariant::class);
-      }
-  
-
+    public function materialDetail()
+    {
+    return $this->belongsTo(VariantDetail::class, 'material', 'id');
+    }
+    public function unitDetail()
+    {
+    return $this->belongsTo(VariantDetail::class, 'units', 'id');
+    }
+    public function weightTypeDetail()
+    {
+    return $this->belongsTo(VariantDetail::class, 'weight_type', 'id');
+    }
+    public function variants()
+    {
+    return $this->hasMany(ProductVariant::class);
+    }
 }
