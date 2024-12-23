@@ -40,6 +40,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
 
   /** maincategory Routes */
   Route::resource('main-category', MainCategoryController::class);
+    /** Banner Slider Routes */
+  Route::resource('banner-slider', BannerSliderController::class);
 
   /**Product maincategory banners Routes */
   Route::get('main-category-banner/{product}', [MainCategoryBannerController::class, 'index'])->name('main-category-banner.show.index');
@@ -69,8 +71,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
   Route::post('/products/delete-image', [ProductController::class, 'deleteImage'])->name('products.deleteImage');
 
 
-  /** Banner Slider Routes */
-  Route::resource('banner-slider', BannerSliderController::class);
+
 
   /** Counter Routes */
   Route::get('counter', [CounterController::class, 'index'])->name('counter.index');
