@@ -5,8 +5,8 @@
                 <div class="col-lg-12">
                     <nav class="navbar navbar-expand-lg">
                         <!-- logo Start-->
-                        <a class="navbar-brand" href="#">
-                            <img src="{{ asset('frontend/images/pvc-archanalok-logo.png') }}" alt="">
+                        <a class="navbar-brand" href="{{ url('/') }}">
+                            <img src="{{ asset($mainCategory->logo) }}" alt="">
                         </a>
                         <!-- logo End-->
                         <!-- Moblie Btn Start -->
@@ -18,27 +18,25 @@
                         <div class="collapse navbar-collapse">
                             <ul class="navbar-nav">
                                 <li class="menu-item-has-children">
-                                    {{-- <a href="index.html">Home</a> --}}
-                                    <a href="{{ url('/') }}">Home</a>
+                                    <a href="{{ url($mainCategory->slug) }}">Home</a>
                                 </li>
                                 <li>
-                                    {{-- <a href="about.html">About</a> --}}
                                     <a href="{{ route('about') }}">About</a>
                                 </li>
                                 <li class="menu-item-has-children">
                                     <a href="javascript:void(0);">{{ $mainCategory->name }}
                                         <ul class="sub-menu">
                                             @foreach ($categories as $category)
-                                                <li><a href="javascript:void(0);">{{ $category->category_name }}</a></li>
+                                                <li><a href="javascript:void(0);">{{ $category->category_name }}</a>
+                                                </li>
                                             @endforeach
-                                           
+
                                         </ul>
                                     </a>
                                 </li>
 
 
                                 <li>
-                                    {{-- <a href="contact.html">Contact</a> --}}
                                     <a href="{{ route('contact.index') }}">Contact</a>
                                 </li>
                             </ul>
