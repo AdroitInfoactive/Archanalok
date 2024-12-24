@@ -7,9 +7,6 @@ use App\Http\Controllers\Frontend\ProfileController;
 use App\Http\Controllers\Frontend\WishlistController;
 use Illuminate\Support\Facades\Route;
 
-
-
-
 /** Admin Auth Routes */
 Route::group(['middleware' => 'guest'], function () {
   Route::get('admin/login', [AdminAuthController::class, 'index'])->name('admin.login');
@@ -37,7 +34,6 @@ Route::get('/', [FrontendController::class, 'index'])->name('home');
 Route::get('/about', [FrontendController::class, 'about'])->name('about');
 /** Privacy Policy Routes */
 
-
 /** Trams and Conditions Routes */
 Route::get('/terms-and-conditions', [FrontendController::class, 'termsAndConditions'])->name('terms-and-conditions');
 // shippingpolicy
@@ -52,7 +48,6 @@ Route::get('/privacy-policy', [FrontendController::class, 'privacyPolicy'])->nam
 // testimonials
 Route::get('/testimonials', [FrontendController::class, 'testimonials'])->name('testimonials.index');
 
-
 Route::get('wishlist/{productId}', [WishlistController::class, 'store'])->name('wishlist.store');
 
 // Category Page (MainCategory -> Category -> SubCategory)
@@ -66,8 +61,3 @@ Route::get('/product/{slug}', [FrontendController::class, 'productPage'])->name(
 
 /** Newsletter Routes */
 Route::post('/subscribe-newsletter', [FrontendController::class, 'subscribeNewsletter'])->name('subscribe-newsletter');
-
-
-
-
-

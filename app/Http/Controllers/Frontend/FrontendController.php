@@ -214,7 +214,7 @@ class FrontendController extends BaseController
     }
 
 
-    public function subCategoryPage($mainCategorySlug, $categorySlug, $subCategorySlug)
+    /* public function subCategoryPage($mainCategorySlug, $categorySlug, $subCategorySlug)
     {
         $footerInfo = FooterInfo::first();
         // Fetch main category
@@ -287,8 +287,79 @@ class FrontendController extends BaseController
             ->get();
 
         return view('frontend.home.subcategory.index', compact('mainCategory', 'category', 'subCategory', 'products', 'categories', 'footerInfo'));
-    }
+    } */
 
+    public function subCategoryPage($mainCategorySlug, $categorySlug, $subCategorySlug, Request $request)
+    {
+        // Fetch main category by slug
+        $mainCategory = MainCategory::where('slug', $mainCategorySlug)->firstOrFail();
+
+        // Fetch category by slug and its main category
+        $category = Category::where('slug', $categorySlug)
+            ->where('main_category_id', $mainCategory->id)
+            ->firstOrFail();
+
+        // Fetch subcategory by slug and its parent category
+        $subCategory = SubCategory::where('slug', $subCategorySlug)
+            ->where('category_id', $category->id)
+            ->firstOrFail();
+
+        // Initialize query for products
+        $productQuery = Product::with([
+            'images' => function ($query) {
+                $query->orderBy('order', 'asc'); // Fetch images sorted by their order
+            },
+            'variants' => function ($query) {
+                $query->orderBy('sale_price', 'asc'); // Fetch variants sorted by sale price
+            }
+        ])
+        ->where('sub_category_id', $subCategory->id)
+        ->where('status', 1); // Only active products
+
+        // Apply sorting logic
+        if ($request->has('orderby')) {
+            switch ($request->orderby) {
+            case 'new': // Newest products
+            $productQuery->orderBy('created_at', 'desc');
+            break;
+            case 'price': // Price: Low to High
+            $productQuery->orderBy('sale_price', 'asc');
+            break;
+            case 'price-desc': // Price: High to Low
+            $productQuery->orderBy('sale_price', 'desc');
+            break;
+            /* case 'rating': // Assuming average rating exists
+            $productQuery->orderBy('average_rating', 'desc');
+            break; */
+            default: // Default sorting
+            $productQuery->orderBy('priority', 'asc');
+            break;
+            }
+        } else {
+            $productQuery->orderBy('priority', 'asc'); // Default sorting
+        }
+
+        // Fetch paginated products
+        $products = $productQuery->paginate(12); // Paginate 12 products per page=
+
+        // Fetch categories and their subcategories
+        $categories = Category::with([
+            'subCategories' => function ($query) {
+                $query->where('status', 1)->orderBy('position', 'asc'); // Only active subcategories
+            }
+        ])
+        ->where('main_category_id', $mainCategory->id) // Filter categories by main category
+        ->get();
+
+        // Return data to the view
+        return view('frontend.home.subcategory.index', compact(
+            'mainCategory',
+            'category',
+            'subCategory',
+            'products',
+            'categories'
+        ));
+    }
 
     function subscribeNewsletter(Request $request): Response
     {

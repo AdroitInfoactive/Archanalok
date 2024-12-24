@@ -110,13 +110,11 @@
                     </div>
                 </div>
 
-
-
                 <div class="col-lg-10 col-sm-9">
                     <div class="row">
                         <div class="col-md-7">
                             <ul class="toolbar-btn nav nav-tabs">
-                                <li><a class="active" href="#gird"
+                                <li><a class="active" href="#grid"
                                         data-toggle="tab"><span></span><span></span><span></span><span></span></a></li>
                                 <li><a class="list" href="#list"
                                         data-toggle="tab"><span></span><span></span><span></span></a></li>
@@ -126,17 +124,31 @@
                         <div class="col-md-5">
                             <div class="sorting">
                                 <select name="orderby" class="orderby">
-                                    <option value="sorting" selected="selected">Default sorting</option>
-                                    <option value="new">Newest Products</option>
-                                    <option value="rating">Average Rating</option>
-                                    <option value="price">Price: Low to High</option>
-                                    <option value="price-desc">Price: High to Low</option>
+                                    <option value="sorting"
+                                        {{ request('orderby') == 'sorting' || !request('orderby') ? 'selected' : '' }}>
+                                        Default sorting
+                                    </option>
+                                    <option value="new"
+                                        {{ request('orderby') == 'new' ? 'selected' : '' }}>
+                                        Newest First
+                                    </option>
+                                    <!-- <option value="rating" 
+                                        {{ request('orderby') == 'rating' ? 'selected' : '' }}>
+                                        Average Rating
+                                    </option> -->
+                                    <option value="price-asc"
+                                        {{ request('orderby') == 'price-asc' ? 'selected' : '' }}>
+                                        Price: Low to High
+                                    </option>
+                                    <option value="price-desc"
+                                        {{ request('orderby') == 'price-desc' ? 'selected' : '' }}>
+                                        Price: High to Low
+                                    </option>
                                 </select>
                             </div>
+
                         </div>
                     </div>
-                    <!-- Tab Content -->
-                    <!-- Tab Content -->
                     <div class="tab-content">
                         <!-- Grid View -->
                         <div class="tab-pane fade show in active" id="grid" role="tabpanel">
@@ -148,7 +160,7 @@
                                     <div class="col-lg-3 mb-5">
                                         <div class="product-item-1 text-center">
                                             <div class="product-thumb">
-                                                <img src="{{ asset($product->product_image) }}"
+                                                <img src="{{ $product->images->isNotEmpty() ? asset($product->images->first()->image_path) : asset('default-image.jpg') }}"
                                                     alt="{{ $product->name }}">
                                                 {{-- <div class="product-meta">
                                                     <a href="" class="view"><i class="nss-eye1"></i></a>
@@ -171,20 +183,50 @@
                                                 <div class="product_price clearfix">
                                                     @if ($product->has_variants == 0)
                                                         @php
-                                                            // Handle price for products without variants
-                                                            $price = $product->sale_price; // Default to sale price
-                                                            if (auth()->check()) {
-                                                                $price = match (auth()->user()->role) {
-                                                                    'user' => $product->sale_price,
-                                                                    'ws' => $product->wholesale_price,
-                                                                    'dr' => $product->distributor_price,
-                                                                    default => $product->sale_price,
-                                                                };
-                                                            }
-                                                        @endphp
-                                                        <span class="price"><span><span>₹</span>{{ number_format($price, 2) }}</span></span>
+                                                        // Determine the effective price (offer price or sale price)
+                                                        $effectivePrice = $product->offer_price ?: $product->sale_price;
+
+                                                        // Check for user roles and adjust price accordingly
+                                                        if (auth()->check()) {
+                                                        $effectivePrice = match (auth()->user()->role) {
+                                                        'user' => $product->offer_price ?: $product->sale_price,
+                                                        'ws' => $product->offer_price ?: $product->wholesale_price,
+                                                        'dr' => $product->offer_price ?: $product->distributor_price,
+                                                        default => $product->offer_price ?: $product->sale_price,
+                                                        };
+                                                        }
+
+                                                        // Calculate the percentage discount if offer_price exists
+                                                        $percentageOff = $product->offer_price
+                                                        ? round((($product->sale_price - $product->offer_price) /
+                                                        $product->sale_price) * 100)
+                                                        : null;
+                                                    @endphp
+
+                                                    <div class="product-pricing">
+                                                        @if($product->offer_price)
+                                                            <span class="price">
+                                                                <span>₹{{ number_format($effectivePrice, 2) }}</span>
+                                                                <span
+                                                                    style="text-decoration: line-through; font-size: 0.9em;"
+                                                                    class="text-muted">
+                                                                    ₹{{ number_format($product->sale_price, 2) }}
+                                                                </span>
+                                                                @if($percentageOff)
+                                                                    <span style="font-size: 0.8em;"
+                                                                        class="discount text-success">
+                                                                        ({{ $percentageOff }}% off)
+                                                                    </span>
+                                                                @endif
+                                                            </span>
+                                                        @else
+                                                            <span class="price">
+                                                                <span>₹{{ number_format($effectivePrice, 2) }}</span>
+                                                            </span>
+                                                        @endif
+                                                    </div>
                                                     @else
-                                                        @php
+                                                        <!-- @php
                                                             $price = $product->sale_price; // Default to sale price
                                                             if (auth()->check()) {
                                                                 $price = match (auth()->user()->role) {
@@ -195,7 +237,50 @@
                                                                 };
                                                             }
                                                         @endphp
-                                                        <span class="price"><span><span>₹</span>{{ number_format($price, 2) }}</span></span>
+                                                        <span class="price"><span><span>₹</span>{{ number_format($price, 2) }}</span></span> -->
+                                                        @php
+                                                            // Default price for products without variants
+                                                            $price = $product->sale_price; 
+
+                                                            // Check if product has variants and pick the variant with the least sale price
+                                                            $leastPriceVariant = $product->variants->sortBy('sale_price')->first();
+
+                                                            // Determine the effective price (offer price or sale price)
+                                                            $effectivePrice = $leastPriceVariant
+                                                                ? ($leastPriceVariant->offer_price ?: $leastPriceVariant->sale_price)
+                                                                : $product->sale_price;
+
+                                                            // Adjust the price based on the user's role
+                                                            if (auth()->check()) {
+                                                                $effectivePrice = match (auth()->user()->role) {
+                                                                    'user' => $leastPriceVariant?->offer_price ?: $leastPriceVariant?->sale_price ?: $product->sale_price,
+                                                                    'ws' => $leastPriceVariant?->offer_price ?: $leastPriceVariant?->wholesale_price ?: $product->wholesale_price,
+                                                                    'dr' => $leastPriceVariant?->offer_price ?: $leastPriceVariant?->distributor_price ?: $product->distributor_price,
+                                                                    default => $leastPriceVariant?->offer_price ?: $leastPriceVariant?->sale_price ?: $product->sale_price,
+                                                                };
+                                                            }
+
+                                                            // Calculate discount percentage if offer price exists
+                                                            $percentageOff = $leastPriceVariant && $leastPriceVariant->offer_price
+                                                                ? round((($leastPriceVariant->sale_price - $leastPriceVariant->offer_price) / $leastPriceVariant->sale_price) * 100)
+                                                                : null;
+                                                        @endphp
+
+                                                        <div class="product-pricing">
+                                                            @if ($leastPriceVariant && $leastPriceVariant->offer_price)
+                                                                <span class="price">
+                                                                    <span>₹{{ number_format($effectivePrice, 2) }}</span>
+                                                                    <span style="text-decoration: line-through;" class="text-muted">₹{{ number_format($leastPriceVariant->sale_price, 2) }}</span>
+                                                                    @if ($percentageOff)
+                                                                        <span class="discount text-success">({{ $percentageOff }}% off)</span>
+                                                                    @endif
+                                                                </span>
+                                                            @else
+                                                                <span class="price">
+                                                                    <span>₹{{ number_format($effectivePrice, 2) }}</span>
+                                                                </span>
+                                                            @endif
+                                                        </div>
                                                     @endif
                                                 </div>
                                                 
@@ -216,7 +301,7 @@
                                             <div class="row">
                                                 <div class="col-lg-4 col-md-5">
                                                     <div class="product-thumb">
-                                                        <img src="{{ asset($product->product_image) }}"
+                                                        <img src="{{ $product->images->isNotEmpty() ? asset($product->images->first()->image_path) : asset('default-image.jpg') }}"
                                                             alt="{{ $product->name }}">
                                                     </div>
                                                 </div>
@@ -272,11 +357,143 @@
                         </div>
                         <!-- List View -->
                     </div>
-                    <!-- Tab Content -->
-
-                    <!-- Tab Content -->
                 </div>
             </div>
         </div>
     </section>
 @endsection
+@push('styles')
+<style>
+    .filter-content {
+  display: none; /* Hide by default */
+}
+
+.filter-toggle {
+  display: none; /* Hide the button by default */
+}
+
+/* Show button on small devices */
+@media (max-width: 768px) {
+  .filter-toggle {
+    display: block; /* Show the button */
+    margin-bottom: 10px;
+  }
+  .filter-content.active {
+    display: block; /* Show the content when active */
+  }
+}
+
+.filter-content {
+  display: none; /* Hide by default */
+}
+
+.filter-toggle {
+  display: none; /* Hide the button by default */
+}
+
+/* Show button on small devices */
+@media (max-width: 768px) {
+  .filter-toggle {
+    display: block; /* Show the button */
+    margin-bottom: 10px;
+  }
+  .filter-content.active {
+    display: block; /* Show the content when active */
+  }
+}
+
+/* Display filters continuously on larger devices */
+@media (min-width: 769px) {
+  .filter-content {
+    display: block; /* Show the filters continuously */
+  }
+  .filter-toggle {
+    display: none; /* Hide the button on larger devices */
+  }
+}
+
+.filter-content {
+  display: none; /* Hide by default */
+  transition: max-height 0.5s ease, opacity 0.5s ease; /* Transition for dropdown */
+  max-height: 0; /* Start with a max-height of 0 */
+  opacity: 0; /* Start with opacity 0 */
+  overflow: hidden; /* Hide overflow */
+}
+
+.filter-content.active {
+  display: block; /* Change display to block when active */
+  max-height: 500px; /* Set a max-height for transition effect */
+  opacity: 1; /* Fade in */
+}
+
+/* Button styles */
+.filter-toggle {
+  display: none; /* Hide the button by default */
+  background-color: #545454; /* Orange background */
+  color: white; /* White text */
+  border: none; /* No border */
+  padding: 10px 15px; /* Padding for the button */
+  cursor: pointer; /* Pointer cursor */
+  font-size: 16px; /* Font size */
+}
+
+/* Show button on small devices */
+@media (max-width: 768px) {
+  .filter-toggle {
+    display: block; /* Show the button */
+    margin-bottom: 10px;
+  }
+}
+
+/* Display filters continuously on larger devices */
+@media (min-width: 769px) {
+  .filter-content {
+    display: block; /* Show the filters continuously */
+    max-height: none; /* Remove max-height on larger devices */
+    opacity: 1; /* Ensure full opacity */
+  }
+  .filter-toggle {
+    display: none; /* Hide the button on larger devices */
+  }
+}
+
+@media (max-width: 480px) {
+  .product-thumb img {
+    height: 160px; /* Set height for mobile devices */
+    object-fit: cover; /* Maintain aspect ratio */
+    margin-top: 10px; /* Adjust the margin as needed */
+  }
+}
+</style>
+@endpush
+
+@push('scripts')
+<script>
+    document.querySelector('.orderby').addEventListener('change', function () {
+    const selectedOption = this.value;
+
+    // Reload the page with the selected sorting
+    const url = new URL(window.location.href);
+    url.searchParams.set('orderby', selectedOption);
+    window.location.href = url.toString();
+    });
+    document.querySelector('.filter-toggle').addEventListener('click', function () {
+        const filterContent = document.querySelector('.filter-content');
+        filterContent.classList.toggle('active');
+
+        // Adjust display property for smooth transitions
+        if (filterContent.classList.contains('active')) {
+            filterContent.style.display = 'block'; // Show the content
+            setTimeout(() => {
+                filterContent.style.maxHeight = filterContent.scrollHeight +
+                'px'; // Set max-height for transition
+            }, 10); // Small delay to allow the display change to take effect
+        } else {
+            filterContent.style.maxHeight = '0'; // Collapse the content
+            setTimeout(() => {
+                filterContent.style.display = 'none'; // Hide the content after collapsing
+            }, 500); // Match this to the transition duration
+        }
+    });
+</script>
+@endpush
