@@ -84,14 +84,7 @@
                     <div class="product-decp">
                         <h4>{{ $product->name }}</h4>
                         <div class="product_price clearfix">
-                          {{--   @php
-                                $price = $product->has_variants == 0 ? $product->sale_price : $product->price;
-                            @endphp
-
-                            @if ($price == 0 || $price == null)
-                                <span class="price"><span>₹0.00</span></span>
-                            @endif --}}
-                            @if ($product->has_variants == 0)
+                          @if ($product->has_variants == 0)
                             @php
                           
                                 // Handle price for products without variants
