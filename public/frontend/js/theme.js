@@ -290,7 +290,7 @@
     /*--------------------------------------------------------
     / 5. Slider Range
     /--------------------------------------------------------*/
-    if($("#slider-range").length > 0){
+    /* if($("#slider-range").length > 0){
        $('#slider-range').slider({
             range: true,
             min: 0,
@@ -303,7 +303,7 @@
         });
         $("#slider-range span.ui-slider-handle").eq(0).html("<span>" +"" + $("#slider-range").slider("values", 0) + "</span>");
         $("#slider-range span.ui-slider-handle").eq(1).html("<span>" +"" + $("#slider-range").slider("values", 1) + "</span>");
-    }
+    } */
     /*--------------------------------------------------------
     / 6. Product Qty
     /----------------------------------------------------------*/

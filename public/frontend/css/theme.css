@@ -2905,7 +2905,8 @@ footer .widget.widget_mc4wp_form_widget{
     font-family: inherit;
 }
 .shop-sidebar .widget{
-    margin: 0 0 65px;
+    /* margin: 0 0 65px; */
+    margin: 0 0 20px;
     padding: 0;
 }
 .shop-sidebar .widget .widget-title{
@@ -3281,7 +3282,7 @@ footer .widget.widget_mc4wp_form_widget{
 }
 .excerpt{
     position: relative;
-    margin: 10px 0 46px;
+    margin: 10px 0 10px;
 }
 .excerpt p{
     font-size: 16px;

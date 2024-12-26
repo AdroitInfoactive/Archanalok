@@ -1,0 +1,129 @@
+.filter-content {
+  display: none; /* Hide by default */
+}
+
+.filter-toggle {
+  display: none; /* Hide the button by default */
+}
+
+/* Show button on small devices */
+@media (max-width: 768px) {
+  .filter-toggle {
+    display: block; /* Show the button */
+    margin-bottom: 10px;
+  }
+  .filter-content.active {
+    display: block; /* Show the content when active */
+  }
+}
+
+.filter-content {
+  display: none; /* Hide by default */
+}
+
+.filter-toggle {
+  display: none; /* Hide the button by default */
+}
+
+/* Show button on small devices */
+@media (max-width: 768px) {
+  .filter-toggle {
+    display: block; /* Show the button */
+    margin-bottom: 10px;
+  }
+  .filter-content.active {
+    display: block; /* Show the content when active */
+  }
+}
+
+/* Display filters continuously on larger devices */
+@media (min-width: 769px) {
+  .filter-content {
+    display: block; /* Show the filters continuously */
+  }
+  .filter-toggle {
+    display: none; /* Hide the button on larger devices */
+  }
+}
+
+.filter-content {
+  display: none; /* Hide by default */
+  transition: max-height 0.5s ease, opacity 0.5s ease; /* Transition for dropdown */
+  max-height: 0; /* Start with a max-height of 0 */
+  opacity: 0; /* Start with opacity 0 */
+  overflow: hidden; /* Hide overflow */
+}
+
+.filter-content.active {
+  display: block; /* Change display to block when active */
+  max-height: 500px; /* Set a max-height for transition effect */
+  opacity: 1; /* Fade in */
+}
+
+/* Button styles */
+.filter-toggle {
+  display: none; /* Hide the button by default */
+  background-color: #545454; /* Orange background */
+  color: white; /* White text */
+  border: none; /* No border */
+  padding: 10px 15px; /* Padding for the button */
+  cursor: pointer; /* Pointer cursor */
+  font-size: 16px; /* Font size */
+}
+
+/* Show button on small devices */
+@media (max-width: 768px) {
+  .filter-toggle {
+    display: block; /* Show the button */
+    margin-bottom: 10px;
+  }
+}
+
+/* Display filters continuously on larger devices */
+@media (min-width: 769px) {
+  .filter-content {
+    display: block; /* Show the filters continuously */
+    max-height: none; /* Remove max-height on larger devices */
+    opacity: 1; /* Ensure full opacity */
+  }
+  .filter-toggle {
+    display: none; /* Hide the button on larger devices */
+  }
+}
+
+@media (max-width: 480px) {
+  .product-thumb img {
+    height: 160px; /* Set height for mobile devices */
+    object-fit: cover; /* Maintain aspect ratio */
+    margin-top: 10px; /* Adjust the margin as needed */
+  }
+}
+
+
+.filters {
+    display: none;
+    padding: 10px 0;
+}
+
+.filters.show {
+    display: block;
+}
+
+.widget-title {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.toggle-arrow {
+    font-size: 0.8em;
+    cursor: pointer;
+    margin-left: 10px;
+    /* transition: transform 0.
+    3s ease; */
+}
+
+.toggle-arrow.rotated {
+    transform: rotate(180deg);
+}

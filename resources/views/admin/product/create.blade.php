@@ -266,7 +266,9 @@
                                                 <div class="form-check">
                                                     <label class="form-check-label">
                                                         <input type="checkbox" class="form-check-input variant-checkbox"
+                                                            data-masterid="{{ $variantMaster->id }}"
                                                             data-master="{{ $variantMaster->name }}"
+                                                            data-detailid="{{ $detail->id }}"
                                                             data-detail="{{ $detail->name }}"
                                                             value="{{ $detail->id }}">
                                                         {{ $detail->name }}

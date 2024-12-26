@@ -33,8 +33,8 @@ class ProductController extends Controller
      */
     public function create()
     {
-       $mainCategories = MainCategory::where('status', 1)
-    ->whereHas('categories', function ($query) {
+        $mainCategories = MainCategory::where('status', 1)
+        ->whereHas('categories', function ($query) {
         $query->where('status', 1);
     })
     ->with(['categories' => function ($query) {
@@ -129,6 +129,9 @@ class ProductController extends Controller
                 $variant->product_id = $product->id;
                 $variant->sku = $sku;
                 $variant->variation_code = $variationCodes[$index] ?? null;
+                $variation_names = explode('/', $variant->variation_code);
+                $variation_ids = VariantDetail::whereIn('name', $variation_names)->pluck('id')->toArray();
+                $variant->variation_ids = json_encode($variation_ids);
                 $variant->sale_price = $salePrices[$index] ?? null;
                 $variant->offer_price = $offerPrices[$index] ?? null;
                 $variant->distributor_price = $distributorPrices[$index] ?? null;
@@ -389,6 +392,17 @@ class ProductController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            $productImages = ProductImage::where('product_id', $id)->get();
+            foreach ($productImages as $productImage) {
+                $this->removeImage($productImage->image_path);
+                $productImage->delete();
+            }
+            $product = Product::findOrFail($id);
+            $product->delete();
+            return response(['status' => 'success', 'message' => 'Deleted Successfully!']);
+        } catch (\Exception $e) {
+            return response(['status' => 'error', 'message' => 'something went wrong!']);
+        }
     }
 }

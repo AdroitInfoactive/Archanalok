@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('product_variants', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('product_id'); // Foreign key to products table
+            $table->string('variation_ids'); // Code to identify the variation (e.g., "color/size")
             $table->string('variation_code'); // Code to identify the variation (e.g., "color/size")
             $table->string('sku')->unique(); // Unique SKU for the variant
             $table->decimal('sale_price', 10, 2)->nullable(); // Sale price

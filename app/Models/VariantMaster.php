@@ -13,8 +13,8 @@ class VariantMaster extends Model
         'name',
     ];
     public function details()
-{
-    return $this->hasMany(VariantDetail::class, 'variant_master_id');
-}
+    {
+        return $this->hasMany(VariantDetail::class, 'variant_master_id');
+    }
 }
 

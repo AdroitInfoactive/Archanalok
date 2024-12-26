@@ -229,18 +229,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Group selected details by their master
         checkboxes.forEach(checkbox => {
-            const master = checkbox.dataset.master;
-            const detail = checkbox.dataset.detail;
+            debugger;
+            const masterId = checkbox.dataset.masterid; // Master ID
+            const masterName = checkbox.dataset.master; // Master Name
+            const detailId = checkbox.dataset.detailid; // Detail ID
+            const detailName = checkbox.dataset.detail; // Detail Name
 
-            if (!variants[master]) {
-                variants[master] = [];
+            if (!variants[masterId]) {
+                variants[masterId] = {
+                    name: masterName,
+                    details: []
+                };
             }
-            variants[master].push(detail);
+            variants[masterId].details.push({
+                id: detailId,
+                name: detailName
+            });
         });
+
         masterDetailField.value = JSON.stringify(variants);
 
         // Generate all combinations
-        const combinations = generateCombinations(Object.values(variants));
+        const combinations = generateCombinations(
+            Object.values(variants).map(variant => variant.details.map(detail => detail.name))
+        );
 
         // Clear and display the table
         variationsBody.innerHTML = '';
@@ -252,45 +264,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const row = document.createElement('tr');
             row.innerHTML = `
-              <td>
-                  <input type="checkbox" class="delete-checkbox"> <!-- Checkbox for row selection -->
-              </td>
-              <td>
-                  <div class="image-upload-box">
-                      <label for="image-upload-${variationCode}" class="image-label">
-                          <img src="" alt="Preview" class="uploaded-image d-none" id="preview-${variationCode}">
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
-                              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                              <line x1="12" y1="8" x2="12" y2="16"></line>
-                              <line x1="8" y1="12" x2="16" y2="12"></line>
-                          </svg>
-                      </label>
-                      <input type="file" id="image-upload-${variationCode}" name="variation_images[]" class="d-none"
-                          accept="image/*" onchange="previewImage(event, '${variationCode}')">
-                  </div>
-              </td>
-              <td>
-                  ${variationCode}
-              </td>
-              <td>
-                  <input type="text" name="skus[]" class="form-control" value="${baseSku}-${variationCode}" placeholder="SKU" >
-                  <input type="hidden" name="variation_codes[]" value="${variationCode}">
-              </td>
-              <td><input type="number" name="sale_prices[]" class="form-control sale-price" step="0.01" placeholder="0 or 0.00" ></td>
-              <td><input type="number" name="offer_prices[]" class="form-control offer-price" step="0.01" placeholder="0 or 0.00"></td>
-              <td><input type="number" name="distributor_prices[]" class="form-control distributor-price" step="0.01" placeholder="0 or 0.00" ></td>
-              <td><input type="number" name="min_order_qtys[]" class="form-control min-order-qty" min="1" placeholder="0" ></td>
-              <td><input type="number" name="wholesale_prices[]" class="form-control wholesale-price" step="0.01" placeholder="0 or 0.00" ></td>
-              <td><input type="number" name="weights[]" class="form-control weight" step="0.01" placeholder="0 or 0.00" ></td>
-              <td><input type="number" name="qtys[]" class="form-control available-quantity" step="0.01" placeholder="0" ></td>
-              <td>
-                  <select name="statuses[]" class="form-control">
-                      <option value="1" selected>Active</option>
-                      <option value="0">Inactive</option>
-                  </select>
-              </td>
-          `;
+            <td>
+                <input type="checkbox" class="delete-checkbox"> <!-- Checkbox for row selection -->
+            </td>
+            <td>
+                <div class="image-upload-box">
+                    <label for="image-upload-${variationCode}" class="image-label">
+                        <img src="" alt="Preview" class="uploaded-image d-none" id="preview-${variationCode}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="12" y1="8" x2="12" y2="16"></line>
+                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                        </svg>
+                    </label>
+                    <input type="file" id="image-upload-${variationCode}" name="variation_images[]" class="d-none"
+                        accept="image/*" onchange="previewImage(event, '${variationCode}')">
+                </div>
+            </td>
+            <td>
+                ${variationCode}
+            </td>
+            <td>
+                <input type="text" name="skus[]" class="form-control" value="${baseSku}-${variationCode}" placeholder="SKU" >
+                <input type="hidden" name="variation_codes[]" value="${variationCode}">
+            </td>
+            <td><input type="number" name="sale_prices[]" class="form-control sale-price" step="0.01" placeholder="0 or 0.00" ></td>
+            <td><input type="number" name="offer_prices[]" class="form-control offer-price" step="0.01" placeholder="0 or 0.00"></td>
+            <td><input type="number" name="distributor_prices[]" class="form-control distributor-price" step="0.01" placeholder="0 or 0.00" ></td>
+            <td><input type="number" name="min_order_qtys[]" class="form-control min-order-qty" min="1" placeholder="0" ></td>
+            <td><input type="number" name="wholesale_prices[]" class="form-control wholesale-price" step="0.01" placeholder="0 or 0.00" ></td>
+            <td><input type="number" name="weights[]" class="form-control weight" step="0.01" placeholder="0 or 0.00" ></td>
+            <td><input type="number" name="qtys[]" class="form-control available-quantity" step="0.01" placeholder="0" ></td>
+            <td>
+                <select name="statuses[]" class="form-control">
+                    <option value="1" selected>Active</option>
+                    <option value="0">Inactive</option>
+                </select>
+            </td>
+        `;
             variationsBody.appendChild(row);
         });
 

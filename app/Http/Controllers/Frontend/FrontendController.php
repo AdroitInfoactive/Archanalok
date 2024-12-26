@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Mail\ContactMail;
 use App\Models\BannerSlider;
+use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Counter;
 use App\Models\FooterInfo;
@@ -21,6 +22,7 @@ use App\Models\PrivacyPolicy;
 use App\Models\ReturnPolicy;
 use App\Models\ShippingPolicy;
 use App\Models\TermsAndCondition;
+use App\Models\VariantMaster;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -45,7 +47,6 @@ class FrontendController extends BaseController
     }
     public function mainCategoryPage($slug)
     {
-        $footerInfo = FooterInfo::first();
         $mainCategory = MainCategory::where('slug', $slug)->firstOrFail();
         $categories = DB::table('categories')
             ->leftJoin('sub_categories', function ($join) {
@@ -61,7 +62,7 @@ class FrontendController extends BaseController
             })
             ->select(
                 'categories.id as category_id',
-                'categories.name as category_name',
+                'categories.name as name',
                 'categories.slug as category_slug',
                 DB::raw('GROUP_CONCAT(DISTINCT sub_categories.id ORDER BY sub_categories.position ASC) as sub_category_ids'), // Order subcategories by position
                 DB::raw('GROUP_CONCAT(DISTINCT sub_categories.name ORDER BY sub_categories.position ASC) as sub_category_names'),
@@ -80,54 +81,11 @@ class FrontendController extends BaseController
             ->where('categories.main_category_id', '=', $mainCategory->id) // Filter by main category ID
             ->groupBy('categories.id', 'categories.name', 'categories.slug') // Group by unique category fields
             ->get();
-        // dd($categories);
-        return view('frontend.home.category.index', compact('mainCategory', 'categories', 'footerInfo'));
+        return view('frontend.home.category.index', compact('mainCategory', 'categories'));
     }
-
-    /*     public function productPage($slug)
-    {
-        $product = Product::where('slug', $slug)->firstOrFail();
-        $mainCatId = $product->main_category_id;
-        $mainCategory = MainCategory::where('id', $mainCatId)->firstOrFail();
-        $categories = DB::table('categories')
-        ->leftJoin('sub_categories', function ($join) {
-            $join->on('categories.id', '=', 'sub_categories.category_id')
-                ->where('sub_categories.status', '=', '1'); // Filter active subcategories
-        })
-        ->leftJoin('products', function ($join) {
-            $join->on('categories.id', '=', 'products.category_id')
-                ->where('products.status', '=', '1'); // Filter active products
-        })
-        ->leftJoin('product_images', function ($join) {
-            $join->on('products.id', '=', 'product_images.product_id');
-        })
-        ->select(
-            'categories.id as category_id',
-            'categories.name as category_name',
-            'categories.slug as category_slug',
-            DB::raw('GROUP_CONCAT(DISTINCT sub_categories.id ORDER BY sub_categories.position ASC) as sub_category_ids'), // Order subcategories by position
-            DB::raw('GROUP_CONCAT(DISTINCT sub_categories.name ORDER BY sub_categories.position ASC) as sub_category_names'),
-            DB::raw('GROUP_CONCAT(DISTINCT sub_categories.image ORDER BY sub_categories.position ASC) as sub_category_images'),
-            DB::raw('GROUP_CONCAT(DISTINCT sub_categories.slug ORDER BY sub_categories.position ASC) as sub_category_slugs'),
-            DB::raw('GROUP_CONCAT(DISTINCT products.id ORDER BY products.priority ASC) as product_ids'), // Order products by priority
-            DB::raw('GROUP_CONCAT(DISTINCT products.name ORDER BY products.priority ASC) as product_names'),
-            DB::raw('GROUP_CONCAT(DISTINCT products.slug ORDER BY products.priority ASC) as product_slugs'),
-            DB::raw('GROUP_CONCAT(DISTINCT (
-                SELECT image_path
-                FROM product_images pi
-                WHERE pi.product_id = products.id
-                ORDER BY pi.order ASC LIMIT 1
-            )) as product_images') // Fetch one product image per product ordered by position
-        )
-        ->where('categories.main_category_id', '=', $mainCategory->id) // Filter by main category ID
-        ->groupBy('categories.id', 'categories.name', 'categories.slug') // Group by unique category fields
-        ->get();
-        return view('frontend.home.category.cat-product-details', compact('product', 'mainCategory', 'categories'));
-    } */
 
     public function productPage($slug)
     {
-        $footerInfo = FooterInfo::first();
         // Fetch the product based on the slug
         $product = Product::where('slug', $slug)->with(['images'])->firstOrFail();
 
@@ -150,7 +108,7 @@ class FrontendController extends BaseController
         
             ->select(
                 'categories.id as category_id',
-                'categories.name as category_name',
+                'categories.name as name',
                 'categories.slug as category_slug',
                 DB::raw('GROUP_CONCAT(DISTINCT sub_categories.id ORDER BY sub_categories.position ASC) as sub_category_ids'),
                 DB::raw('GROUP_CONCAT(DISTINCT sub_categories.name ORDER BY sub_categories.position ASC) as sub_category_names'),
@@ -185,176 +143,362 @@ class FrontendController extends BaseController
             ->orderBy('order', 'asc')
             ->get();
 
-        return view('frontend.home.category.cat-product-details', compact('product', 'mainCategory', 'categories', 'relatedProducts', 'variants', 'images', 'footerInfo'));
+        return view('frontend.home.category.cat-product-details', compact('product', 'mainCategory', 'categories', 'relatedProducts', 'variants', 'images'));
     }
 
-    public function categoryPage($slug)
-    {
-        $footerInfo = FooterInfo::first();
-        // Fetch the category by slug
-        $category = Category::where('slug', $slug)->firstOrFail();
-        // Fetch subcategories for the category
-        $subcategories = SubCategory::where('category_id', $category->id)
-            ->where('status', 1)
-            ->orderBy('position', 'asc')
-            ->get();
-        // Fetch products if there are no subcategories
-        $products = $subcategories->isEmpty()
-            ? Product::where('category_id', $category->id)
-                ->where('status', 1)
-                ->orderBy('position', 'asc')
-                ->get()
-            : collect(); // Empty collection if subcategories exist
+    public function categoryPage($maninCategorySlug, $slug, Request $request)
+    {        
+        $mainCategory = MainCategory::where('slug', $maninCategorySlug)->firstOrFail();
+        $category = Category::where('slug', $slug)->where('main_category_id', $mainCategory->id)->firstOrFail();
+        // check whether sub categories available for the category
+        $subcategories = SubCategory::where('category_id', $category->id)->where('status', 1)->orderBy('position', 'asc')->get();
 
-        return view('frontend.home.category.index', compact('category', 'subcategories', 'products', 'footerInfo'));
+        $categories = Category::with('subCategories')->where('main_category_id', $mainCategory->id)->get();
+        // if subcategories available then fetch subcategories
+        if ($subcategories->isNotEmpty()) {
+            // display view for sub categorirs
+            return view('frontend.home.category.subcategories', compact('mainCategory', 'category', 'subcategories', 'categories'));
+        }
+        else
+        {
+            // display view for products
+            $productQuery = Product::with(['variants', 'images'])
+            ->where('category_id', $category->id)
+            ->where('status', 1);
+
+                // Fetch all products
+                $products = $productQuery->get();
+
+                // Fetch min and max prices dynamically based on user role and variants
+                $userType = auth()->check() ? auth()->user()->role : 'user';
+
+                $minPrice = $products->map(function ($product) use ($userType) {
+                    return $this->getEffectivePriceWithVariants($product, $userType, 'min');
+                })->filter()->min();
+
+                $maxPrice = $products->map(function ($product) use ($userType) {
+                    return $this->getEffectivePriceWithVariants($product, $userType, 'max');
+                })->filter()->max();
+
+                if ($request->has('orderby')) {
+                    $userType = auth()->check() ? auth()->user()->role : 'user';
+
+                    switch ($request->orderby) {
+                        case 'new': // Newest products
+                            $productQuery->orderBy('created_at', 'desc');
+                            $products = $productQuery->get();
+                            break;
+
+                        case 'price-asc': // Price: Low to High
+                            $products = $productQuery->get()->map(function ($product) use ($userType) {
+                                $product->effective_price = $this->getEffectivePriceWithVariants($product, $userType);
+                                return $product;
+                            })->sortBy('effective_price')->values(); // Reindex the sorted collection
+                            break;
+
+                        case 'price-desc': // Price: High to Low
+                            $products = $productQuery->get()->map(function ($product) use ($userType) {
+                                $product->effective_price = $this->getEffectivePriceWithVariants($product, $userType);
+                                return $product;
+                            })->sortByDesc('effective_price')->values(); // Reindex the sorted collection
+                            break;
+
+                        default: // Default sorting
+                            $productQuery->orderBy('priority', 'asc');
+                            $products = $productQuery->get();
+                            break;
+                    }
+                } else {
+                    $productQuery->orderBy('priority', 'asc'); // Default sorting
+                    $products = $productQuery->get();
+                }
+
+                // Fetch categories and brands
+                $categories = Category::with('subCategories')->where('main_category_id', $mainCategory->id)->get();
+                $brands = Brand::where('status', 1)
+                    ->orderBy('position', 'asc')
+                    ->get();
+
+                $variants = VariantMaster::with(['details' => function ($query) {
+                    $query->where('status', 1) // Filter only active variants
+                        ->orderBy('name', 'asc'); // Sort variants by name
+                }])
+                ->where('status', 1) // Filter only active variant masters
+                ->orderBy('position', 'asc') // Sort variant masters by position
+                ->get();
+            // return view('frontend.home.category.products', compact('mainCategory', 'category'));
+            return view('frontend.home.subcategory.index', compact(
+                'mainCategory',
+                'category',
+                'products',
+                'categories',
+                'brands',
+                'minPrice',
+                'maxPrice',
+                'variants'
+            ));
+        }
     }
-
-
-    /* public function subCategoryPage($mainCategorySlug, $categorySlug, $subCategorySlug)
-    {
-        $footerInfo = FooterInfo::first();
-        // Fetch main category
-        $mainCategory = MainCategory::where('slug', $mainCategorySlug)->firstOrFail();
-
-        // Fetch category
-        $category = Category::where('slug', $categorySlug)->where('main_category_id', $mainCategory->id)->firstOrFail();
-
-        // Fetch subcategory
-        $subCategory = SubCategory::where('slug', $subCategorySlug)->where('category_id', $category->id)->firstOrFail();
-
-        // Fetch products under the subcategory
-        $products = DB::table('products')
-            ->leftJoin('product_images', 'products.id', '=', 'product_images.product_id')
-            ->leftJoin(('product_variants'), 'products.id', '=', 'product_variants.product_id')
-            ->select(
-                'products.id',
-                'products.name',
-                'products.slug',
-                'products.has_variants',
-                'products.sale_price',
-                'products.offer_price',
-                'products.distributor_price',
-                'products.wholesale_price',
-                'products.qty',
-                'products.status',
-                DB::raw('MIN(product_images.image_path) as product_image') ,// Fetch the first image
-                DB::raw('MIN(product_variants.sale_price) as variant_sale_price'), // Example aggregated field
-                DB::raw('MIN(product_variants.qty) as variant_qty'),
-                DB::raw('MIN(product_variants.distributor_price) as variant_distributor_price'),
-                DB::raw('MIN(product_variants.wholesale_price) as variant_wholesale_price')
-            )
-            ->where('products.sub_category_id', '=', $subCategory->id)
-            ->where('products.status', '=', 1) // Only active products
-            ->groupBy('products.id', 'products.name', 'products.slug', 'products.sale_price', 'products.offer_price', 'products.qty', 'products.status', 'products.distributor_price', 'products.wholesale_price', 'products.has_variants')
-            ->orderBy('products.priority', 'asc') // Order by priority
-            ->get();
-
-        $categories = DB::table('categories')
-            ->leftJoin('sub_categories', function ($join) {
-                $join->on('categories.id', '=', 'sub_categories.category_id')
-                    ->where('sub_categories.status', '=', '1'); // Filter active subcategories
-            })
-            ->leftJoin('products', function ($join) {
-                $join->on('categories.id', '=', 'products.category_id')
-                    ->where('products.status', '=', '1'); // Filter active products
-            })
-            ->leftJoin('product_images', function ($join) {
-                $join->on('products.id', '=', 'product_images.product_id');
-            })
-            ->select(
-                'categories.id as category_id',
-                'categories.name as category_name',
-                'categories.slug as category_slug',
-                DB::raw('GROUP_CONCAT(DISTINCT sub_categories.id ORDER BY sub_categories.position ASC) as sub_category_ids'),
-                DB::raw('GROUP_CONCAT(DISTINCT sub_categories.name ORDER BY sub_categories.position ASC) as sub_category_names'),
-                DB::raw('GROUP_CONCAT(DISTINCT sub_categories.slug ORDER BY sub_categories.position ASC) as sub_category_slugs'),
-                DB::raw('GROUP_CONCAT(DISTINCT products.id ORDER BY products.priority ASC) as product_ids'),
-                DB::raw('GROUP_CONCAT(DISTINCT products.name ORDER BY products.priority ASC) as product_names'),
-                DB::raw('GROUP_CONCAT(DISTINCT products.slug ORDER BY products.priority ASC) as product_slugs'),
-                DB::raw('GROUP_CONCAT(DISTINCT (
-                SELECT image_path
-                FROM product_images pi
-                WHERE pi.product_id = products.id
-                ORDER BY pi.order ASC LIMIT 1
-            )) as product_images')
-            )
-            ->where('categories.main_category_id', '=', $mainCategory->id) // Filter by main category ID
-            ->groupBy('categories.id', 'categories.name', 'categories.slug')
-            ->get();
-
-        return view('frontend.home.subcategory.index', compact('mainCategory', 'category', 'subCategory', 'products', 'categories', 'footerInfo'));
-    } */
 
     public function subCategoryPage($mainCategorySlug, $categorySlug, $subCategorySlug, Request $request)
     {
-        // Fetch main category by slug
         $mainCategory = MainCategory::where('slug', $mainCategorySlug)->firstOrFail();
+        $category = Category::where('slug', $categorySlug)->where('main_category_id', $mainCategory->id)->firstOrFail();
+        $subCategory = SubCategory::where('slug', $subCategorySlug)->where('category_id', $category->id)->firstOrFail();
 
-        // Fetch category by slug and its main category
-        $category = Category::where('slug', $categorySlug)
-            ->where('main_category_id', $mainCategory->id)
-            ->firstOrFail();
+        // Query for products
+        $productQuery = Product::with(['variants', 'images'])
+            ->where('sub_category_id', $subCategory->id)
+            ->where('status', 1);
 
-        // Fetch subcategory by slug and its parent category
-        $subCategory = SubCategory::where('slug', $subCategorySlug)
-            ->where('category_id', $category->id)
-            ->firstOrFail();
+        // Fetch all products
+        $products = $productQuery->get();
 
-        // Initialize query for products
-        $productQuery = Product::with([
-            'images' => function ($query) {
-                $query->orderBy('order', 'asc'); // Fetch images sorted by their order
-            },
-            'variants' => function ($query) {
-                $query->orderBy('sale_price', 'asc'); // Fetch variants sorted by sale price
-            }
-        ])
-        ->where('sub_category_id', $subCategory->id)
-        ->where('status', 1); // Only active products
+        // Fetch min and max prices dynamically based on user role and variants
+        $userType = auth()->check() ? auth()->user()->role : 'user';
 
-        // Apply sorting logic
+        $minPrice = $products->map(function ($product) use ($userType) {
+            return $this->getEffectivePriceWithVariants($product, $userType, 'min');
+        })->filter()->min();
+
+        $maxPrice = $products->map(function ($product) use ($userType) {
+            return $this->getEffectivePriceWithVariants($product, $userType, 'max');
+        })->filter()->max();
+
         if ($request->has('orderby')) {
+            $userType = auth()->check() ? auth()->user()->role : 'user';
+
             switch ($request->orderby) {
-            case 'new': // Newest products
-            $productQuery->orderBy('created_at', 'desc');
-            break;
-            case 'price': // Price: Low to High
-            $productQuery->orderBy('sale_price', 'asc');
-            break;
-            case 'price-desc': // Price: High to Low
-            $productQuery->orderBy('sale_price', 'desc');
-            break;
-            /* case 'rating': // Assuming average rating exists
-            $productQuery->orderBy('average_rating', 'desc');
-            break; */
-            default: // Default sorting
-            $productQuery->orderBy('priority', 'asc');
-            break;
+                case 'new': // Newest products
+                    $productQuery->orderBy('created_at', 'desc');
+                    $products = $productQuery->get();
+                    break;
+
+                case 'price-asc': // Price: Low to High
+                    $products = $productQuery->get()->map(function ($product) use ($userType) {
+                        $product->effective_price = $this->getEffectivePriceWithVariants($product, $userType);
+                        return $product;
+                    })->sortBy('effective_price')->values(); // Reindex the sorted collection
+                    break;
+
+                case 'price-desc': // Price: High to Low
+                    $products = $productQuery->get()->map(function ($product) use ($userType) {
+                        $product->effective_price = $this->getEffectivePriceWithVariants($product, $userType);
+                        return $product;
+                    })->sortByDesc('effective_price')->values(); // Reindex the sorted collection
+                    break;
+
+                default: // Default sorting
+                    $productQuery->orderBy('priority', 'asc');
+                    $products = $productQuery->get();
+                    break;
             }
         } else {
             $productQuery->orderBy('priority', 'asc'); // Default sorting
+            $products = $productQuery->get();
         }
 
-        // Fetch paginated products
-        $products = $productQuery->paginate(12); // Paginate 12 products per page=
+        // Fetch categories and brands
+        $categories = Category::with('subCategories')->where('main_category_id', $mainCategory->id)->get();
+        $brands = Brand::where('status', 1)
+            ->orderBy('position', 'asc')
+            ->get();
 
-        // Fetch categories and their subcategories
-        $categories = Category::with([
-            'subCategories' => function ($query) {
-                $query->where('status', 1)->orderBy('position', 'asc'); // Only active subcategories
-            }
-        ])
-        ->where('main_category_id', $mainCategory->id) // Filter categories by main category
+        $variants = VariantMaster::with(['details' => function ($query) {
+            $query->where('status', 1) // Filter only active variants
+                ->orderBy('name', 'asc'); // Sort variants by name
+        }])
+        ->where('status', 1) // Filter only active variant masters
+        ->orderBy('position', 'asc') // Sort variant masters by position
         ->get();
 
-        // Return data to the view
         return view('frontend.home.subcategory.index', compact(
             'mainCategory',
             'category',
             'subCategory',
             'products',
-            'categories'
+            'categories',
+            'brands',
+            'minPrice',
+            'maxPrice',
+            'variants'
         ));
+    }
+
+    // Helper method to get effective price based on user type and variants
+    private function getEffectivePriceWithVariants($product, $userType)
+    {
+        // If product has variants
+        if ($product->has_variants && $product->variants->isNotEmpty()) {
+            // Fetch the lowest price among variants
+            return $product->variants->map(function ($variant) use ($userType) {
+                return $this->getEffectivePrice($variant, $userType);
+            })->min(); // Get the lowest price
+        }
+
+        // If no variants, use product's base price
+        return $this->getEffectivePrice($product, $userType);
+    }
+
+    // Helper method to calculate effective price for a product or variant
+    private function getEffectivePrice($item, $userType)
+    {
+        // Determine the effective price based on user type and availability
+        if ($userType === 'ws') {
+            return $item->wholesale_price;
+        } elseif ($userType === 'dr') {
+            return $item->distributor_price;
+        } elseif ($userType === 'user') {
+            return $item->offer_price ?: $item->sale_price;
+        } else {
+            return $item->sale_price;
+        }
+    }
+
+    public function getVariantPrices(Request $request)
+    {
+        $request->validate([
+            'variant_ids' => 'required|array', // Validate that variant_ids is an array
+            'variant_ids.*' => 'integer', // Each ID in the array should be an integer
+            'productId' => 'required|integer', // Validate that productId is an integer
+        ]);
+
+        $variantIds = $request->variant_ids; // Selected variant IDs
+        $productId = $request->productId; // Product ID
+
+        // Fetch all active variants for the given product
+        $variants = ProductVariant::where('product_id', $productId)
+            ->where('status', 1)
+            ->get();
+
+        // Find the matched variant
+        $matchedVariant = $variants->first(function ($variant) use ($variantIds) {
+            // Decode the JSON variation_ids field into an array
+            $variantVariationIds = json_decode($variant->variation_ids, true);
+
+            // Check if $variantIds matches $variantVariationIds irrespective of order
+            return !array_diff($variantIds, $variantVariationIds) && !array_diff($variantVariationIds, $variantIds);
+        });
+
+        if (!$matchedVariant) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No matching variant found.',
+            ], 404);
+        }
+
+        // Determine user type
+        $userType = auth()->check() ? auth()->user()->role : 'user';
+
+        // Calculate prices for the matched variant
+        $effectivePrice = match ($userType) {
+            'ws' => $matchedVariant->wholesale_price,
+            'dr' => $matchedVariant->distributor_price,
+            'user' => $matchedVariant->offer_price ?? $matchedVariant->sale_price,
+            default => $matchedVariant->sale_price,
+        };
+
+        $isDiscounted = $matchedVariant->offer_price && $matchedVariant->offer_price < $matchedVariant->sale_price;
+
+        $responseData = [
+            'id' => $matchedVariant->id,
+            'effective_price' => $effectivePrice,
+            'original_price' => $matchedVariant->sale_price,
+            'is_discounted' => $isDiscounted,
+            'offer_price' => $matchedVariant->offer_price,
+            'discount_percentage' => $isDiscounted
+                ? round((($matchedVariant->sale_price - $matchedVariant->offer_price) / $matchedVariant->sale_price) * 100)
+                : null,
+        ];
+
+        return response()->json([
+            'success' => true,
+            'data' => $responseData,
+        ]);
+    }
+
+    public function filterProducts(Request $request)
+    {
+        $request->validate([
+            'min_price' => 'required|numeric',
+            'max_price' => 'required|numeric',
+        ]);
+
+        $minPrice = $request->min_price;
+        $maxPrice = $request->max_price;
+        $userType = auth()->check() ? auth()->user()->role : 'user';
+
+        $productQuery = Product::with(['variants', 'images'])->where('status', 1);
+
+        if ($request->filled('brands')) {
+            // Filter products by brand ID
+            $brands = is_array($request->brands) ? $request->brands : explode(',', $request->brands);
+            $productQuery->whereIn('brand', $brands);
+        }
+
+        if ($request->filled('details')) {
+            $details = is_array($request->details) ? $request->details : explode(',', $request->details);
+
+            $productQuery->where(function ($query) use ($details) {
+                foreach ($details as $detail) {
+                    // Determine the type of the detail (e.g., material, units, weight type)
+                    $masterType = VariantMaster::whereHas('details', function ($q) use ($detail) {
+                        $q->where('id', $detail);
+                    })->value('name');
+
+                    if ($masterType) {
+                        switch (strtolower($masterType)) {
+                            case 'material':
+                                $query->orWhereRaw("FIND_IN_SET(?, material)", [$detail]);
+                                break;
+                            case 'units':
+                                $query->orWhereRaw("FIND_IN_SET(?, units)", [$detail]);
+                                break;
+                            case 'weight type':
+                                $query->orWhereRaw("FIND_IN_SET(?, weight_type)", [$detail]);
+                                break;
+                            default:
+                                $query->orWhereRaw("JSON_CONTAINS(JSON_EXTRACT(variation_ids, '$.*.details[*].id'), JSON_QUOTE(?))", [$detail]);
+                                break;
+                        }
+                    }
+                }
+            });
+        }
+
+        $products = $productQuery->get()->map(function ($product) use ($userType) {
+            if ($product->has_variants && $product->variants->isNotEmpty()) {
+                $variant = $product->variants->sortBy('sale_price')->first();
+                $product->effective_price = match ($userType) {
+                    'user' => $variant->offer_price ?? $variant->sale_price,
+                    'ws' => $variant->wholesale_price ?? $variant->sale_price,
+                    'dr' => $variant->distributor_price ?? $variant->sale_price,
+                    default => $variant->sale_price,
+                };
+            } else {
+                $product->effective_price = match ($userType) {
+                    'user' => $product->offer_price ?? $product->sale_price,
+                    'ws' => $product->wholesale_price ?? $product->sale_price,
+                    'dr' => $product->distributor_price ?? $product->sale_price,
+                    default => $product->sale_price,
+                };
+            }
+            return $product;
+        });
+
+        $products = $products->filter(function ($product) use ($minPrice, $maxPrice) {
+            return $product->effective_price >= $minPrice && $product->effective_price <= $maxPrice;
+        });
+
+        $gridHtml = view('frontend.home.subcategory.filter-products-grid', ['products' => $products])->render();
+        $listHtml = view('frontend.home.subcategory.filter-products-list', ['products' => $products])->render();
+
+        return response()->json([
+            'gridHtml' => $gridHtml,
+            'listHtml' => $listHtml,
+            'calculatedMinPrice' => $products->min('effective_price'),
+            'calculatedMaxPrice' => $products->max('effective_price'),
+        ]);
     }
 
     function subscribeNewsletter(Request $request): Response

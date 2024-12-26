@@ -739,8 +739,8 @@ namespace App\Models{
  * @property string $role
  * @property \Illuminate\Support\Carbon|null $email_verified_at
  * @property mixed $password
- * @property string|null $remember_token
  * @property string $status
+ * @property string|null $remember_token
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications

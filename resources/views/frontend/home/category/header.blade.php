@@ -27,7 +27,7 @@
                                     <a href="javascript:void(0);">{{ $mainCategory->name }}
                                         <ul class="sub-menu">
                                             @foreach ($categories as $category)
-                                                <li><a href="javascript:void(0);">{{ $category->category_name }}</a>
+                                                <li><a href="javascript:void(0);">{{ $category->name }}</a>
                                                 </li>
                                             @endforeach
 

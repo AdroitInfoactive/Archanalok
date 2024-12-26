@@ -25,14 +25,14 @@ class UserDataTable extends DataTable
             ->addColumn('status', function ($query) {
                 $selectedActive = $query->status == 'a' ? 'selected' : '';
                 $selectedPending = $query->status == 'p' ? 'selected' : '';
-                $selectedPending = $query->status == 'r' ? 'selected' : '';
-                $selectedPending = $query->status == 'i' ? 'selected' : '';
+                $selectedRejected = $query->status == 'r' ? 'selected' : '';
+                $selectedInactive = $query->status == 'i' ? 'selected' : '';
                 return "
                     <select class='form-control status-dropdown' data-id='{$query->id}'>
                         <option value='a' {$selectedActive}>Active</option>
                         <option value='p' {$selectedPending}>Pending</option>
-                        <option value='r' {$selectedPending}>Rejected</option>
-                        <option value='i' {$selectedPending}>Inactive</option>
+                        <option value='r' {$selectedRejected}>Rejected</option>
+                        <option value='i' {$selectedInactive}>Inactive</option>
                     </select>
                 ";
             })->addColumn('role', function ($query) {

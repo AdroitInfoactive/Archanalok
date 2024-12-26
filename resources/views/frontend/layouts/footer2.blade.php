@@ -46,7 +46,7 @@
                     <h3 class="widget-title">Products</h3>
                     <ul>
                         @foreach ($categories as $category)
-                        <li><a href="javascript:void(0);">{{ $category->category_name }}</a></li>
+                        <li><a href="javascript:void(0);">{{ $category->name }}</a></li>
                     @endforeach
                     </ul>
                 </aside>

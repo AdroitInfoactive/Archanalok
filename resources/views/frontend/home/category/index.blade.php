@@ -3,7 +3,6 @@
 
 @include('frontend.home.category.header')
 @include('frontend.home.category.banner')
- 
 
 <!-- Popup Search End -->
 <section class="popup_search_sec">

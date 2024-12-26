@@ -50,14 +50,22 @@ Route::get('/testimonials', [FrontendController::class, 'testimonials'])->name('
 
 Route::get('wishlist/{productId}', [WishlistController::class, 'store'])->name('wishlist.store');
 
+Route::get('/filter-products', [FrontendController::class, 'filterProducts'])->name('filter-products');
+
+Route::post('/get-variant-prices', [FrontendController::class, 'getVariantPrices'])->name('get.variant.prices');
+
 // Category Page (MainCategory -> Category -> SubCategory)
 Route::get('/{slug}', [FrontendController::class, 'mainCategoryPage'])->name('maincategory.show');
+
+Route::get('/product/{slug}', [FrontendController::class, 'productPage'])->name('product.show');
+
+// Category Page
+Route::get('/{mainCategorySlug}/{slug}', [FrontendController::class, 'categoryPage'])->name('category.show');
 
 // SubCategory Page
 Route::get('/{mainCategorySlug}/{categorySlug}/{slug}', [FrontendController::class, 'subCategoryPage'])->name('subcategory.show');
 
 // // Product details Page
-Route::get('/product/{slug}', [FrontendController::class, 'productPage'])->name('product.show');
 
 /** Newsletter Routes */
 Route::post('/subscribe-newsletter', [FrontendController::class, 'subscribeNewsletter'])->name('subscribe-newsletter');

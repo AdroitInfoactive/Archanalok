@@ -6,7 +6,20 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12 text-center">
-                    <h2 class="sec_titles">{{ $category->category_name }}</h2>
+                    <h2 class="sec_titles">
+                        {{ $category->name }}
+                        @if (!empty($category->sub_category_names))
+                            {{-- View All Subcategories --}}
+                            <a href="{{ url($mainCategory->slug . '/' . $category->category_slug) }}"
+                                class="btn btn-link view-all-link float-right">View All <i
+                                    class="fas fa-arrow-right"></i></a>
+                        @else
+                            {{-- View All Products --}}
+                            <a href="{{ url($mainCategory->slug . '/' . $category->category_slug) }}"
+                                class="btn btn-link view-all-link float-right">View All <i
+                                    class="fas fa-arrow-right"></i></a>
+                        @endif
+                    </h2>
                 </div>
             </div>
             <div class="row">
@@ -20,16 +33,18 @@
                                 $subCategorySlugs = explode(',', $category->sub_category_slugs);
                             @endphp
                             @foreach ($subCategoryNames as $subIndex => $subCategoryName)
-                            <div class="product-item-2 text-center">
-                                <div class="product-thumb">
-                                      <a href="{{ url($mainCategory->slug . '/' . $category->category_slug . '/' . $subCategorySlugs[$subIndex] ?? '#') }}">
-                                        <img src="{{ asset($subCategoryImages[$subIndex] ?? 'frontend/images/default-placeholder.png') }}" alt="{{ $subCategoryName }}" />
-                                    </a>
+                                <div class="product-item-2 text-center">
+                                    <div class="product-thumb">
+                                        <a href="{{ url($mainCategory->slug . '/' . $category->category_slug . '/' . $subCategorySlugs[$subIndex] ?? '#') }}">
+                                            <img src="{{ asset($subCategoryImages[$subIndex] ?? 'frontend/images/default-placeholder.png') }}" alt="{{ $subCategoryName }}" />
+                                        </a>
+                                    </div>
+                                    <div class="product-details">
+                                        <h5>
+                                            <a href="{{ url($mainCategory->slug . '/' . $category->category_slug . '/' . $subCategorySlugs[$subIndex] ?? '#') }}">{{ $subCategoryName }}</a>
+                                        </h5>
+                                    </div>
                                 </div>
-                                <div class="product-details">
-                                    <h5><a href="{{ url($mainCategory->slug . '/' . $category->category_slug . '/' . $subCategorySlugs[$subIndex] ?? '#') }}">{{ $subCategoryName }}</a></h5>
-                                </div>
-                            </div>
                             @endforeach
                         @else
                             {{-- Display products if no subcategories --}}
@@ -39,16 +54,18 @@
                                 $productSlugs = explode(',', $category->product_slugs);
                             @endphp
                             @foreach ($productNames as $productIndex => $productName)
-                            <div class="product-item-2 text-center">
-                                <div class="product-thumb">
-                                    <a href="{{ url('product/' . ($productSlugs[$productIndex] ?? '#')) }}">
-                                        <img src="{{ asset($productImages[$productIndex] ?? 'frontend/images/default-placeholder.png') }}" alt="{{ $productName }}" />
-                                    </a>
+                                <div class="product-item-2 text-center">
+                                    <div class="product-thumb">
+                                        <a href="{{ url('product/' . ($productSlugs[$productIndex] ?? '#')) }}">
+                                            <img src="{{ asset($productImages[$productIndex] ?? 'frontend/images/default-placeholder.png') }}" alt="{{ $productName }}" />
+                                        </a>
+                                    </div>
+                                    <div class="product-details">
+                                        <h5>
+                                            <a href="{{ url('product/' . ($productSlugs[$productIndex] ?? '#')) }}">{{ $productName }}</a>
+                                        </h5>
+                                    </div>
                                 </div>
-                                <div class="product-details">
-                                    <h5><a href="{{ url('product/' . ($productSlugs[$productIndex] ?? '#')) }}">{{ $productName }}</a></h5>
-                                </div>
-                            </div>
                             @endforeach
                         @endif
                     </div>
@@ -56,7 +73,6 @@
             </div>
         </div>
     </section>
-  
     {{-- Insert banner after every two sections --}}
     @if (($index + 1) % 2 === 0)
     <div class="row">
@@ -66,4 +82,4 @@
     </div>
     @endif
     @endforeach
-  </div>
+</div>

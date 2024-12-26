@@ -1,5 +1,6 @@
 @extends('frontend.layouts.cat-master')
 @section('content')
+<link rel="stylesheet" href="{{ asset('frontend/css/product-detail-page.css') }}">
     @include('frontend.home.category.header')
 
 
@@ -27,10 +28,7 @@
     <!-- Popup Search End -->
 
     <!-- Hero Banner Start -->
-    @php
-        // dd(  $product);
-        // dd($categories);
-    @endphp
+
     <section class="page_banner" style="background-image: url({{ asset('frontend/images/banner.jpg') }});">
         <div class="container">
             <div class="row">
@@ -38,10 +36,20 @@
                     <h3 class="pb_title">{{ $product->name }}</h3>
                     <div class="page_crumb">
                         <a href="{{ route('home') }}">Home</a> |
-                        <a href="{{ route('maincategory.show', $mainCategory->slug) }}">{{ $mainCategory->name }}</a>
+                        <a
+                            href="{{ url($mainCategory->slug) }}">{{ $mainCategory->name }}</a>
                         |
-                        <a href=""></a>{{ $product->category->name }}</a>
+                        <a
+                            href="{{ url($mainCategory->slug . '/' . $product->category->slug) }}">{{ $product->category->name }}</a>
                         |
+                        @if($product->sub_category_id != 0 && $product->sub_category_id != null)
+                        @php
+                            $subCat = \App\Models\SubCategory::where('id', $product->sub_category_id)->first();
+                        @endphp
+                            <a
+                                href="{{ url($mainCategory->slug . '/' . $product->category->slug . '/' . $subCat->slug) }}">{{ $subCat->name }}</a>
+                            |
+                        @endif
                         <span>{{ $product->name }}</span>
                     </div>
                 </div>
@@ -83,81 +91,136 @@
                 <div class="col-lg-7 col-md-7">
                     <div class="product-decp">
                         <h4>{{ $product->name }}</h4>
+                        @php
+                            // Determine user type
+                            $userType = auth()->check() ? auth()->user()->role : 'user';
+                        @endphp
+
                         <div class="product_price clearfix">
-                          @if ($product->has_variants == 0)
-                            @php
-                          
-                                // Handle price for products without variants
-                                $price = $product->sale_price; // Default to sale price
-                                if (auth()->check()) {
-                                    $price = match (auth()->user()->role) {
-                                        'user' => $product->sale_price,
+                            @if ($product->has_variants == 0)
+                                @php
+                                    // Handle price for products without variants
+                                    $price = match ($userType) {
                                         'ws' => $product->wholesale_price,
                                         'dr' => $product->distributor_price,
+                                        'user' => $product->offer_price ?: $product->sale_price,
                                         default => $product->sale_price,
                                     };
-                                }
-                            @endphp
-                            <span class="price"><span><span>₹</span>{{ number_format($price, 2) }}</span></span>
-                        @else
-                            @php
-                                $price = $variants[0]->sale_price; // Default to sale price
-                                if (auth()->check()) {
-                                    $price = match (auth()->user()->role) {
-                                        'user' => $variants[0]->sale_price ?? $product->sale_price,
-                                        'ws' => $variants[0]->wholesale_price ?? $product->wholesale_price,
-                                        'dr' => $variants[0]->distributor_price ?? $product->distributor_price,
-                                        default => $variants[0]->sale_price ?? $product->sale_price,
+                                    $isDiscounted = $userType === 'user' && $product->offer_price && $product->offer_price < $product->sale_price;
+                                    $percentageOff = $isDiscounted ? round((($product->sale_price - $product->offer_price) / $product->sale_price) * 100) : null;
+                                @endphp
+                                <span class="price">
+                                    <span><span>₹</span>{{ number_format($price, 2) }}</span>
+                                    @if ($isDiscounted)
+                                        <span style="text-decoration: line-through; font-size: 0.7em;"
+                                            class="original-price text-muted">
+                                            ₹{{ number_format($product->sale_price, 2) }}
+                                        </span>
+                                        <span class="discount text-success" style="font-size: 0.7em;">({{ $percentageOff }}% off)</span>
+                                    @endif
+                                </span>
+                            @else
+                                @php
+                                    $prices = json_encode(
+                                        $product->variants->mapWithKeys(function ($variant) {
+                                            return [
+                                                $variant->variant_detail_id => [
+                                                    'ws' => $variant->wholesale_price,
+                                                    'dr' => $variant->distributor_price,
+                                                    'user' => $variant->offer_price ?? $variant->sale_price,
+                                                    'default' => $variant->sale_price,
+                                                ],
+                                            ];
+                                        })->toArray()
+                                    );
+
+                                    // Default to the first variant's price
+                                    $defaultVariant = $product->variants->first();
+
+                                    // Determine price for products with variants
+                                    $price = match ($userType) {
+                                        'ws' => $defaultVariant->wholesale_price ?? $product->wholesale_price,
+                                        'dr' => $defaultVariant->distributor_price ?? $product->distributor_price,
+                                        'user' => $defaultVariant->offer_price ?? $defaultVariant->sale_price,
+                                        default => $defaultVariant->sale_price,
                                     };
-                                }
+
+                                    $isDiscounted = $userType === 'user' && $defaultVariant->offer_price && $defaultVariant->offer_price < $defaultVariant->sale_price;
+                                    $percentageOff = $isDiscounted ? round((($defaultVariant->sale_price - $defaultVariant->offer_price) / $defaultVariant->sale_price) * 100) : null;
+                                @endphp
+                                <span class="price">
+                                    <span><span>₹</span>{{ number_format($price, 2) }}</span>
+                                    @if ($isDiscounted)
+                                        <span style="text-decoration: line-through; font-size: 0.7em;"
+                                            class="original-price text-muted">
+                                            ₹{{ number_format($defaultVariant->sale_price, 2) }}
+                                        </span>
+                                        <span class="discount text-success" style="font-size: 0.7em;">({{ $percentageOff }}% off)</span>
+                                    @endif
+                                </span>
+                            @endif
+                        </div>
+                        <div class="metatext"><span>Code:</span> #196DB6{{ $product->sku ?? 'N/A' }}</div>
+                        <div class="metatext"><span>Material:</span> {{ $product->materialDetail->name ?? 'N/A' }}</div>
+                        <div class="metatext"><span>Units:</span> {{ $product->unitDetail->name ?? 'N/A' }}</div>
+                        <div class="metatext"><span>weight type:</span> {{ $product->weightTypeDetail->name ?? 'N/A' }}</div>
+                        <div class="metatext"><span>Brand:</span> {{ $product->brandName->name ?? 'N/A' }}</div>
+                        @if ($product->has_variants == 1)
+                            @php
+                                $variantData = json_decode($product->variation_ids, true); // Assuming the JSON is stored in the 'variation_ids' field
+                                $selectedVariant = $product->variants->first(); // Default selected variant
                             @endphp
-                            <span class="price"><span><span>₹</span>{{ number_format($price, 2) }}</span></span>
+
+                            @if (!empty($variantData))
+                                @foreach ($variantData as $key => $variant)
+                                    <div class="">
+                                        <div class="excerpt">
+                                            <h5 class="mb-1">{{ $variant['name'] }}</h5>
+                                            @if ($variant['name'] == 'Color')
+                                                <div class="color-options d-flex">
+                                                    @foreach ($variant['details'] as $detail)
+                                                        <div class="color-option" 
+                                                            style="background-color: {{ strtolower($detail['name']) }}; width: 30px; height: 30px; margin-right: 10px; cursor: pointer; position: relative;" 
+                                                            title="{{ $detail['name'] }}" 
+                                                            data-variant-id="{{ $detail['id'] }}">
+                                                            
+                                                            <!-- Tick mark overlay -->
+                                                            <div class="tick-mark" style="
+                                                                position: absolute;
+                                                                top: 50%;
+                                                                left: 50%;
+                                                                transform: translate(-50%, -50%);
+                                                                font-size: 20px;
+                                                                color: white;
+                                                                display: none; /* Hidden by default */
+                                                            ">
+                                                                ✓
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            @else
+                                                <div class="variant-options">
+                                                    <div class="btn-group-toggle" data-toggle="buttons">
+                                                        @foreach ($variant['details'] as $detail)
+                                                            <label class="btn btn-outline-secondary m-1 {{ $selectedVariant && $selectedVariant->variant_detail_id == $detail['id'] ? 'active' : '' }}">
+                                                                <input type="radio" 
+                                                                    name="{{ strtolower($variant['name']) }}" 
+                                                                    value="{{ $detail['id'] }}" 
+                                                                    data-variant-id="{{ $detail['id'] }}" 
+                                                                    autocomplete="off" 
+                                                                    {{ $selectedVariant && $selectedVariant->variant_detail_id == $detail['id'] ? 'checked' : '' }}> 
+                                                                {{ $detail['name'] }}
+                                                            </label>
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @endif
                         @endif
-
-                        </div>
-
-                        <div class="metatext"><span>Code:</span> <a href="#">{{ $product->sku ?? 'N/A' }}</a></div>
-                        <div class="metatext"><span>Material:</span> <a
-                                href="#">{{ $product->materialDetail->name ?? 'N/A' }}</a></div>
-                        <div class="metatext"><span>Units:</span> <a
-                                href="#">{{ $product->unitDetail->name ?? 'N/A' }}</a></div>
-                        <div class="metatext"><span>weight type:</span> <a
-                                href="#">{{ $product->weightTypeDetail->name ?? 'N/A' }}</a>
-                        </div>
-                        <div class="metatext"><span>Brand:</span> <a
-                                href="#">{{ $product->brandName->name ?? 'N/A' }}</a></div>
-
-                                <div class="">
-                                    <div class="excerpt">
-                                        <h4 class="">Sizes</h4>
-                                        <div class="dropdown">
-                                            <button class="btn btn-secondary " type="button" id="sizeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                Select Size
-                                            </button>
-                                            <div class="dropdown-menu" aria-labelledby="sizeDropdown">
-                                                <a class="dropdown-item" href="#">850</a>
-                                                <a class="dropdown-item" href="#">1000</a>
-                                                <a class="dropdown-item" href="#">1250</a>
-                                                <!-- <a class="dropdown-item" href="#">Extra Large</a>
-                                                <a class="dropdown-item" href="#">Custom Size</a> -->
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-    
-    
-    
-                                <div class="">
-                                    <div class="excerpt">
-                                        <h4 class="">Available Colors</h4>
-                                        <div class="color-options d-flex">
-                                            <div class="color-option" style="background-color: green; width: 50px; height: 50px; margin-right: 10px; cursor: pointer;" title="Green"></div>
-                                            <div class="color-option" style="background-color: blue; width: 50px; height: 50px; margin-right: 10px; cursor: pointer;" title="Blue"></div>
-                                            <div class="color-option" style="background-color: red; width: 50px; height: 50px; margin-right: 10px; cursor: pointer;" title="Red"></div>
-                                            <div class="color-option" style="background-color: orange; width: 50px; height: 50px; cursor: pointer;" title="Orange"></div>
-                                        </div>
-                                    </div>
-                                </div>
                         <section class="product-variants-section">
                             <div class="container-fluid">
                                 <h2 class="text-center">Product Variants</h2>
@@ -206,8 +269,6 @@
                                 </table>
                             </div>
                         </section>
-                        
-
                         <!-- Quantity Section -->
                         <div class="quantityd clearfix">
                             <button class="qtyBtn btnMinus"><span>-</span></button>
@@ -294,255 +355,149 @@
 @endsection
 
 @push('styles')
-<style>
-    .vehicle-detail-banner .car-slider-desc {
-        max-width: 180px;
-        margin: 0 auto;
-    }
 
-    .banner-slider .slider.slider-for {
-        max-width: 84%;
-        padding-right: 35px;
-    }
-
-    .banner-slider .slider.slider-nav {
-        max-width: 16%;
-    }
-
-    .banner-slider .slider.slider-for,
-    .banner-slider .slider.slider-nav {
-        width: 100%;
-        float: left;
-    }
-
-    .banner-slider .slider.slider-nav {
-        height: 610px;
-        overflow: hidden;
-
-    }
-
-    .slider-banner-image {
-        height: 610px;
-    }
-
-    .banner-slider .slider.slider-nav {
-        padding: 20px 0 0;
-    }
-
-    .slider-nav .slick-slide.thumbnail-image .thumbImg {
-        max-width: 178px;
-        height: 110px;
-        margin: 0 auto;
-        border: 1px solid #EBEBEB;
-    }
-
-    .slider-banner-image img,
-    .slider-nav .slick-slide.thumbnail-image .thumbImg img {
-        height: 100%;
-        width: 100%;
-        object-fit: cover;
-        border: #ddd 1px solid;
-    }
-
-    .slick-vertical .slick-slide:active,
-    .slick-vertical .slick-slide:focus,
-    .slick-arrow:hover,
-    .slick-arrow:focus {
-        border: 0;
-        outline: 0;
-    }
-
-    .slider-nav .slick-slide.slick-current.thumbnail-image .thumbImg {
-        border: 2px solid #196DB6;
-    }
-
-    .thumbnail-image img {
-        width: 100px;
-        height: 100px;
-        border: #ddd 1px solid;
-    }
-
-    .slider-nav .slick-slide.slick-current span {
-        color: #196DB6;
-    }
-
-    .slider-nav .slick-slide {
-        text-align: center;
-    }
-
-    .slider-nav .slick-slide span {
-        font-size: 14px;
-        display: block;
-        padding: 5px 0 15px;
-    }
-
-    .slick-arrow {
-        width: 100%;
-        background-color: transparent;
-        border: 0;
-        background-position: center;
-        background-repeat: no-repeat;
-        font-size: 0;
-        height: 18px;
-        position: absolute;
-        left: 0;
-        right: 0;
-        z-index: 99;
-    }
-
-    .slick-prev {
-        top: 0;
-    }
-
-    .slick-next {
-        bottom: 0;
-        background-color: #fff;
-    }
-
-    .slick-prev.slick-arrow {
-        background-image: url(../images/black-up-arrow.png);
-    }
-
-    .slick-next.slick-arrow {
-        background-image: url(../images/black-down-arrow.png);
-    }
-
-    /*End USE CSS for Slider*/
-
-    @media screen and (max-width : 991px) {
-
-        .banner-slider .slider.slider-for,
-        .banner-slider .slider.slider-nav {
-            max-width: 100%;
-            float: none;
-        }
-
-        .banner-slider .slider.slider-for {
-            padding-right: 0;
-        }
-
-        .banner-slider .slider.slider-nav {
-            height: auto;
-        }
-
-        .slider-banner-image {
-            height: 500px;
-        }
-
-        .slider.slider-nav.thumb-image {
-            padding: 10px 30px 0;
-        }
-
-        .slider-nav .slick-slide span {
-            padding: 5px 0;
-        }
-
-        .slick-arrow {
-            padding: 0;
-            width: 30px;
-            height: 30px;
-            top: 50%;
-            bottom: 0;
-            -webkit-transform: translateY(-50%) rotate(-90deg);
-            -moz-transform: translateY(-50%) rotate(-90deg);
-            -ms-transform: translateY(-50%) rotate(-90deg);
-            transform: translateY(-50%) rotate(-90deg);
-        }
-
-        .slick-prev {
-            left: 0;
-            right: unset;
-        }
-
-        .slick-next {
-            left: unset;
-            right: 0;
-            background-color: transparent;
-        }
-
-        .vehicle-detail-banner .car-slider-desc {
-            max-width: 340px;
-        }
-
-        .bid-tag {
-            padding: 10px 0 15px;
-        }
-
-        .slider.slider-nav.thumb-image {
-            white-space: nowrap;
-        }
-
-        .thumbnail-image.slick-slide {
-            padding: 0px 5px;
-            min-width: 75px;
-            display: inline-block;
-            float: none;
-        }
-    }
-
-    @media screen and (max-width : 767px) {
-        .slider-banner-image {
-            height: 400px;
-        }
-
-        .slider.slider-nav.thumb-image {
-            padding: 0px 20px 0;
-            margin: 10px 0px 0;
-        }
-
-        .slider-nav .slick-slide.thumbnail-image .thumbImg {
-            max-width: 140px;
-            height: 80px;
-        }
-
-        .slick-prev.slick-arrow {
-            background-position: center 10px;
-        }
-
-        .slick-next.slick-arrow {
-            background-position: center 10px, center;
-        }
-
-        .slider-nav .slick-slide span {
-            font-size: 12px;
-            white-space: normal;
-        }
-    }
-
-    @media screen and (max-width: 580px) {
-        .slider-banner-image {
-            height: 340px;
-        }
-    }
-
-    @media screen and (max-width : 480px) {
-        .slider-banner-image {
-            height: 280px;
-        }
-    }
-
-
-    .dropdown-menu {
-        display: none;
-        /* Hide the menu by default */
-        opacity: 0;
-        /* Start with no opacity */
-        transition: opacity 0.3s ease, visibility 0.3s ease;
-        /* Transition for smoothness */
-    }
-
-    .dropdown:hover .dropdown-menu {
-        display: block;
-        /* Show the menu on hover */
-        opacity: 1;
-        /* Fade in */
-        visibility: visible;
-        /* Make it visible */
-    }
-</style>
 @endpush
 @push('scripts')
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const prices = JSON.parse(@json($prices));
+            const userType = "{{ $userType }}";
+
+            // Pre-select the first variant for each group on page load
+            function preselectVariants() {
+                // Pre-select the first radio button in each variant group
+                document.querySelectorAll('.variant-options').forEach(group => {
+                    const firstRadio = group.querySelector('input[type="radio"]');
+                    if (firstRadio) {
+                        firstRadio.checked = true;
+                        firstRadio.dispatchEvent(new Event('change')); // Trigger change event
+                    }
+                });
+
+                // Pre-select the first color option and mark it as selected
+                const firstColorOption = document.querySelector('.color-option');
+                if (firstColorOption) {
+                    firstColorOption.classList.add('selected');
+                    const tickMark = firstColorOption.querySelector('.tick-mark');
+                    if (tickMark) {
+                        tickMark.style.display = 'block'; // Show the tick mark
+                    }
+                }
+
+                // Gather initial selections and update the price
+                updatePrice(getSelectedVariantIds());
+            }
+
+            // Gather all selected variant IDs
+            function getSelectedVariantIds() {
+                const selectedIds = [];
+
+                // Gather the selected color
+                const selectedColor = document.querySelector('.color-option.selected');
+                if (selectedColor) {
+                    selectedIds.push(selectedColor.getAttribute('data-variant-id'));
+                }
+
+                // Gather the selected radio buttons
+                document.querySelectorAll('.variant-options input[type="radio"]:checked').forEach(radio => {
+                    selectedIds.push(radio.value);
+                });
+
+                return selectedIds;
+            }
+
+            // Update price when a color option is selected
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.addEventListener('click', function () {
+                    // Deselect all color options and hide their tick marks
+                    document.querySelectorAll('.color-option').forEach(el => {
+                        el.classList.remove('selected');
+                        const tickMark = el.querySelector('.tick-mark');
+                        if (tickMark) {
+                            tickMark.style.display = 'none'; // Hide the tick mark
+                        }
+                    });
+
+                    // Mark the clicked option as selected and show its tick mark
+                    this.classList.add('selected');
+                    const tickMark = this.querySelector('.tick-mark');
+                    if (tickMark) {
+                        tickMark.style.display = 'block'; // Show the tick mark
+                    }
+
+                    // Update the price dynamically based on all selected variants
+                    updatePrice(getSelectedVariantIds());
+                });
+            });
+
+            // Update price when a radio button is selected
+            document.querySelectorAll('.variant-options input[type="radio"]').forEach(radio => {
+                radio.addEventListener('click', function () {
+                    // Update the price dynamically based on all selected variants
+                    updatePrice(getSelectedVariantIds());
+                });
+            });
+
+            // Function to update the price display
+            function updatePrice(selectedVariantIds) {
+                console.log('Selected Variant IDs:', selectedVariantIds); // Debugging
+
+                // Make an AJAX request to fetch prices based on selected variant IDs
+                $.ajax({
+                    url: "{{ route('get.variant.prices') }}", // Ensure this route is set in web.php
+                    method: 'POST',
+                    data: {
+                        variant_ids: selectedVariantIds,
+                        productId: "{{ $product->id }}",
+                        _token: "{{ csrf_token() }}", // Include CSRF token for security
+                    },
+                    success: function (response) {
+                        if (!response.success) {
+                            console.error('Error fetching prices:', response.message || 'Unknown error');
+                            return;
+                        }
+
+                        console.log('Fetched prices:', response.data);
+                        const priceData = response.data;
+
+                        // Update the price display
+                        const priceElement = document.querySelector('.product_price .price span');
+                        const originalPriceElement = document.querySelector('.product_price .price .original-price');
+                        const discountElement = document.querySelector('.product_price .price .discount');
+
+                        if (priceElement) {
+                            priceElement.textContent = `₹${parseFloat(priceData.effective_price).toFixed(2)}`;
+                        }
+
+                        // Update the original price (strikethrough) if discounted
+                        if (originalPriceElement) {
+                            if (priceData.is_discounted) {
+                                originalPriceElement.textContent = `₹${parseFloat(priceData.original_price).toFixed(2)}`;
+                                originalPriceElement.style.display = 'inline';
+                            } else {
+                                originalPriceElement.style.display = 'none';
+                            }
+                        }
+
+                        // Update the discount percentage if applicable
+                        if (discountElement) {
+                            if (priceData.is_discounted && priceData.discount_percentage) {
+                                discountElement.textContent = `(${priceData.discount_percentage}% off)`;
+                                discountElement.style.display = 'inline';
+                            } else {
+                                discountElement.style.display = 'none';
+                            }
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('AJAX error:', error);
+                    }
+                });
+            }
+            // Initialize pre-selected variants
+            preselectVariants();
+        });
+
         $('.slider-for').slick({
             slidesToShow: 1,
             slidesToScroll: 1,
