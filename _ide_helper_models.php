@@ -433,9 +433,9 @@ namespace App\Models{
  * @property-read \App\Models\Category $category
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductImage> $images
  * @property-read int|null $images_count
- * @property-read \App\Models\Category $mainCategory
+ * @property-read \App\Models\MainCategory $mainCategory
  * @property-read \App\Models\VariantDetail|null $materialDetail
- * @property-read \App\Models\Category|null $subCategory
+ * @property-read \App\Models\SubCategory|null $subCategory
  * @property-read \App\Models\VariantDetail|null $unitDetail
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductVariant> $variants
  * @property-read int|null $variants_count
@@ -509,6 +509,7 @@ namespace App\Models{
  *
  * @property int $id
  * @property int $product_id
+ * @property string $variation_ids
  * @property string $variation_code
  * @property string $sku
  * @property string|null $sale_price
@@ -538,6 +539,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereVariationCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereVariationIds($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereWeight($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereWholesalePrice($value)
  */

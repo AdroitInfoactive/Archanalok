@@ -143,6 +143,8 @@ class FrontendController extends BaseController
             ->orderBy('order', 'asc')
             ->get();
 
+        // dd($images);
+
         return view('frontend.home.category.cat-product-details', compact('product', 'mainCategory', 'categories', 'relatedProducts', 'variants', 'images'));
     }
 
@@ -247,9 +249,14 @@ class FrontendController extends BaseController
         $subCategory = SubCategory::where('slug', $subCategorySlug)->where('category_id', $category->id)->firstOrFail();
 
         // Query for products
-        $productQuery = Product::with(['variants', 'images'])
-            ->where('sub_category_id', $subCategory->id)
-            ->where('status', 1);
+        $productQuery = Product::with([
+            'variants',
+            'images' => function ($query) {
+                $query->orderBy('order', 'asc'); // Order images by the 'order' field in ascending order
+            }
+        ])
+        ->where('sub_category_id', $subCategory->id)
+        ->where('status', 1);
 
         // Fetch all products
         $products = $productQuery->get();
@@ -414,6 +421,27 @@ class FrontendController extends BaseController
         return response()->json([
             'success' => true,
             'data' => $responseData,
+        ]);
+    }
+
+    public function getVariantImage(Request $request)
+    {
+        $request->validate([
+            'variant_id' => 'required|integer',
+            'productId' => 'required|integer',
+        ]);
+        $variantId = $request->variant_id;
+        $productId = $request->productId;
+        $variantImage = ProductImage::where('variant_id', $variantId)->where('product_id', $productId)->pluck('image_path')->first();
+        if (!$variantImage) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Variant image not found.',
+            ], 404);
+        }
+        return response()->json([
+            'success' => true,
+            'data' => $variantImage
         ]);
     }
 

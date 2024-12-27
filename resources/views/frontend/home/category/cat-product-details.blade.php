@@ -67,18 +67,22 @@
                     <div class="vehicle-detail-banner clearfix">
                         <div class="banner-slider">
                             <div class="slider slider-nav thumb-image">
-                                @foreach ($product->images as $image)
+                                @foreach ($images as $image)
                                     <div class="thumbnail-image">
                                         <div class="thumbImg">
-                                            <img src="{{ asset(@$image->image_path) }}" alt="{{ @$product->name }}">
+                                            <img src="{{ asset($image->image_path) }}" 
+                                                data-image-path="{{ $image->image_path }}" 
+                                                alt="{{ $product->name }}">
                                         </div>
                                     </div>
                                 @endforeach
                             </div>
                             <div class="slider slider-for">
-                                @foreach ($product->images as $image)
+                                @foreach ($images as $image)
                                     <div class="slider-banner-image">
-                                        <img src="{{ asset(@$image->image_path) }}" alt="{{ @$product->name }}">
+                                        <img src="{{ asset($image->image_path) }}" 
+                                            data-image-path="{{ $image->image_path }}" 
+                                            alt="{{ $product->name }}">
                                     </div>
                                 @endforeach
                             </div>
@@ -133,10 +137,8 @@
                                             ];
                                         })->toArray()
                                     );
-
                                     // Default to the first variant's price
                                     $defaultVariant = $product->variants->first();
-
                                     // Determine price for products with variants
                                     $price = match ($userType) {
                                         'ws' => $defaultVariant->wholesale_price ?? $product->wholesale_price,
@@ -221,54 +223,6 @@
                                 @endforeach
                             @endif
                         @endif
-                        <section class="product-variants-section">
-                            <div class="container-fluid">
-                                <h2 class="text-center">Product Variants</h2>
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Variation Code</th>
-                                            <th>SKU</th>
-                                            <th>Sale Price</th>
-                                            <th>Offer Price</th>
-                                            <th>Distributor Price</th>
-                                            <th>Wholesale Price</th>
-                                            <th>Min Order Qty</th>
-                                            <th>Weight</th>
-                                            <th>Stock Qty</th>
-                                            <th>Status</th>
-                                            <th>Images</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($variants as $index => $variant)
-                                            <tr>
-                                                <td>{{ $index + 1 }}</td>
-                                                <td>{{ $variant->variation_code }}</td>
-                                                <td>{{ $variant->sku }}</td>
-                                                <td>₹{{ number_format($variant->sale_price, 2) }}</td>
-                                                <td>₹{{ number_format($variant->offer_price, 2) }}</td>
-                                                <td>₹{{ number_format($variant->distributor_price, 2) }}</td>
-                                                <td>₹{{ number_format($variant->wholesale_price, 2) }}</td>
-                                                <td>{{ $variant->min_order_qty }}</td>
-                                                <td>{{ $variant->weight }} kg</td>
-                                                <td>{{ $variant->qty }}</td>
-                                                <td>{{ $variant->status == 1 ? 'Active' : 'Inactive' }}</td>
-                                                <td>
-                                                    @php
-                                                        $variantImages = $images->where('variant_id', $variant->id);
-                                                    @endphp
-                                                    @foreach ($variantImages as $image)
-                                                        <img src="{{ asset($image->image_path) }}" alt="Variant Image" style="width: 50px; height: 50px; margin-right: 5px;">
-                                                    @endforeach
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </section>
                         <!-- Quantity Section -->
                         <div class="quantityd clearfix">
                             <button class="qtyBtn btnMinus"><span>-</span></button>
@@ -362,6 +316,7 @@
         document.addEventListener('DOMContentLoaded', function () {
             const prices = JSON.parse(@json($prices));
             const userType = "{{ $userType }}";
+            let isFirstLoad = true;
 
             // Pre-select the first variant for each group on page load
             function preselectVariants() {
@@ -440,7 +395,7 @@
 
             // Function to update the price display
             function updatePrice(selectedVariantIds) {
-                console.log('Selected Variant IDs:', selectedVariantIds); // Debugging
+                // console.log('Selected Variant IDs:', selectedVariantIds); // Debugging
 
                 // Make an AJAX request to fetch prices based on selected variant IDs
                 $.ajax({
@@ -457,7 +412,7 @@
                             return;
                         }
 
-                        console.log('Fetched prices:', response.data);
+                        // console.log('Fetched prices:', response.data);
                         const priceData = response.data;
 
                         // Update the price display
@@ -487,6 +442,79 @@
                             } else {
                                 discountElement.style.display = 'none';
                             }
+                        }
+                        if (!isFirstLoad) {
+                            updateImage(priceData.id);
+                        } else {
+                            isFirstLoad = false; // Reset the flag after the first update
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('AJAX error:', error);
+                    }
+                });
+            }
+
+            function updateImage(variantId) {
+                // Using AJAX to get the image for the selected variant
+                $.ajax({
+                    url: "{{ route('get.variant.image') }}", // Ensure this route is defined in web.php
+                    method: 'POST',
+                    data: {
+                        variant_id: variantId,
+                        productId: "{{ $product->id }}",
+                        _token: "{{ csrf_token() }}", // Include CSRF token for security
+                    },
+                    success: function (response) {
+                        if (!response.success) {
+                            console.error('Error fetching image:', response.message || 'Unknown error');
+                            return;
+                        }
+
+                        const variantImage = response.data; // The fetched image path
+
+                        console.log('Fetched variant image:', variantImage);
+
+                        // Update thumbnail and banner images
+                        const thumbSlider = document.querySelector('.slider-nav.thumb-image');
+                        const bannerSlider = document.querySelector('.slider-for');
+
+                        if (thumbSlider && bannerSlider) {
+                            const thumbImages = [...thumbSlider.querySelectorAll('.thumbImg img')].filter(img => {
+                                // Exclude cloned elements
+                                return !img.closest('.slick-cloned');
+                            });
+
+                            const bannerImages = [...bannerSlider.querySelectorAll('.slider-banner-image img')];
+
+                            let imageFound = false;
+
+                            thumbImages.forEach((img, index) => {
+                                // Match the `data-image-path` attribute directly
+                                const imagePath = img.getAttribute('data-image-path'); // Custom attribute to store original image paths
+                                if (imagePath === variantImage) {
+                                    // Highlight the corresponding thumbnail
+                                    const parentThumb = img.closest('.thumbnail-image');
+                                    if (parentThumb) {
+                                        parentThumb.classList.add('selected');
+                                    }
+
+                                    // Navigate to the corresponding banner image
+                                    $('.slider-for').slick('slickGoTo', index);
+                                    imageFound = true;
+                                } else {
+                                    const parentThumb = img.closest('.thumbnail-image');
+                                    if (parentThumb) {
+                                        parentThumb.classList.remove('selected');
+                                    }
+                                }
+                            });
+
+                            if (!imageFound) {
+                                console.warn('Variant image not found in existing slider.');
+                            }
+                        } else {
+                            console.error('Sliders not found in the DOM.');
                         }
                     },
                     error: function (xhr, status, error) {

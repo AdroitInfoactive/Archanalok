@@ -123,7 +123,7 @@ class ProductController extends Controller
             $qtys = $request->input('qtys', []);
             $statuses = $request->input('statuses', []);
             $variationImages = $request->file('variation_images', []);
-
+            $priorityCounter = 99;
             foreach ($skus as $index => $sku) {
                 $variant = new ProductVariant();
                 $variant->product_id = $product->id;
@@ -166,8 +166,10 @@ class ProductController extends Controller
                         $variantImage = new ProductImage();
                         $variantImage->product_id = $product->id;
                         $variantImage->variant_id = $variant->id;
-                        $variantImage->image_path = 'uploads/products/' . $filename; // Save relative path
+                        $variantImage->image_path = 'uploads/products/' . $filename;
+                        $variantImage->order = $priorityCounter;
                         $variantImage->save();
+                        $priorityCounter--;
                     } else {
                         // Handle error if the file couldn't be moved
                         throw new \Exception("Failed to move variant image '{$filename}' to {$uploadDir}");
@@ -311,22 +313,7 @@ class ProductController extends Controller
             'images',
             'variants.images'
         ])->findOrFail($id);
-
-        /* $mainCategories = MainCategory::where('status', 1)
-        ->whereHas('categories', function ($query) {
-        $query->where('status', 1)
-        ->whereHas('subcategories', function ($query) {
-        $query->where('status', 1);
-        });
-        })
-        ->with(['categories' => function ($query) {
-        $query->where('status', 1)
-        ->with(['subcategories' => function ($query) {
-        $query->where('status', 1);
-        }]);
-        }])
-        ->get(); */
-
+        
         $mainCategories = MainCategory::where('status', 1)
             ->whereHas('categories', function ($query) {
                 $query->where('status', 1);

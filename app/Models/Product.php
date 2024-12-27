@@ -11,7 +11,7 @@ class Product extends Model
 
     public function mainCategory()
     {
-        return $this->belongsTo(Category::class, 'main_category_id');
+        return $this->belongsTo(MainCategory::class, 'main_category_id');
     }
     public function category()
     {
@@ -20,7 +20,7 @@ class Product extends Model
 
     public function subCategory()
     {
-        return $this->belongsTo(Category::class, 'sub_category_id');
+        return $this->belongsTo(SubCategory::class, 'sub_category_id');
     }
     public function images()
     {

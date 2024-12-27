@@ -53,6 +53,7 @@ Route::get('wishlist/{productId}', [WishlistController::class, 'store'])->name('
 Route::get('/filter-products', [FrontendController::class, 'filterProducts'])->name('filter-products');
 
 Route::post('/get-variant-prices', [FrontendController::class, 'getVariantPrices'])->name('get.variant.prices');
+Route::post('/get-variant-image', [FrontendController::class, 'getVariantImage'])->name('get.variant.image');
 
 // Category Page (MainCategory -> Category -> SubCategory)
 Route::get('/{slug}', [FrontendController::class, 'mainCategoryPage'])->name('maincategory.show');
