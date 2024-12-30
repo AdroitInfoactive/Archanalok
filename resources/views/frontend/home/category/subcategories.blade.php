@@ -36,8 +36,6 @@
                         }
                     }
                 @endphp
-
-                <h3 class="pb_title">{{ $lastSegmentName }}</h3>
                 <div class="page_crumb">
                     {!! implode(' | ', $breadcrumbs) !!}
                 </div>
@@ -53,6 +51,7 @@
             <div class="col-lg-10 col-sm-9">
                 <div class="tab-content">
                     <div class="tab-pane fade show in active" id="grid" role="tabpanel">
+                        <h3>{{ $lastSegmentName }}</h3>
                         <div class="row" id="grid-view">
                             <!-- repeat this -->
                             @foreach ($subcategories as $subcategory)
@@ -65,7 +64,8 @@
                                             </div>
                                         </div>
                                         <div class="product-details">
-                                            <h5><a href="product-details.html">{{ $subcategory->name }}</a></h5>
+                                            <h5><a href="{{ url(($mainCategory->slug ?? '#') .  '/' . ($category->slug ?? '#'). '/' . ($subcategory->slug ?? '#')) }}">{{ $subcategory->name }}</a>
+                                            </h5>
                                         </div>
                                     </div>
                                 </div>

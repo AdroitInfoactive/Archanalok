@@ -63,7 +63,7 @@ class FrontendController extends BaseController
             ->select(
                 'categories.id as category_id',
                 'categories.name as name',
-                'categories.slug as category_slug',
+                'categories.slug as slug',
                 DB::raw('GROUP_CONCAT(DISTINCT sub_categories.id ORDER BY sub_categories.position ASC) as sub_category_ids'), // Order subcategories by position
                 DB::raw('GROUP_CONCAT(DISTINCT sub_categories.name ORDER BY sub_categories.position ASC) as sub_category_names'),
                 DB::raw('GROUP_CONCAT(DISTINCT sub_categories.image ORDER BY sub_categories.position ASC) as sub_category_images'),
@@ -109,7 +109,7 @@ class FrontendController extends BaseController
             ->select(
                 'categories.id as category_id',
                 'categories.name as name',
-                'categories.slug as category_slug',
+                'categories.slug as slug',
                 DB::raw('GROUP_CONCAT(DISTINCT sub_categories.id ORDER BY sub_categories.position ASC) as sub_category_ids'),
                 DB::raw('GROUP_CONCAT(DISTINCT sub_categories.name ORDER BY sub_categories.position ASC) as sub_category_names'),
                 DB::raw('GROUP_CONCAT(DISTINCT sub_categories.slug ORDER BY sub_categories.position ASC) as sub_category_slugs'),
@@ -416,6 +416,8 @@ class FrontendController extends BaseController
             'discount_percentage' => $isDiscounted
                 ? round((($matchedVariant->sale_price - $matchedVariant->offer_price) / $matchedVariant->sale_price) * 100)
                 : null,
+            'min_order_qty' => $matchedVariant->min_order_qty,
+            'available_qty' => $matchedVariant->qty,
         ];
 
         return response()->json([
@@ -456,7 +458,12 @@ class FrontendController extends BaseController
         $maxPrice = $request->max_price;
         $userType = auth()->check() ? auth()->user()->role : 'user';
 
-        $productQuery = Product::with(['variants', 'images'])->where('status', 1);
+        $productQuery = Product::with([
+            'variants',
+            'images' => function ($query) {
+            $query->orderBy('order', 'asc'); // Order images by the 'order' field in ascending order
+            }
+        ])->where('status', 1);
 
         if ($request->filled('brands')) {
             // Filter products by brand ID

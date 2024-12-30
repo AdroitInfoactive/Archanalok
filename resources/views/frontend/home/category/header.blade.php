@@ -27,7 +27,8 @@
                                     <a href="javascript:void(0);">{{ $mainCategory->name }}
                                         <ul class="sub-menu">
                                             @foreach ($categories as $category)
-                                                <li><a href="javascript:void(0);">{{ $category->name }}</a>
+                                                <li><a
+                                                        href="{{ url($mainCategory->slug."/".$category->slug) }}">{{ $category->name }}</a>
                                                 </li>
                                             @endforeach
 

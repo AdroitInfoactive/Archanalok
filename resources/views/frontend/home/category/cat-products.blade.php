@@ -10,12 +10,12 @@
                         {{ $category->name }}
                         @if (!empty($category->sub_category_names))
                             {{-- View All Subcategories --}}
-                            <a href="{{ url($mainCategory->slug . '/' . $category->category_slug) }}"
+                            <a href="{{ url($mainCategory->slug . '/' . $category->slug) }}"
                                 class="btn btn-link view-all-link float-right">View All <i
                                     class="fas fa-arrow-right"></i></a>
                         @else
                             {{-- View All Products --}}
-                            <a href="{{ url($mainCategory->slug . '/' . $category->category_slug) }}"
+                            <a href="{{ url($mainCategory->slug . '/' . $category->slug) }}"
                                 class="btn btn-link view-all-link float-right">View All <i
                                     class="fas fa-arrow-right"></i></a>
                         @endif
@@ -35,13 +35,13 @@
                             @foreach ($subCategoryNames as $subIndex => $subCategoryName)
                                 <div class="product-item-2 text-center">
                                     <div class="product-thumb">
-                                        <a href="{{ url($mainCategory->slug . '/' . $category->category_slug . '/' . $subCategorySlugs[$subIndex] ?? '#') }}">
+                                        <a href="{{ url($mainCategory->slug . '/' . $category->slug . '/' . $subCategorySlugs[$subIndex] ?? '#') }}">
                                             <img src="{{ asset($subCategoryImages[$subIndex] ?? 'frontend/images/default-placeholder.png') }}" alt="{{ $subCategoryName }}" />
                                         </a>
                                     </div>
                                     <div class="product-details">
                                         <h5>
-                                            <a href="{{ url($mainCategory->slug . '/' . $category->category_slug . '/' . $subCategorySlugs[$subIndex] ?? '#') }}">{{ $subCategoryName }}</a>
+                                            <a href="{{ url($mainCategory->slug . '/' . $category->slug . '/' . $subCategorySlugs[$subIndex] ?? '#') }}">{{ $subCategoryName }}</a>
                                         </h5>
                                     </div>
                                 </div>

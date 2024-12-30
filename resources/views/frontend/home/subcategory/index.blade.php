@@ -36,8 +36,6 @@
                         }
                     }
                 @endphp
-
-                <h3 class="pb_title">{{ $lastSegmentName }}</h3>
                 <div class="page_crumb">
                     {!! implode(' | ', $breadcrumbs) !!}
                 </div>
@@ -116,6 +114,7 @@
                         </div>
                     </div>
                 </div>
+                <h3>{{ $lastSegmentName }}</h3>
                 <div class="tab-content">
                     <div class="tab-pane fade show in active" id="grid" role="tabpanel">
                         <div class="row" id="grid-view">

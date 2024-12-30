@@ -33,7 +33,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
-                    <h3 class="pb_title">{{ $product->name }}</h3>
+                    <!-- <h3 class="pb_title">{{ $product->name }}</h3> -->
                     <div class="page_crumb">
                         <a href="{{ route('home') }}">Home</a> |
                         <a
@@ -103,28 +103,41 @@
                         <div class="product_price clearfix">
                             @if ($product->has_variants == 0)
                                 @php
-                                    // Handle price for products without variants
+                                    // Handle price for non-variant products
                                     $price = match ($userType) {
                                         'ws' => $product->wholesale_price,
                                         'dr' => $product->distributor_price,
                                         'user' => $product->offer_price ?: $product->sale_price,
                                         default => $product->sale_price,
                                     };
+
                                     $isDiscounted = $userType === 'user' && $product->offer_price && $product->offer_price < $product->sale_price;
                                     $percentageOff = $isDiscounted ? round((($product->sale_price - $product->offer_price) / $product->sale_price) * 100) : null;
+
+                                    // Define a placeholder for `prices` to avoid undefined variable issues
+                                    $prices = json_encode([
+                                        'default' => [
+                                            'ws' => $product->wholesale_price,
+                                            'dr' => $product->distributor_price,
+                                            'user' => $product->offer_price ?: $product->sale_price,
+                                            'default' => $product->sale_price,
+                                        ]
+                                    ]);
                                 @endphp
                                 <span class="price">
                                     <span><span>₹</span>{{ number_format($price, 2) }}</span>
                                     @if ($isDiscounted)
-                                        <span style="text-decoration: line-through; font-size: 0.7em;"
-                                            class="original-price text-muted">
+                                        <span class="original-price text-muted" style="text-decoration: line-through; font-size: 0.7em;">
                                             ₹{{ number_format($product->sale_price, 2) }}
                                         </span>
-                                        <span class="discount text-success" style="font-size: 0.7em;">({{ $percentageOff }}% off)</span>
+                                        <span class="discount text-success" style="font-size: 0.7em;">
+                                            ({{ $percentageOff }}% off)
+                                        </span>
                                     @endif
                                 </span>
                             @else
                                 @php
+                                    // Serialize variant prices for use in JavaScript
                                     $prices = json_encode(
                                         $product->variants->mapWithKeys(function ($variant) {
                                             return [
@@ -137,9 +150,10 @@
                                             ];
                                         })->toArray()
                                     );
+
                                     // Default to the first variant's price
                                     $defaultVariant = $product->variants->first();
-                                    // Determine price for products with variants
+
                                     $price = match ($userType) {
                                         'ws' => $defaultVariant->wholesale_price ?? $product->wholesale_price,
                                         'dr' => $defaultVariant->distributor_price ?? $product->distributor_price,
@@ -153,15 +167,17 @@
                                 <span class="price">
                                     <span><span>₹</span>{{ number_format($price, 2) }}</span>
                                     @if ($isDiscounted)
-                                        <span style="text-decoration: line-through; font-size: 0.7em;"
-                                            class="original-price text-muted">
+                                        <span class="original-price text-muted" style="text-decoration: line-through; font-size: 0.7em;">
                                             ₹{{ number_format($defaultVariant->sale_price, 2) }}
                                         </span>
-                                        <span class="discount text-success" style="font-size: 0.7em;">({{ $percentageOff }}% off)</span>
+                                        <span class="discount text-success" style="font-size: 0.7em;">
+                                            ({{ $percentageOff }}% off)
+                                        </span>
                                     @endif
                                 </span>
                             @endif
                         </div>
+
                         <div class="metatext"><span>Code:</span> #196DB6{{ $product->sku ?? 'N/A' }}</div>
                         <div class="metatext"><span>Material:</span> {{ $product->materialDetail->name ?? 'N/A' }}</div>
                         <div class="metatext"><span>Units:</span> {{ $product->unitDetail->name ?? 'N/A' }}</div>
@@ -230,6 +246,7 @@
                                 type="text">
                             <button class="qtyBtn btnPlus">+</button>
                         </div>
+                        <p class="qty-error text-danger d-none"></p>
                         <div class="listing-meta">
                             <a class="add-to-cart" href="cart.html"><i class="nss-shopping-cart1"></i>Add To Cart</a>
                             <a href="javascript:;" class="whishlist" onclick="addToWishlist('{{ $product->id }}')">
@@ -314,217 +331,209 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const prices = JSON.parse(@json($prices));
-            const userType = "{{ $userType }}";
-            let isFirstLoad = true;
+    const prices = @json($prices); // JSON-encoded prices for variants
+    const userType = "{{ $userType }}"; // User type from the backend
+    const productHasVariants = "{{ $product->has_variants }}"; // Check if the product has variants
+    let isFirstLoad = true;
 
-            // Pre-select the first variant for each group on page load
-            function preselectVariants() {
-                // Pre-select the first radio button in each variant group
-                document.querySelectorAll('.variant-options').forEach(group => {
-                    const firstRadio = group.querySelector('input[type="radio"]');
-                    if (firstRadio) {
-                        firstRadio.checked = true;
-                        firstRadio.dispatchEvent(new Event('change')); // Trigger change event
-                    }
-                });
+    function updateUI(selector, action) {
+        document.querySelectorAll(selector).forEach(action);
+    }
 
-                // Pre-select the first color option and mark it as selected
-                const firstColorOption = document.querySelector('.color-option');
-                if (firstColorOption) {
-                    firstColorOption.classList.add('selected');
-                    const tickMark = firstColorOption.querySelector('.tick-mark');
-                    if (tickMark) {
-                        tickMark.style.display = 'block'; // Show the tick mark
-                    }
+    function preselectVariants() {
+        if (productHasVariants == 1) {
+            updateUI('.variant-options', group => {
+                const firstRadio = group.querySelector('input[type="radio"]');
+                if (firstRadio) {
+                    firstRadio.checked = true;
+                    firstRadio.dispatchEvent(new Event('change'));
                 }
-
-                // Gather initial selections and update the price
-                updatePrice(getSelectedVariantIds());
-            }
-
-            // Gather all selected variant IDs
-            function getSelectedVariantIds() {
-                const selectedIds = [];
-
-                // Gather the selected color
-                const selectedColor = document.querySelector('.color-option.selected');
-                if (selectedColor) {
-                    selectedIds.push(selectedColor.getAttribute('data-variant-id'));
-                }
-
-                // Gather the selected radio buttons
-                document.querySelectorAll('.variant-options input[type="radio"]:checked').forEach(radio => {
-                    selectedIds.push(radio.value);
-                });
-
-                return selectedIds;
-            }
-
-            // Update price when a color option is selected
-            document.querySelectorAll('.color-option').forEach(option => {
-                option.addEventListener('click', function () {
-                    // Deselect all color options and hide their tick marks
-                    document.querySelectorAll('.color-option').forEach(el => {
-                        el.classList.remove('selected');
-                        const tickMark = el.querySelector('.tick-mark');
-                        if (tickMark) {
-                            tickMark.style.display = 'none'; // Hide the tick mark
-                        }
-                    });
-
-                    // Mark the clicked option as selected and show its tick mark
-                    this.classList.add('selected');
-                    const tickMark = this.querySelector('.tick-mark');
-                    if (tickMark) {
-                        tickMark.style.display = 'block'; // Show the tick mark
-                    }
-
-                    // Update the price dynamically based on all selected variants
-                    updatePrice(getSelectedVariantIds());
-                });
             });
 
-            // Update price when a radio button is selected
-            document.querySelectorAll('.variant-options input[type="radio"]').forEach(radio => {
-                radio.addEventListener('click', function () {
-                    // Update the price dynamically based on all selected variants
-                    updatePrice(getSelectedVariantIds());
-                });
-            });
-
-            // Function to update the price display
-            function updatePrice(selectedVariantIds) {
-                // console.log('Selected Variant IDs:', selectedVariantIds); // Debugging
-
-                // Make an AJAX request to fetch prices based on selected variant IDs
-                $.ajax({
-                    url: "{{ route('get.variant.prices') }}", // Ensure this route is set in web.php
-                    method: 'POST',
-                    data: {
-                        variant_ids: selectedVariantIds,
-                        productId: "{{ $product->id }}",
-                        _token: "{{ csrf_token() }}", // Include CSRF token for security
-                    },
-                    success: function (response) {
-                        if (!response.success) {
-                            console.error('Error fetching prices:', response.message || 'Unknown error');
-                            return;
-                        }
-
-                        // console.log('Fetched prices:', response.data);
-                        const priceData = response.data;
-
-                        // Update the price display
-                        const priceElement = document.querySelector('.product_price .price span');
-                        const originalPriceElement = document.querySelector('.product_price .price .original-price');
-                        const discountElement = document.querySelector('.product_price .price .discount');
-
-                        if (priceElement) {
-                            priceElement.textContent = `₹${parseFloat(priceData.effective_price).toFixed(2)}`;
-                        }
-
-                        // Update the original price (strikethrough) if discounted
-                        if (originalPriceElement) {
-                            if (priceData.is_discounted) {
-                                originalPriceElement.textContent = `₹${parseFloat(priceData.original_price).toFixed(2)}`;
-                                originalPriceElement.style.display = 'inline';
-                            } else {
-                                originalPriceElement.style.display = 'none';
-                            }
-                        }
-
-                        // Update the discount percentage if applicable
-                        if (discountElement) {
-                            if (priceData.is_discounted && priceData.discount_percentage) {
-                                discountElement.textContent = `(${priceData.discount_percentage}% off)`;
-                                discountElement.style.display = 'inline';
-                            } else {
-                                discountElement.style.display = 'none';
-                            }
-                        }
-                        if (!isFirstLoad) {
-                            updateImage(priceData.id);
-                        } else {
-                            isFirstLoad = false; // Reset the flag after the first update
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('AJAX error:', error);
-                    }
-                });
+            const firstColorOption = document.querySelector('.color-option');
+            if (firstColorOption) {
+                selectColorOption(firstColorOption);
             }
 
-            function updateImage(variantId) {
-                // Using AJAX to get the image for the selected variant
-                $.ajax({
-                    url: "{{ route('get.variant.image') }}", // Ensure this route is defined in web.php
-                    method: 'POST',
-                    data: {
-                        variant_id: variantId,
-                        productId: "{{ $product->id }}",
-                        _token: "{{ csrf_token() }}", // Include CSRF token for security
-                    },
-                    success: function (response) {
-                        if (!response.success) {
-                            console.error('Error fetching image:', response.message || 'Unknown error');
-                            return;
-                        }
+            updatePrice(getSelectedVariantIds());
+        } else {
+            // Handle non-variant product price and quantity controls
+            const minOrderQty = "{{ $product->min_order_qty ?? 1 }}";
+            const availableQty = "{{ $product->qty ?? 0 }}";
+            updateQuantityControls(minOrderQty, availableQty);
+        }
+    }
 
-                        const variantImage = response.data; // The fetched image path
+    function getSelectedVariantIds() {
+        const selectedIds = [];
+        const selectedColor = document.querySelector('.color-option.selected');
+        if (selectedColor) selectedIds.push(selectedColor.getAttribute('data-variant-id'));
 
-                        console.log('Fetched variant image:', variantImage);
-
-                        // Update thumbnail and banner images
-                        const thumbSlider = document.querySelector('.slider-nav.thumb-image');
-                        const bannerSlider = document.querySelector('.slider-for');
-
-                        if (thumbSlider && bannerSlider) {
-                            const thumbImages = [...thumbSlider.querySelectorAll('.thumbImg img')].filter(img => {
-                                // Exclude cloned elements
-                                return !img.closest('.slick-cloned');
-                            });
-
-                            const bannerImages = [...bannerSlider.querySelectorAll('.slider-banner-image img')];
-
-                            let imageFound = false;
-
-                            thumbImages.forEach((img, index) => {
-                                // Match the `data-image-path` attribute directly
-                                const imagePath = img.getAttribute('data-image-path'); // Custom attribute to store original image paths
-                                if (imagePath === variantImage) {
-                                    // Highlight the corresponding thumbnail
-                                    const parentThumb = img.closest('.thumbnail-image');
-                                    if (parentThumb) {
-                                        parentThumb.classList.add('selected');
-                                    }
-
-                                    // Navigate to the corresponding banner image
-                                    $('.slider-for').slick('slickGoTo', index);
-                                    imageFound = true;
-                                } else {
-                                    const parentThumb = img.closest('.thumbnail-image');
-                                    if (parentThumb) {
-                                        parentThumb.classList.remove('selected');
-                                    }
-                                }
-                            });
-
-                            if (!imageFound) {
-                                console.warn('Variant image not found in existing slider.');
-                            }
-                        } else {
-                            console.error('Sliders not found in the DOM.');
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('AJAX error:', error);
-                    }
-                });
-            }
-            // Initialize pre-selected variants
-            preselectVariants();
+        updateUI('.variant-options input[type="radio"]:checked', radio => {
+            selectedIds.push(radio.value);
         });
+
+        return selectedIds;
+    }
+
+    function selectColorOption(option) {
+        // Deselect all color options
+        document.querySelectorAll('.color-option').forEach(el => {
+            el.classList.remove('selected');
+            const tickMark = el.querySelector('.tick-mark');
+            if (tickMark) tickMark.style.display = 'none';
+        });
+
+        // Select the clicked option
+        option.classList.add('selected');
+        const tickMark = option.querySelector('.tick-mark');
+        if (tickMark) tickMark.style.display = 'block';
+    }
+
+    function updatePrice(selectedVariantIds) {
+        $.post("{{ route('get.variant.prices') }}", {
+            variant_ids: selectedVariantIds,
+            productId: "{{ $product->id }}",
+            _token: "{{ csrf_token() }}"
+        }).done(response => {
+            if (!response.success) {
+                console.error('Error fetching prices:', response.message || 'Unknown error');
+                return;
+            }
+            const priceData = response.data;
+            const priceElement = document.querySelector('.product_price .price span');
+            const originalPriceElement = document.querySelector('.product_price .price .original-price');
+            const discountElement = document.querySelector('.product_price .price .discount');
+
+            if (priceElement) priceElement.textContent = `₹${parseFloat(priceData.effective_price).toFixed(2)}`;
+            if (originalPriceElement) {
+                originalPriceElement.style.display = priceData.is_discounted ? 'inline' : 'none';
+                if (priceData.is_discounted) {
+                    originalPriceElement.textContent = `₹${parseFloat(priceData.original_price).toFixed(2)}`;
+                }
+            }
+            if (discountElement) {
+                discountElement.style.display = priceData.is_discounted && priceData.discount_percentage ? 'inline' : 'none';
+                if (priceData.is_discounted) {
+                    discountElement.textContent = `(${priceData.discount_percentage}% off)`;
+                }
+            }
+
+            if (!isFirstLoad) updateImage(priceData.id);
+            else isFirstLoad = false;
+
+            updateQuantityControls(priceData.min_order_qty, priceData.available_qty);
+        }).fail((xhr, status, error) => console.error('AJAX error:', error));
+    }
+
+    function updateImage(variantId) {
+        $.post("{{ route('get.variant.image') }}", {
+            variant_id: variantId,
+            productId: "{{ $product->id }}",
+            _token: "{{ csrf_token() }}"
+        }).done(response => {
+            if (!response.success) {
+                console.error('Error fetching image:', response.message || 'Unknown error');
+                return;
+            }
+
+            const variantImage = response.data;
+            const thumbSlider = document.querySelector('.slider-nav.thumb-image');
+            const bannerSlider = document.querySelector('.slider-for');
+
+            if (!thumbSlider || !bannerSlider) {
+                console.error('Sliders not found in the DOM.');
+                return;
+            }
+
+            const thumbImages = [...thumbSlider.querySelectorAll('.thumbImg img')].filter(img => !img.closest('.slick-cloned'));
+            const bannerImages = [...bannerSlider.querySelectorAll('.slider-banner-image img')];
+
+            let imageFound = false;
+
+            thumbImages.forEach((img, index) => {
+                const imagePath = img.getAttribute('data-image-path');
+                const parentThumb = img.closest('.thumbnail-image');
+                if (imagePath === variantImage) {
+                    if (parentThumb) parentThumb.classList.add('selected');
+                    $('.slider-for').slick('slickGoTo', index);
+                    imageFound = true;
+                } else if (parentThumb) {
+                    parentThumb.classList.remove('selected');
+                }
+            });
+
+            if (!imageFound) console.warn('Variant image not found in existing slider.');
+        }).fail((xhr, status, error) => console.error('AJAX error:', error));
+    }
+
+    function updateQuantityControls(minOrderQty, availableQty) {
+        const qtyInput = document.querySelector('.quantityd .qty');
+        const btnPlus = document.querySelector('.quantityd .btnPlus');
+        const btnMinus = document.querySelector('.quantityd .btnMinus');
+        const qtyError = document.querySelector('.qty-error');
+
+        if (qtyInput) {
+            const userMinQty = userType === 'user' ? 1 : minOrderQty;
+            const userMaxQty = userType === 'user' ? availableQty : Infinity;
+
+            qtyInput.value = userMinQty;
+            qtyInput.setAttribute('min', userMinQty);
+
+            if (userType === 'user') {
+                qtyInput.setAttribute('max', availableQty);
+            } else {
+                qtyInput.removeAttribute('max');
+            }
+
+            btnPlus.onclick = () => {
+                const currentQty = parseInt(qtyInput.value) || 0;
+                if (currentQty < userMaxQty) {
+                    qtyInput.value = currentQty + 1;
+                    qtyError?.classList.add('d-none');
+                } else {
+                    qtyError?.classList.remove('d-none');
+                    qtyError.textContent = `Maximum quantity allowed is ${userMaxQty}.`;
+                }
+            };
+
+            btnMinus.onclick = () => {
+                const currentQty = parseInt(qtyInput.value) || 0;
+                if (currentQty > userMinQty) {
+                    qtyInput.value = currentQty - 1;
+                    qtyError?.classList.add('d-none');
+                } else {
+                    qtyError?.classList.remove('d-none');
+                    qtyError.textContent = `Minimum quantity allowed is ${userMinQty}.`;
+                }
+            };
+
+            qtyInput.onblur = () => {
+                const inputQty = parseInt(qtyInput.value) || 0;
+                if (inputQty < userMinQty) qtyInput.value = userMinQty;
+                else if (userType === 'user' && inputQty > userMaxQty) qtyInput.value = userMaxQty;
+            };
+        }
+    }
+
+    function addEventListeners() {
+        updateUI('.color-option', option => {
+            option.addEventListener('click', function () {
+                selectColorOption(this);
+                updatePrice(getSelectedVariantIds());
+            });
+        });
+
+        updateUI('.variant-options input[type="radio"]', radio => {
+            radio.addEventListener('click', () => updatePrice(getSelectedVariantIds()));
+        });
+    }
+
+    preselectVariants();
+    addEventListeners();
+});
+
+
 
         $('.slider-for').slick({
             slidesToShow: 1,
