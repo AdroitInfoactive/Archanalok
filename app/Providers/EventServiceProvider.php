@@ -23,6 +23,9 @@ class EventServiceProvider extends ServiceProvider
         UrlRedirectCreateEvent::class => [
             SaveUrlRedirectListener::class,
         ],
+        \Illuminate\Auth\Events\Login::class => [
+            \App\Listeners\SyncCartOnLogin::class,
+        ],
     ];
 
     /**

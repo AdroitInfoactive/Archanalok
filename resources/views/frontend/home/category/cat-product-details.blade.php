@@ -248,7 +248,7 @@
                         </div>
                         <p class="qty-error text-danger d-none"></p>
                         <div class="listing-meta">
-                            <a class="add-to-cart" href="cart.html"><i class="nss-shopping-cart1"></i>Add To Cart</a>
+                            <a class="add-to-cart" href="javascript:;"><i class="nss-shopping-cart1"></i>Add To Cart</a>
                             <a href="javascript:;" class="whishlist" onclick="addToWishlist('{{ $product->id }}')">
                                 <i class="nss-heart1"></i>
                             </a>
@@ -331,209 +331,244 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-    const prices = @json($prices); // JSON-encoded prices for variants
-    const userType = "{{ $userType }}"; // User type from the backend
-    const productHasVariants = "{{ $product->has_variants }}"; // Check if the product has variants
-    let isFirstLoad = true;
+            const prices = @json($prices); // JSON-encoded prices for variants
+            const userType = "{{ $userType }}"; // User type from the backend
+            const productHasVariants = "{{ $product->has_variants }}"; // Check if the product has variants
+            let isFirstLoad = true;
 
-    function updateUI(selector, action) {
-        document.querySelectorAll(selector).forEach(action);
-    }
-
-    function preselectVariants() {
-        if (productHasVariants == 1) {
-            updateUI('.variant-options', group => {
-                const firstRadio = group.querySelector('input[type="radio"]');
-                if (firstRadio) {
-                    firstRadio.checked = true;
-                    firstRadio.dispatchEvent(new Event('change'));
-                }
-            });
-
-            const firstColorOption = document.querySelector('.color-option');
-            if (firstColorOption) {
-                selectColorOption(firstColorOption);
+            function updateUI(selector, action) {
+                document.querySelectorAll(selector).forEach(action);
             }
 
-            updatePrice(getSelectedVariantIds());
-        } else {
-            // Handle non-variant product price and quantity controls
-            const minOrderQty = "{{ $product->min_order_qty ?? 1 }}";
-            const availableQty = "{{ $product->qty ?? 0 }}";
-            updateQuantityControls(minOrderQty, availableQty);
-        }
-    }
+            function preselectVariants() {
+                if (productHasVariants == 1) {
+                    updateUI('.variant-options', group => {
+                        const firstRadio = group.querySelector('input[type="radio"]');
+                        if (firstRadio) {
+                            firstRadio.checked = true;
+                            firstRadio.dispatchEvent(new Event('change'));
+                        }
+                    });
 
-    function getSelectedVariantIds() {
-        const selectedIds = [];
-        const selectedColor = document.querySelector('.color-option.selected');
-        if (selectedColor) selectedIds.push(selectedColor.getAttribute('data-variant-id'));
+                    const firstColorOption = document.querySelector('.color-option');
+                    if (firstColorOption) {
+                        selectColorOption(firstColorOption);
+                    }
 
-        updateUI('.variant-options input[type="radio"]:checked', radio => {
-            selectedIds.push(radio.value);
-        });
-
-        return selectedIds;
-    }
-
-    function selectColorOption(option) {
-        // Deselect all color options
-        document.querySelectorAll('.color-option').forEach(el => {
-            el.classList.remove('selected');
-            const tickMark = el.querySelector('.tick-mark');
-            if (tickMark) tickMark.style.display = 'none';
-        });
-
-        // Select the clicked option
-        option.classList.add('selected');
-        const tickMark = option.querySelector('.tick-mark');
-        if (tickMark) tickMark.style.display = 'block';
-    }
-
-    function updatePrice(selectedVariantIds) {
-        $.post("{{ route('get.variant.prices') }}", {
-            variant_ids: selectedVariantIds,
-            productId: "{{ $product->id }}",
-            _token: "{{ csrf_token() }}"
-        }).done(response => {
-            if (!response.success) {
-                console.error('Error fetching prices:', response.message || 'Unknown error');
-                return;
-            }
-            const priceData = response.data;
-            const priceElement = document.querySelector('.product_price .price span');
-            const originalPriceElement = document.querySelector('.product_price .price .original-price');
-            const discountElement = document.querySelector('.product_price .price .discount');
-
-            if (priceElement) priceElement.textContent = `₹${parseFloat(priceData.effective_price).toFixed(2)}`;
-            if (originalPriceElement) {
-                originalPriceElement.style.display = priceData.is_discounted ? 'inline' : 'none';
-                if (priceData.is_discounted) {
-                    originalPriceElement.textContent = `₹${parseFloat(priceData.original_price).toFixed(2)}`;
-                }
-            }
-            if (discountElement) {
-                discountElement.style.display = priceData.is_discounted && priceData.discount_percentage ? 'inline' : 'none';
-                if (priceData.is_discounted) {
-                    discountElement.textContent = `(${priceData.discount_percentage}% off)`;
-                }
-            }
-
-            if (!isFirstLoad) updateImage(priceData.id);
-            else isFirstLoad = false;
-
-            updateQuantityControls(priceData.min_order_qty, priceData.available_qty);
-        }).fail((xhr, status, error) => console.error('AJAX error:', error));
-    }
-
-    function updateImage(variantId) {
-        $.post("{{ route('get.variant.image') }}", {
-            variant_id: variantId,
-            productId: "{{ $product->id }}",
-            _token: "{{ csrf_token() }}"
-        }).done(response => {
-            if (!response.success) {
-                console.error('Error fetching image:', response.message || 'Unknown error');
-                return;
-            }
-
-            const variantImage = response.data;
-            const thumbSlider = document.querySelector('.slider-nav.thumb-image');
-            const bannerSlider = document.querySelector('.slider-for');
-
-            if (!thumbSlider || !bannerSlider) {
-                console.error('Sliders not found in the DOM.');
-                return;
-            }
-
-            const thumbImages = [...thumbSlider.querySelectorAll('.thumbImg img')].filter(img => !img.closest('.slick-cloned'));
-            const bannerImages = [...bannerSlider.querySelectorAll('.slider-banner-image img')];
-
-            let imageFound = false;
-
-            thumbImages.forEach((img, index) => {
-                const imagePath = img.getAttribute('data-image-path');
-                const parentThumb = img.closest('.thumbnail-image');
-                if (imagePath === variantImage) {
-                    if (parentThumb) parentThumb.classList.add('selected');
-                    $('.slider-for').slick('slickGoTo', index);
-                    imageFound = true;
-                } else if (parentThumb) {
-                    parentThumb.classList.remove('selected');
-                }
-            });
-
-            if (!imageFound) console.warn('Variant image not found in existing slider.');
-        }).fail((xhr, status, error) => console.error('AJAX error:', error));
-    }
-
-    function updateQuantityControls(minOrderQty, availableQty) {
-        const qtyInput = document.querySelector('.quantityd .qty');
-        const btnPlus = document.querySelector('.quantityd .btnPlus');
-        const btnMinus = document.querySelector('.quantityd .btnMinus');
-        const qtyError = document.querySelector('.qty-error');
-
-        if (qtyInput) {
-            const userMinQty = userType === 'user' ? 1 : minOrderQty;
-            const userMaxQty = userType === 'user' ? availableQty : Infinity;
-
-            qtyInput.value = userMinQty;
-            qtyInput.setAttribute('min', userMinQty);
-
-            if (userType === 'user') {
-                qtyInput.setAttribute('max', availableQty);
-            } else {
-                qtyInput.removeAttribute('max');
-            }
-
-            btnPlus.onclick = () => {
-                const currentQty = parseInt(qtyInput.value) || 0;
-                if (currentQty < userMaxQty) {
-                    qtyInput.value = currentQty + 1;
-                    qtyError?.classList.add('d-none');
+                    updatePrice(getSelectedVariantIds());
                 } else {
-                    qtyError?.classList.remove('d-none');
-                    qtyError.textContent = `Maximum quantity allowed is ${userMaxQty}.`;
+                    const minOrderQty = "{{ $product->min_order_qty ?? 1 }}";
+                    const availableQty = "{{ $product->qty ?? 0 }}";
+                    updateQuantityControls(minOrderQty, availableQty);
                 }
-            };
+            }
 
-            btnMinus.onclick = () => {
-                const currentQty = parseInt(qtyInput.value) || 0;
-                if (currentQty > userMinQty) {
-                    qtyInput.value = currentQty - 1;
-                    qtyError?.classList.add('d-none');
-                } else {
-                    qtyError?.classList.remove('d-none');
-                    qtyError.textContent = `Minimum quantity allowed is ${userMinQty}.`;
+            function getSelectedVariantIds() {
+                const selectedIds = [];
+                const selectedColor = document.querySelector('.color-option.selected');
+                if (selectedColor) selectedIds.push(selectedColor.getAttribute('data-variant-id'));
+
+                updateUI('.variant-options input[type="radio"]:checked', radio => {
+                    selectedIds.push(radio.value);
+                });
+
+                return selectedIds;
+            }
+
+            function selectColorOption(option) {
+                document.querySelectorAll('.color-option').forEach(el => {
+                    el.classList.remove('selected');
+                    const tickMark = el.querySelector('.tick-mark');
+                    if (tickMark) tickMark.style.display = 'none';
+                });
+
+                option.classList.add('selected');
+                const tickMark = option.querySelector('.tick-mark');
+                if (tickMark) tickMark.style.display = 'block';
+            }
+
+            function updatePrice(selectedVariantIds) {
+                $.post("{{ route('get.variant.prices') }}", {
+                    variant_ids: selectedVariantIds,
+                    productId: "{{ $product->id }}",
+                    _token: "{{ csrf_token() }}"
+                }).done(response => {
+                    if (!response.success) {
+                        console.error('Error fetching prices:', response.message || 'Unknown error');
+                        return;
+                    }
+
+                    const priceData = response.data;
+                    const priceElement = document.querySelector('.product_price .price span');
+                    const originalPriceElement = document.querySelector('.product_price .price .original-price');
+                    const discountElement = document.querySelector('.product_price .price .discount');
+
+                    if (priceElement) priceElement.textContent = `₹${parseFloat(priceData.effective_price).toFixed(2)}`;
+                    if (originalPriceElement) {
+                        originalPriceElement.style.display = priceData.is_discounted ? 'inline' : 'none';
+                        if (priceData.is_discounted) {
+                            originalPriceElement.textContent = `₹${parseFloat(priceData.original_price).toFixed(2)}`;
+                        }
+                    }
+                    if (discountElement) {
+                        discountElement.style.display = priceData.is_discounted && priceData.discount_percentage ? 'inline' : 'none';
+                        if (priceData.is_discounted) {
+                            discountElement.textContent = `(${priceData.discount_percentage}% off)`;
+                        }
+                    }
+
+                    if (!isFirstLoad) updateImage(priceData.id);
+                    else isFirstLoad = false;
+
+                    updateQuantityControls(priceData.min_order_qty, priceData.available_qty);
+                }).fail((xhr, status, error) => console.error('AJAX error:', error));
+            }
+
+            function updateImage(variantId) {
+                $.post("{{ route('get.variant.image') }}", {
+                    variant_id: variantId,
+                    productId: "{{ $product->id }}",
+                    _token: "{{ csrf_token() }}"
+                }).done(response => {
+                    if (!response.success) {
+                        console.error('Error fetching image:', response.message || 'Unknown error');
+                        return;
+                    }
+
+                    const variantImage = response.data;
+                    const thumbSlider = document.querySelector('.slider-nav.thumb-image');
+                    const bannerSlider = document.querySelector('.slider-for');
+
+                    if (!thumbSlider || !bannerSlider) {
+                        console.error('Sliders not found in the DOM.');
+                        return;
+                    }
+
+                    const thumbImages = [...thumbSlider.querySelectorAll('.thumbImg img')].filter(img => !img.closest('.slick-cloned'));
+                    const bannerImages = [...bannerSlider.querySelectorAll('.slider-banner-image img')];
+
+                    let imageFound = false;
+
+                    thumbImages.forEach((img, index) => {
+                        const imagePath = img.getAttribute('data-image-path');
+                        const parentThumb = img.closest('.thumbnail-image');
+                        if (imagePath === variantImage) {
+                            if (parentThumb) parentThumb.classList.add('selected');
+                            $('.slider-for').slick('slickGoTo', index);
+                            imageFound = true;
+                        } else if (parentThumb) {
+                            parentThumb.classList.remove('selected');
+                        }
+                    });
+
+                    if (!imageFound) console.warn('Variant image not found in existing slider.');
+                }).fail((xhr, status, error) => console.error('AJAX error:', error));
+            }
+
+            function updateQuantityControls(minOrderQty, availableQty) {
+                const qtyInput = document.querySelector('.quantityd .qty');
+                const btnPlus = document.querySelector('.quantityd .btnPlus');
+                const btnMinus = document.querySelector('.quantityd .btnMinus');
+                const qtyError = document.querySelector('.qty-error');
+
+                if (qtyInput) {
+                    const userMinQty = userType === 'user' ? 1 : minOrderQty;
+                    const userMaxQty = userType === 'user' ? availableQty : Infinity;
+
+                    qtyInput.value = userMinQty;
+                    qtyInput.setAttribute('min', userMinQty);
+
+                    if (userType === 'user') {
+                        qtyInput.setAttribute('max', availableQty);
+                    } else {
+                        qtyInput.removeAttribute('max');
+                    }
+
+                    btnPlus.onclick = () => {
+                        const currentQty = parseInt(qtyInput.value) || 0;
+                        if (currentQty < userMaxQty) {
+                            qtyInput.value = currentQty + 1;
+                            qtyError?.classList.add('d-none');
+                        } else {
+                            qtyError?.classList.remove('d-none');
+                            qtyError.textContent = `Maximum quantity allowed is ${userMaxQty}.`;
+                        }
+                    };
+
+                    btnMinus.onclick = () => {
+                        const currentQty = parseInt(qtyInput.value) || 0;
+                        if (currentQty > userMinQty) {
+                            qtyInput.value = currentQty - 1;
+                            qtyError?.classList.add('d-none');
+                        } else {
+                            qtyError?.classList.remove('d-none');
+                            qtyError.textContent = `Minimum quantity allowed is ${userMinQty}.`;
+                        }
+                    };
+
+                    qtyInput.onblur = () => {
+                        const inputQty = parseInt(qtyInput.value) || 0;
+                        if (inputQty < userMinQty) qtyInput.value = userMinQty;
+                        else if (userType === 'user' && inputQty > userMaxQty) qtyInput.value = userMaxQty;
+                    };
                 }
-            };
+            }
 
-            qtyInput.onblur = () => {
-                const inputQty = parseInt(qtyInput.value) || 0;
-                if (inputQty < userMinQty) qtyInput.value = userMinQty;
-                else if (userType === 'user' && inputQty > userMaxQty) qtyInput.value = userMaxQty;
-            };
-        }
-    }
+            function addEventListeners() {
+                updateUI('.color-option', option => {
+                    option.addEventListener('click', function () {
+                        selectColorOption(this);
+                        updatePrice(getSelectedVariantIds());
+                    });
+                });
 
-    function addEventListeners() {
-        updateUI('.color-option', option => {
-            option.addEventListener('click', function () {
-                selectColorOption(this);
-                updatePrice(getSelectedVariantIds());
-            });
+                updateUI('.variant-options input[type="radio"]', radio => {
+                    radio.addEventListener('click', () => updatePrice(getSelectedVariantIds()));
+                });
+
+                document.querySelector('.add-to-cart').addEventListener('click', function () {
+                    const productId = "{{ $product->id }}";
+                    const selectedVariantId = getSelectedVariantIds() || null;
+                    const quantity = parseInt(document.querySelector('.quantityd .qty').value) || 1;
+
+                    $.ajax({
+                        method: 'POST',
+                        url: "{{ route('cart.add') }}",
+                        data: {
+                            product_id: productId,
+                            variant_id: selectedVariantId,
+                            quantity: quantity,
+                            _token: "{{ csrf_token() }}"
+                        },
+                        beforeSend: function () {
+                            document.querySelector('.add-to-cart').innerHTML = '<i class="nss-shopping-cart1"></i> Adding to Cart...';
+                            document.querySelector('.add-to-cart').disabled = true;
+                        },
+                        success: function(response) {
+                            toastr.success(response.message);
+                            document.querySelector('.cart-count').textContent = response.cartCount;
+                        },
+                        error: function(xhr, status, error){
+                            let errors = xhr.responseJSON.errors;
+                            $.each(errors, function(index, value) {
+                                toastr.error(value);
+                            })
+                            // redirect to login
+                            setTimeout(function() {
+                            location.href = "{{ route('login') }}";
+                            }, 3000);
+                        },
+                        complete: function () {
+                            document.querySelector('.add-to-cart').innerHTML = '<i class="nss-shopping-cart1"></i> Add to Cart...';
+                            document.querySelector('.add-to-cart').disabled = false;
+                        }
+                    });
+                });
+            }
+
+            preselectVariants();
+            addEventListeners();
         });
-
-        updateUI('.variant-options input[type="radio"]', radio => {
-            radio.addEventListener('click', () => updatePrice(getSelectedVariantIds()));
-        });
-    }
-
-    preselectVariants();
-    addEventListeners();
-});
-
-
 
         $('.slider-for').slick({
             slidesToShow: 1,

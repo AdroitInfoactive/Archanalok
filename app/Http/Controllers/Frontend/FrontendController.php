@@ -40,9 +40,7 @@ class FrontendController extends BaseController
         $bannerSliders = BannerSlider::where('status', 1)->orderBy('position', 'asc')->get();
         $homeInfo = HomeInfo::first();
         $counter = Counter::first();
-
         // Fetch categories and their related subcategories
-
         return view('frontend.home.index', compact('bannerSliders', 'homeInfo', 'counter'));
     }
     public function mainCategoryPage($slug)
@@ -506,15 +504,15 @@ class FrontendController extends BaseController
                 $variant = $product->variants->sortBy('sale_price')->first();
                 $product->effective_price = match ($userType) {
                     'user' => $variant->offer_price ?? $variant->sale_price,
-                    'ws' => $variant->wholesale_price ?? $variant->sale_price,
-                    'dr' => $variant->distributor_price ?? $variant->sale_price,
+                    'ws' => $variant->wholesale_price,
+                    'dr' => $variant->distributor_price,
                     default => $variant->sale_price,
                 };
             } else {
                 $product->effective_price = match ($userType) {
                     'user' => $product->offer_price ?? $product->sale_price,
-                    'ws' => $product->wholesale_price ?? $product->sale_price,
-                    'dr' => $product->distributor_price ?? $product->sale_price,
+                    'ws' => $product->wholesale_price,
+                    'dr' => $product->distributor_price,
                     default => $product->sale_price,
                 };
             }

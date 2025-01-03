@@ -83,11 +83,12 @@
                         </div>
                         <!-- Nav Menu End -->
                         <!-- Btn -->
-                        <div class="access-btn">
+                        @include('frontend.layouts.user_icons')
+                        <!-- <div class="access-btn">
                             <a href="javascript:void(0);" class="btn-search"><i class="nss-search1"></i></a>
                             <a href="{{ route('login') }}" class="btn-user"><i class="nss-user1"></i></a>
                             <a href="cart.html" class="btn-cart"><i class="nss-shopping-cart1"></i><span>1</span></a>
-                        </div>
+                        </div> -->
                         <!-- Btn -->
                     </nav>
                 </div>

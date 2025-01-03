@@ -15,8 +15,8 @@
                     </a>
                 </div>
                 
-                <a class="add-to-cart" href=""><i
-                        class="nss-shopping-cart1"></i>Add To Cart</a>
+                <!-- <a class="add-to-cart" href="{{ url('product/' . ($product->slug ?? '#')) }}"><i
+                        class="nss-shopping-cart1"></i>View Product</a> -->
             </div>
             <div class="product-details">
                 <h5><a

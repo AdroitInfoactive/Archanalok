@@ -1,74 +1,76 @@
 @extends('frontend.layouts.master')
 
 @section('content')
-    <!-- Hero Banner Start -->
-    <section class="page_banner" style="background-image: url(assets/images/banner.jpg);">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <h3 class="pb_title">My Account</h3>
-                    <div class="page_crumb">
-                        <a href="index.html">Home</a> | <span>My Account</span>
-                    </div>
+<!-- Hero Banner Start -->
+<section class="page_banner" style="background-image: url(assets/images/banner.jpg);">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <h3 class="pb_title">My Account</h3>
+                <div class="page_crumb">
+                    <a href="index.html">Home</a> | <span>My Account</span>
                 </div>
             </div>
         </div>
-    </section>
-    <!-- Banner End -->
+    </div>
+</section>
+<!-- Banner End -->
 
-    <section class="auth-section">
-        <div class="container">
-            <div class="row justify-content-center"> <!-- Centering the row -->
+<section class="auth-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <!-- Centering the row -->
 
-                <div class="col-xl-5 col-md-6"> <!-- Register Form -->
-                    <h2>Login</h2>
+            <div class="col-xl-5 col-md-6">
+                <!-- Register Form -->
+                <h2>Login</h2>
 
-                    <form method="POST" class="signup-form" action="{{ route('login') }}">
-                        @csrf
-
-
-                       
-                        <div class="form-group">
-                            <label for="signup-email">Email Address:</label>
-                            <input type="email" placeholder="Email Id" id="email" name="email"
-                                value="{{ old('email') }}">
-                        </div>
-                      
-                        <div class="form-group">
-                            <label for="signup-password">Password:</label>
-                            <input type="password" id="password" placeholder="Password" name="password"
-                                placeholder="Password" autocomplete="new-password" >
-                        </div>
-                        <a href="{{ route('password.request') }}"  class="forgot-password">Forgot Password ?</a>
-
-                        <div class="text-center">
-                            <button type="submit" class="btn">Login</button>
-                        </div>
-                    </form>
-                    <div class="text-center" style="margin-top: 10px;">
-                        <a href="{{ route('register') }}" class="forgot-password">Dont’t have an account ? Sign Up</a>
+                <form method="POST" class="signup-form" action="{{ route('login') }}">
+                    @csrf
+                    <div class="form-group">
+                        <label for="signup-email">Email Address:</label>
+                        <input type="email" placeholder="Email Id" id="email" name="email"
+                            value="{{ old('email') }}">
                     </div>
-                </div>
 
+                    <div class="form-group">
+                        <label for="signup-password">Password:</label>
+                        <input type="password" id="password" placeholder="Password" name="password"
+                            placeholder="Password" autocomplete="new-password">
+                    </div>
+                    <a href="{{ route('password.request') }}" class="forgot-password">Forgot Password
+                        ?</a>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn">Login</button>
+                    </div>
+                </form>
+                <div class="text-center" style="margin-top: 10px;">
+                    <a href="{{ route('register') }}" class="forgot-password">Dont’t have an account ?
+                        Sign Up</a>
+                </div>
             </div>
+
         </div>
-    </section>
-    <!-- Back To Top -->
-    <a href="#" id="back-to-top">
-        <i class="arrow_carrot-2up"></i>
-    </a>
-    <!-- Back To Top -->
+    </div>
+</section>
+<!-- Back To Top -->
+<a href="#" id="back-to-top">
+    <i class="arrow_carrot-2up"></i>
+</a>
+<!-- Back To Top -->
 @endsection
 
 @push('scripts')
     <script>
-        document.getElementById('my-address-btn').addEventListener('mouseover', function() {
+        document.getElementById('my-address-btn').addEventListener('mouseover', function () {
             document.querySelector('.address-edit-options').style.display = 'block';
         });
 
-        document.getElementById('my-address-btn').addEventListener('mouseout', function() {
+        document.getElementById('my-address-btn').addEventListener('mouseout', function () {
             document.querySelector('.address-edit-options').style.display = 'none';
         });
+
     </script>
 @endpush
 
@@ -140,13 +142,11 @@
             /* Add space above the button */
         }
 
-        @media (max-width: 768px) {
-
-            .auth-section .col-xl-5,
-            .auth-section .col-md-6 {
-                width: 100%;
-                /* Stack forms on smaller screens */
-            }
+        <blade media|%20(max-width%3A%20768px)%20%7B>.auth-section .col-xl-5,
+        .auth-section .col-md-6 {
+            width: 100%;
+            /* Stack forms on smaller screens */
+        }
         }
 
         .forgot-password {
@@ -274,5 +274,6 @@
             border: 1px solid #ccc;
             border-radius: 4px;
         }
+
     </style>
 @endpush

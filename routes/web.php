@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminAuthController;
+use App\Http\Controllers\Frontend\CartController;
 use App\Http\Controllers\Frontend\DashboardController;
 use App\Http\Controllers\Frontend\FrontendController;
 use App\Http\Controllers\Frontend\ProfileController;
@@ -24,7 +25,12 @@ Route::group(['middleware' => 'auth'], function () {
   Route::put('address/{id}', [DashboardController::class, 'updateAddress'])->name('address.update'); 
   Route::delete('address/{id}', [DashboardController::class, 'destroyAddress'])->name('address.destroy');
   /** Wishlist Route */
-Route::get('wishlist/', [WishlistController::class, 'whishlist'])->name('wishlist.index');
+  Route::get('wishlist/', [WishlistController::class, 'whishlist'])->name('wishlist.index');
+  Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+  Route::post('/cart/add', [CartController::class, 'addCart'])->name('cart.add');
+  Route::post('/cart/update', [CartController::class, 'updateCart'])->name('cart.update');
+  Route::post('/cart/clear', [CartController::class, 'clearCart'])->name('cart.clear');
+  Route::post('/cart/remove', [CartController::class, 'removeItem'])->name('cart.remove');
 });
 
 require __DIR__ . '/auth.php';
@@ -65,8 +71,6 @@ Route::get('/{mainCategorySlug}/{slug}', [FrontendController::class, 'categoryPa
 
 // SubCategory Page
 Route::get('/{mainCategorySlug}/{categorySlug}/{slug}', [FrontendController::class, 'subCategoryPage'])->name('subcategory.show');
-
-// // Product details Page
 
 /** Newsletter Routes */
 Route::post('/subscribe-newsletter', [FrontendController::class, 'subscribeNewsletter'])->name('subscribe-newsletter');

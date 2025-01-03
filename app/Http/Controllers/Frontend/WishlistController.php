@@ -17,7 +17,7 @@ class WishlistController extends BaseController
     function store(string $productId): Response
     {
         if (!Auth::check()) {
-            throw ValidationException::withMessages(['Please login for add product in wishlist']);
+            throw ValidationException::withMessages(['Please login for add product to wishlist']);
         }
         $productAlreadyExist = Wishlist::where(['user_id' => auth()->user()->id, 'product_id' => $productId])->exists();
         if ($productAlreadyExist) {

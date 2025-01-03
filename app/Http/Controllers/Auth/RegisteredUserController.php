@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\DataTables\UserDataTable;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Frontend\BaseController;
 use App\Mail\UserActivatedMail;
 use App\Models\FooterInfo;
 use App\Models\MainCategory;
@@ -18,18 +19,14 @@ use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 use Mail;
 
-class RegisteredUserController extends Controller
+class RegisteredUserController extends BaseController
 {
     /**
      * Display the registration view.
      */
     public function create(): View
     {
-        $footerInfo = FooterInfo::first();
-        $mainCategory = MainCategory::where('status', 1)
-        ->orderBy('position', 'asc')
-        ->get();
-        return view('auth.register', compact('mainCategory', 'footerInfo'));
+        return view('auth.register');
     }
 
     /**

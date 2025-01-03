@@ -8,7 +8,6 @@
             <div class="col-lg-12">
                 @php
                     use Illuminate\Support\Str;
-
                     $segments = request()->segments();
                     $breadcrumbs = [];
                     $url = '';

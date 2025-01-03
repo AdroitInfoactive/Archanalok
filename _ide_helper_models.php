@@ -770,6 +770,50 @@ namespace App\Models{
 
 namespace App\Models{
 /**
+ * App\Models\UserCart
+ *
+ * @property int $id
+ * @property int $user_id
+ * @property int $product_id
+ * @property int|null $variant_id
+ * @property string $name
+ * @property string $price
+ * @property string|null $sale_price
+ * @property string|null $offer_price
+ * @property int $quantity
+ * @property string|null $weight
+ * @property string|null $tax
+ * @property string|null $image
+ * @property string|null $variant_code
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Product $product
+ * @property-read \App\Models\User $user
+ * @property-read \App\Models\ProductVariant|null $variant
+ * @method static \Illuminate\Database\Eloquent\Builder|UserCart newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|UserCart newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|UserCart query()
+ * @method static \Illuminate\Database\Eloquent\Builder|UserCart whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserCart whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserCart whereImage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserCart whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserCart whereOfferPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserCart wherePrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserCart whereProductId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserCart whereQuantity($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserCart whereSalePrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserCart whereTax($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserCart whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserCart whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserCart whereVariantCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserCart whereVariantId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserCart whereWeight($value)
+ */
+	class UserCart extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
  * App\Models\VariantDetail
  *
  * @property int $id
