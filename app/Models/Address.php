@@ -10,7 +10,7 @@ class Address extends Model
     use HasFactory;
     protected $fillable = [
         'user_id',
-        'first_name',
+        'name',
         'email',
         'phone',
         'address',
@@ -18,7 +18,15 @@ class Address extends Model
         'state',
         'country',
         'zip',
-        'is_default',
+        'company',
+        'gst',
+        'is_default_billing',
+        'is_default_shipping',
     ];
-    
+
+    // Relationships
+    public function stateName()
+    {
+        return $this->belongsTo(State::class, 'state', 'id');
+    }
 }

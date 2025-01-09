@@ -34,29 +34,38 @@
                 @foreach ($userAddresses as $address)
                     <div class="col-md-6 mb-4">
                         <div class="address-box">
-                            <h5>{{ $address->is_default ? 'Default Shipping Address' : 'Additional Address' }}</h5>
+                            <h5>{{ $address->name }}</h5>
                             <button class="close remove-address delete-item"
                                 data-url="{{ route('address.destroy', $address->id) }}">&times;</button>
 
-                            <p>{{ $address->first_name }} {{ $address->last_name }}</p>
-                            <p>{{ $address->address }}</p>
-                            <p>{{ $address->city }}, {{ $address->state }}, {{ $address->zip }}</p>
+                            <p>Address: {{ $address->address }}</p>
+                            <p>{{ $address->city }}, {{ $address->stateName->name }}, {{ $address->zip }}</p>
                             <p>{{ $address->country }}</p>
+                            <p>Email: {{ $address->email }}</p>
                             <p>Phone: {{ $address->phone }}</p>
+
+                            <!-- Default Billing Address Checkbox -->
+                            <input type="checkbox" class="default-billing" name="is_default_billing" id="is_default_billing_{{ $address->id }}"
+                                value="{{ $address->id }}" {{ $address->is_default_billing ? 'checked' : '' }}>
+                            <label for="is_default_billing_{{ $address->id }}">Default Billing Address</label>
+
+                            <!-- Default Shipping Address Checkbox -->
+                            <input type="checkbox" class="default-shipping" name="is_default_shipping" id="is_default_shipping_{{ $address->id }}"
+                                value="{{ $address->id }}" {{ $address->is_default_shipping ? 'checked' : '' }}>
+                            <label for="is_default_shipping_{{ $address->id }}">Default Shipping Address</label>
+
                             <a href="javascript:void(0);" class="btn btn-secondary edit-address"
-                                data-id="{{ $address->id }}" data-first_name="{{ $address->first_name }}"
-                                data-last_name="{{ $address->last_name }}" data-email="{{ $address->email }}"
+                                data-id="{{ $address->id }}" data-name="{{ $address->name }}" data-email="{{ $address->email }}"
                                 data-address="{{ $address->address }}" data-city="{{ $address->city }}"
-                                data-state="{{ $address->state }}" data-zip="{{ $address->zip }}"
-                                data-country="{{ $address->country }}" data-phone="{{ $address->phone }}"
-                                data-is_default="{{ $address->is_default }}" data-toggle="modal"
+                                data-state="{{ $address->state }}" data-zip="{{ $address->zip }}" data-phone="{{ $address->phone }}" data-company="{{ $address->company }}" data-gst="{{ $address->gst }}"
+                                data-is_default_billing="{{ $address->is_default_billing }}" data-is_default_shipping="{{ $address->is_default_shipping }}" data-toggle="modal"
                                 data-target="#editAddressModal">
                                 Edit Address
                             </a>
                         </div>
                     </div>
                 @endforeach
-            </div>
+                            </div>
 
             <!-- Add Address Button -->
             <div class="row">
@@ -64,13 +73,12 @@
                     <button class="btn btn-primary" data-toggle="modal" data-target="#addAddressModal">Add New
                         Address</button>
                 </div>
-
             </div>
         </div>
 
         <!-- Add Address Modal -->
         <div class="modal fade" id="addAddressModal">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5>Add New Address</h5>
@@ -93,7 +101,7 @@
 
         <!-- Edit Address Modal -->
         <div class="modal fade" id="editAddressModal">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5>Edit Address</h5>
@@ -120,6 +128,67 @@
 
 @push('scripts')
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Ensure only one Default Billing Address is selected
+            document.querySelectorAll('.default-billing').forEach(function (checkbox) {
+                checkbox.addEventListener('change', function () {
+                    if (this.checked) {
+                        // Uncheck other billing checkboxes
+                        document.querySelectorAll('.default-billing').forEach(function (otherCheckbox) {
+                            if (otherCheckbox !== checkbox) {
+                                otherCheckbox.checked = false;
+                            }
+                        });
+
+                        // Send AJAX request to set the default billing address
+                        setDefaultAddress(this.value, 'billing');
+                    }
+                });
+            });
+
+            // Ensure only one Default Shipping Address is selected
+            document.querySelectorAll('.default-shipping').forEach(function (checkbox) {
+                checkbox.addEventListener('change', function () {
+                    if (this.checked) {
+                        // Uncheck other shipping checkboxes
+                        document.querySelectorAll('.default-shipping').forEach(function (otherCheckbox) {
+                            if (otherCheckbox !== checkbox) {
+                                otherCheckbox.checked = false;
+                            }
+                        });
+
+                        // Send AJAX request to set the default shipping address
+                        setDefaultAddress(this.value, 'shipping');
+                    }
+                });
+            });
+
+            // Function to update default address via AJAX
+            async function setDefaultAddress(addressId, type) {
+                try {
+                    const response = await fetch('{{ route('address.setDefault') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        },
+                        body: JSON.stringify({ address_id: addressId, type: type }),
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        toastr.success(data.message || 'Default address updated successfully.');
+                    } else {
+                        toastr.error(data.message || 'Failed to update default address.');
+                    }
+                } catch (error) {
+                    console.error('Error updating default address:', error);
+                    toastr.error('An error occurred. Please try again.');
+                }
+            }
+        });
+
+
+
         $(document).ready(function() {
             // CSRF Setup
             $.ajaxSetup({
@@ -132,8 +201,6 @@
             $('#addAddressForm').on('submit', function(e) {
                 e.preventDefault();
                 const formData = $(this).serialize();
-                // Append the value of the checkbox
-               
                 $.post("{{ route('address.store') }}", formData, function(response) {
                     toastr.success(response.message || 'Address added successfully!');
                     $('#addAddressModal').modal('hide');
@@ -148,22 +215,26 @@
                 $('#addAddressForm')[0].reset(); // Reset all form fields
             });
             // Edit Address (Load Data into Form)
-            $('.edit-address').on('click', function() {
-                const fields = ['first_name', 'last_name', 'email', 'address', 'city', 'state', 'zip',
-                    'country', 'phone', 'is_default'
-                ];
+            $('.edit-address').on('click', function () {
+                const fields = ['name', 'email', 'address', 'city', 'state', 'zip', 'company', 'gst', 'phone'];
+                
+                // Populate input fields
                 $('#address_id').val($(this).data('id'));
                 fields.forEach(field => $('#edit_' + field).val($(this).data(field)));
+
+                // Handle checkbox fields explicitly
+                $('#edit_is_default_billing').prop('checked', !!$(this).data('is_default_billing'));
+                $('#edit_is_default_shipping').prop('checked', !!$(this).data('is_default_shipping'));
             });
+
 
             // Update Address
             $('#editAddressForm').on('submit', function(e) {
                 e.preventDefault();
                 const addressId = $('#address_id').val();
                 const formData = $(this).serialize();
-              
                 $.ajax({
-                    url: `/address/${addressId}`,
+                    url: `{{ route('address.update', ':id') }}`.replace(':id', addressId),
                     method: 'PUT',
                     data: formData,
                     success: function(response) {

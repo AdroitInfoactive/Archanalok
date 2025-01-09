@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Frontend\CartController;
+use App\Http\Controllers\Frontend\CheckoutController;
 use App\Http\Controllers\Frontend\DashboardController;
 use App\Http\Controllers\Frontend\FrontendController;
 use App\Http\Controllers\Frontend\ProfileController;
@@ -23,6 +24,7 @@ Route::group(['middleware' => 'auth'], function () {
   Route::get('address', [DashboardController::class, 'address'])->name('address.index');
   Route::post('address', [DashboardController::class, 'createAddress'])->name('address.store');
   Route::put('address/{id}', [DashboardController::class, 'updateAddress'])->name('address.update'); 
+  Route::post('/set-default-address', [DashboardController::class, 'setDefaultAddress'])->name('address.setDefault');
   Route::delete('address/{id}', [DashboardController::class, 'destroyAddress'])->name('address.destroy');
   /** Wishlist Route */
   Route::get('wishlist/', [WishlistController::class, 'whishlist'])->name('wishlist.index');
@@ -31,6 +33,11 @@ Route::group(['middleware' => 'auth'], function () {
   Route::post('/cart/update', [CartController::class, 'updateCart'])->name('cart.update');
   Route::post('/cart/clear', [CartController::class, 'clearCart'])->name('cart.clear');
   Route::post('/cart/remove', [CartController::class, 'removeItem'])->name('cart.remove');
+  Route::post('/cart/check-stock', [CartController::class, 'checkStock'])->name('cart.check-stock');
+  Route::post('/cart/validate-before-checkout', [CartController::class, 'validateBeforeCheckout'])->name('cart.validateBeforeCheckout');
+  Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+  Route::post('/checkout', [CheckoutController::class, 'processCheckout'])->name('checkout.process');
+
 });
 
 require __DIR__ . '/auth.php';

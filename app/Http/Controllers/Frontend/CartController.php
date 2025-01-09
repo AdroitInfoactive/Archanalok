@@ -91,8 +91,8 @@ class CartController extends BaseController
             'price' => $price,
             'qty' => $quantity,
             'weight' => $variant ? ($variant->weight ?? 0) : ($product->weight ?? 0),
-            'tax' => $product->gst,
             'options' => [
+                'tax' => $product->gst,
                 'image' => $image ? $image->image_path : null,
                 'sale_price' => $salePrice,
                 'offer_price' => $offerPrice,
@@ -120,7 +120,7 @@ class CartController extends BaseController
                         'offer_price' => $sessionCartItem->options['offer_price'] ?? null,
                         'name' => $sessionCartItem->name,
                         'weight' => $sessionCartItem->weight ?? 0,
-                        'tax' => $sessionCartItem->tax ?? 0,
+                        'tax' => $sessionCartItem->options['tax'] ?? 0,
                         'image' => $sessionCartItem->options['image'] ?? null,
                         'variant_code' => $sessionCartItem->options['variant_code'] ?? null,
                         'updated_at' => now(),
@@ -144,6 +144,7 @@ class CartController extends BaseController
             'variant_id' => 'nullable|integer', // Nullable for products without variants
             'quantity' => 'required|integer|min:1',
         ]);
+
         $rowId = $validatedData['row_id'];
         $productId = $validatedData['product_id'];
         $variantId = $validatedData['variant_id'] ?? null;
@@ -173,8 +174,6 @@ class CartController extends BaseController
         $minQty = $userType === 'user' ? 1 : ($variant ? $variant->min_order_qty : $product->min_order_qty);
         $maxQty = $userType === 'user' ? ($variant ? $variant->qty : $product->qty) : PHP_INT_MAX;
 
-        // dd($quantity);
-
         // Validate quantity limits
         if ($quantity < $minQty) {
             return response()->json(['success' => false, 'message' => "Minimum quantity is $minQty.", 'min_qty' => $minQty], 400);
@@ -183,11 +182,52 @@ class CartController extends BaseController
             return response()->json(['success' => false, 'message' => "Maximum quantity is $maxQty.", 'max_qty' => $maxQty], 400);
         }
 
+        // Get image and other details
+        $image = $variantId
+            ? ProductImage::where('product_id', $productId)
+                ->where('variant_id', $variantId)
+                ->orderBy('order', 'desc')
+                ->first() ?? // Check if variant image exists; if not, fallback to product image
+                ProductImage::where('product_id', $productId)
+                    ->orderBy('order', 'asc')
+                    ->first()
+            : ProductImage::where('product_id', $productId)
+                ->orderBy('order', 'asc')
+                ->first();
+
+        $variantCode = $variant ? $variant->variation_code : null;
+
         // Update the cart
         Cart::update($rowId, [
             'qty' => $quantity,
             'price' => $price,
+            'weight' => $variant ? $variant->weight : $product->weight,
+            'options' => [
+                'image' => $image ? $image->image_path : null,
+                'variant_id' => $variantId,
+                'variant_code' => $variantCode,
+                'tax' => $product->gst,
+                'sale_price' => $variant ? $variant->sale_price : $product->sale_price,
+                'offer_price' => $variant ? ($variant->offer_price ?? null) : ($product->offer_price ?? null),
+            ]
         ]);
+
+        // Update in the user carts as well
+        if (auth()->check()) {
+            UserCart::where('user_id', auth()->id())
+                ->where('product_id', $productId)
+                ->where('variant_id', $variantId)
+                ->update([
+                    'quantity' => $quantity,
+                    'price' => $price,
+                    'sale_price' => $variant ? $variant->sale_price : $product->sale_price,
+                    'offer_price' => $variant ? ($variant->offer_price ?? null) : ($product->offer_price ?? null),
+                    'weight' => $variant ? $variant->weight : $product->weight,
+                    'tax' => $product->gst,
+                    'image' => $image,
+                    'variant_code' => $variantCode,
+                ]);
+        }
 
         $totalPrice = $price * $quantity;
 
@@ -261,5 +301,86 @@ class CartController extends BaseController
                 'message' => 'Failed to remove product. Please try again.',
             ], 500);
         }
+    }
+
+    public function checkStock(Request $request)
+    {
+        $validatedData = $request->validate([
+            'cart_items' => 'required|array',
+            'cart_items.*.row_id' => 'required|string',
+            'cart_items.*.product_id' => 'required|integer',
+            'cart_items.*.variant_id' => 'nullable|integer',
+            'cart_items.*.quantity' => 'required|integer|min:1',
+        ]);
+
+        $responseItems = [];
+
+        foreach ($validatedData['cart_items'] as $item) {
+            $product = Product::find($item['product_id']);
+            $variant = $item['variant_id'] ? ProductVariant::find($item['variant_id']) : null;
+
+            $availableQty = $variant ? $variant->qty : $product->qty;
+
+            $responseItems[] = [
+                'row_id' => $item['row_id'],
+                'requested_qty' => $item['quantity'],
+                'available_qty' => $availableQty,
+            ];
+        }
+
+        return response()->json([
+            'success' => true,
+            'items' => $responseItems,
+        ]);
+    }
+
+    public function validateBeforeCheckout(Request $request)
+    {
+        $cartContent = Cart::content();
+        $userType = auth()->check() ? auth()->user()->role : 'user'; // Get user type
+        $errors = [];
+
+        foreach ($cartContent as $item) {
+            $product = Product::find($item->id);
+            $variant = $item->options->variant_id ? ProductVariant::find($item->options->variant_id) : null;
+
+            $availableQty = $variant ? $variant->qty : $product->qty;
+            $minOrderQty = $variant ? $variant->min_order_qty : $product->min_order_qty;
+
+            if ($userType === 'user') {
+                // For "user" type, check available stock
+                if ($availableQty <= 0) {
+                    $errors[] = [
+                        'row_id' => $item->rowId,
+                        'message' => "Out of stock. Please remove this item.",
+                    ];
+                } elseif ($item->qty > $availableQty) {
+                    $errors[] = [
+                        'row_id' => $item->rowId,
+                        'message' => "Only {$availableQty} are available. Please adjust your quantity.",
+                    ];
+                }
+            } else {
+                // For "ws" or "dr" types, check minimum order quantity
+                if ($item->qty < $minOrderQty) {
+                    $errors[] = [
+                        'row_id' => $item->rowId,
+                        'message' => "Minimum order quantity is {$minOrderQty}.",
+                    ];
+                }
+            }
+        }
+
+        if (!empty($errors)) {
+            return response()->json([
+                'success' => false,
+                'errors' => $errors,
+            ], 422);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'All items are valid. Proceeding to checkout.',
+        ]);
     }
 }

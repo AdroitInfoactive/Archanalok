@@ -42,8 +42,7 @@ namespace App\Models{
  *
  * @property int $id
  * @property int $user_id
- * @property string $first_name
- * @property string|null $last_name
+ * @property string $name
  * @property string $email
  * @property string $phone
  * @property string $address
@@ -51,21 +50,27 @@ namespace App\Models{
  * @property string $state
  * @property string $country
  * @property string $zip
- * @property int $is_default
+ * @property string|null $company
+ * @property string|null $gst
+ * @property int $is_default_billing
+ * @property int $is_default_shipping
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\State|null $stateName
  * @method static \Illuminate\Database\Eloquent\Builder|Address newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Address newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Address query()
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereAddress($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereCity($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Address whereCompany($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereCountry($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereEmail($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Address whereFirstName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Address whereGst($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Address whereIsDefault($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Address whereLastName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Address whereIsDefaultBilling($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Address whereIsDefaultShipping($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Address whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address wherePhone($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereState($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereUpdatedAt($value)
@@ -628,6 +633,27 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|SocialLink whereUpdatedAt($value)
  */
 	class SocialLink extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * App\Models\State
+ *
+ * @property int $id
+ * @property string $name
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Address> $addresses
+ * @property-read int|null $addresses_count
+ * @method static \Illuminate\Database\Eloquent\Builder|State newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|State newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|State query()
+ * @method static \Illuminate\Database\Eloquent\Builder|State whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|State whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|State whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|State whereUpdatedAt($value)
+ */
+	class State extends \Eloquent {}
 }
 
 namespace App\Models{

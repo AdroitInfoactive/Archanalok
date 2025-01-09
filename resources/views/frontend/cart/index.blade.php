@@ -89,8 +89,8 @@
                                 @endforeach
                                 <tr>
                                     <td colspan="8" class="actions">
-                                        <button type="submit" class="button fishto-btn clear-cart">Clear All</button>
-                                        <button type="submit" class="button fishto-btn clear-cart">Proceed to
+                                        <button type="button" class="button fishto-btn clear-cart">Clear All</button>
+                                        <button type="button" class="button fishto-btn proceed-checkout">Proceed to
                                             Checkout</button>
                                     </td>
                                 </tr>
@@ -151,170 +151,389 @@
             text-align: center;
             /* Center-aligns the cell content */
         }
-
     </style>
 @endpush
 @push('scripts')
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const cartForm = document.querySelector('.woocommerce-cart-form');
-      const qtyButtons = document.querySelectorAll('.qtyBtn');
-      const qtyInputs = document.querySelectorAll('.carqty');
-      const removeButtons = document.querySelectorAll('.cart-item .fa-trash-alt');
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const cartForm = document.querySelector('.woocommerce-cart-form');
+            const qtyButtons = document.querySelectorAll('.qtyBtn');
+            const qtyInputs = document.querySelectorAll('.carqty');
+            const removeButtons = document.querySelectorAll('.cart-item .fa-trash-alt');
+            const proceedCheckoutButton = document.querySelector('.proceed-checkout');
+            const clearCartButton = document.querySelector('.clear-cart');
 
-      qtyButtons.forEach(button => {
-          button.addEventListener('click', async function (event) {
-              event.preventDefault(); // Prevent default form submission
+            // Disable the checkout button initially
+            disableCheckoutButton(true);
 
-              const action = this.dataset.action;
-              const row = this.closest('.cart-item');
-              const qtyInput = row.querySelector('.carqty');
-              const unitPriceElement = row.querySelector('.unit-price');
-              const totalPriceElement = row.querySelector('.total-price');
-              const rowId = row.dataset.rowId;
-              const productId = row.dataset.productId;
-              const variantId = row.dataset.variantId;
-              const qtyError = row.querySelector('.qty-error');
+            if (clearCartButton) {
+                clearCartButton.addEventListener('click', async function () {
+                    if (confirm('Are you sure you want to clear the entire cart?')) {
+                        try {
+                            const response = await fetch('/cart/clear', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                },
+                            });
 
-              let currentQty = parseInt(qtyInput.value) || 1;
-              let newQty = currentQty;
+                            const data = await response.json();
 
-              // Determine the new quantity
-              if (action === 'increase') {
-                  newQty++;
-              } else if (action === 'decrease' && currentQty > 1) {
-                  newQty--;
-              }
+                            if (data.success) {
+                                alert('Cart cleared successfully!');
+                                location.reload(true); // Reload the page
+                            } else {
+                                alert('Failed to clear the cart. Please try again.');
+                            }
+                        } catch (error) {
+                            console.error('Error clearing the cart:', error);
+                            alert('An error occurred while clearing the cart. Please try again.');
+                        }
+                    }
+                });
+            }
 
-              // Pass the new quantity to the server
-              const result = await updateCart(rowId, productId, variantId, newQty);
+            qtyButtons.forEach(button => {
+                button.addEventListener('click', async function (event) {
+                    event.preventDefault(); // Prevent default form submission
 
-              if (result.success) {
-                  qtyError.classList.add('d-none'); // Hide error if successful
+                    const action = this.dataset.action;
+                    const row = this.closest('.cart-item');
+                    const qtyInput = row.querySelector('.carqty');
+                    const unitPriceElement = row.querySelector('.unit-price');
+                    const totalPriceElement = row.querySelector('.total-price');
+                    const rowId = row.dataset.rowId;
+                    const productId = row.dataset.productId;
+                    const variantId = row.dataset.variantId;
+                    const qtyError = row.querySelector('.qty-error');
 
-                  // Update the UI with the new quantity and total price
-                  qtyInput.value = newQty;
-                  const unitPrice = parseFloat(unitPriceElement.textContent.replace(/,/g, ''));
-                  totalPriceElement.textContent = (unitPrice * newQty).toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2
-                  });
-              } else {
-                  // Show error message
-                  qtyError.textContent = result.message || 'An error occurred.';
-                  qtyError.classList.remove('d-none');
-                  if (result.max_qty) {
-                      qtyInput.value = result.max_qty || newQty; // Set corrected quantity if available
-                  } else {
-                      qtyInput.value = result.min_qty || newQty;
-                  }
-              }
-          });
-      });
+                    let currentQty = parseInt(qtyInput.value) || 1;
+                    let newQty = currentQty;
 
-      qtyInputs.forEach(qtyInput => {
-          qtyInput.addEventListener('input', debounce(async function () {
-              const row = this.closest('.cart-item');
-              const unitPriceElement = row.querySelector('.unit-price');
-              const totalPriceElement = row.querySelector('.total-price');
-              const rowId = row.dataset.rowId;
-              const productId = row.dataset.productId;
-              const variantId = row.dataset.variantId;
-              const qtyError = row.querySelector('.qty-error');
+                    // Determine the new quantity
+                    if (action === 'increase') {
+                        newQty++;
+                    } else if (action === 'decrease' && currentQty > 1) {
+                        newQty--;
+                    }
 
-              let newQty = parseInt(this.value) || 1;
+                    // Pass the new quantity to the server
+                    const result = await updateCart(rowId, productId, variantId, newQty);
+                    if (result.success) {
+                        qtyError.classList.add('d-none'); // Hide error if successful
 
-              // Pass the new quantity to the server
-              const result = await updateCart(rowId, productId, variantId, newQty);
-              if (result.success) {
-                  qtyError.classList.add('d-none'); // Hide error if successful
+                        // Update the UI with the new quantity and total price
+                        qtyInput.value = newQty;
+                        const unitPrice = parseFloat(unitPriceElement.textContent.replace(
+                            /,/g, ''));
+                        totalPriceElement.textContent = (unitPrice * newQty).toLocaleString(
+                            undefined, {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
+                        setTimeout(() => {
+                            location.reload(true);
+                        }, 500);
+                    } else {
+                        // Handle quantity adjustment if stock constraints are encountered
+                        qtyError.textContent = result.message || 'An error occurred.';
+                        qtyError.classList.remove('d-none');
 
-                  // Update the UI with the new quantity and total price
-                  this.value = newQty;
-                  const unitPrice = parseFloat(unitPriceElement.textContent.replace(/,/g, ''));
-                  totalPriceElement.textContent = (unitPrice * newQty).toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2
-                  });
-              } else {
-                  // Show error message
-                  qtyError.textContent = result.message || 'An error occurred.';
-                  qtyError.classList.remove('d-none');
-                  if (result.max_qty) {
-                      this.value = result.max_qty || newQty; // Set corrected quantity if available
-                  } else {
-                      this.value = result.min_qty || newQty;
-                  }
-              }
-          }, 300)); // Debounced to reduce frequent server calls
-      });
+                        // Automatically adjust to the available quantity and update cart
+                        if (result.max_qty || result.min_qty) {
+                            const adjustedQty = result.max_qty || result.min_qty;
 
-      async function updateCart(rowId, productId, variantId, quantity) {
-          try {
-              const response = await fetch('{{ route('cart.update') }}', {
-                  method: 'POST',
-                  headers: {
-                      'Content-Type': 'application/json',
-                      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                  },
-                  body: JSON.stringify({
-                      row_id: rowId,
-                      product_id: productId,
-                      variant_id: variantId,
-                      quantity: quantity
-                  }),
-              });
+                            // Update the input field to reflect adjusted quantity
+                            qtyInput.value = adjustedQty;
 
-              const data = await response.json();
-              return data; // Return success or error data
-          } catch (error) {
-              console.error('Error:', error);
-              return { success: false, message: 'A network error occurred. Please try again.' };
-          }
-      }
+                            // Update the cart package and user cart with the adjusted quantity
+                            const adjustResult = await updateCart(rowId, productId, variantId, adjustedQty);
 
-      removeButtons.forEach(button => {
-          button.closest('a').addEventListener('click', async function (event) {
-              event.preventDefault(); // Prevent default anchor click behavior
+                            if (adjustResult.success) {
+                                // Update the total price in the UI
+                                const unitPrice = parseFloat(unitPriceElement.textContent.replace(/,/g, ''));
+                                totalPriceElement.textContent = (unitPrice * adjustedQty).toLocaleString(undefined, {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                });
 
-              const row = button.closest('.cart-item');
-              const rowId = row.dataset.rowId;
+                                // Reload the page after a delay
+                                setTimeout(() => {
+                                    location.reload(true);
+                                }, 500); // Reload after 2 seconds
+                            }
+                        }
+                    }
 
-              if (confirm('Are you sure you want to remove this item from the cart?')) {
-                  try {
-                      const response = await fetch('{{ route('cart.remove') }}', {
-                          method: 'POST',
-                          headers: {
-                              'Content-Type': 'application/json',
-                              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                          },
-                          body: JSON.stringify({ row_id: rowId }),
-                      });
+                    // Check if checkout button can be enabled
+                    validateCart();
+                });
+            });
 
-                      const data = await response.json();
+            qtyInputs.forEach(qtyInput => {
+                qtyInput.addEventListener('input', debounce(async function () {
+                    const row = this.closest('.cart-item');
+                    const unitPriceElement = row.querySelector('.unit-price');
+                    const totalPriceElement = row.querySelector('.total-price');
+                    const rowId = row.dataset.rowId;
+                    const productId = row.dataset.productId;
+                    const variantId = row.dataset.variantId;
+                    const qtyError = row.querySelector('.qty-error');
 
-                      if (data.success) {
-                          toastr.success(data.message);
-                          row.remove();
-                          location.reload();
-                      } else {
-                          toastr.error(data.message || 'Failed to remove item. Please try again.');
-                      }
-                  } catch (error) {
-                      console.error('Error removing item:', error);
-                      toastr.error('An error occurred. Please try again.');
-                  }
-              }
-          });
-      });
+                    let newQty = parseInt(this.value) || 1;
 
-      function debounce(func, delay) {
-          let timeout;
-          return function (...args) {
-              clearTimeout(timeout);
-              timeout = setTimeout(() => func.apply(this, args), delay);
-          };
-      }
-  });
-  </script>
+                    // Pass the new quantity to the server
+                    const result = await updateCart(rowId, productId, variantId,
+                    newQty);
+                    if (result.success) {
+                        qtyError.classList.add('d-none'); // Hide error if successful
+
+                        // Update the UI with the new quantity and total price
+                        this.value = newQty;
+                        const unitPrice = parseFloat(unitPriceElement.textContent
+                            .replace(/,/g, ''));
+                        totalPriceElement.textContent = (unitPrice * newQty)
+                            .toLocaleString(undefined, {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
+                        setTimeout(() => {
+                            location.reload(true);
+                        }, 500);
+                    } else {
+                        // Show error message
+                        qtyError.textContent = result.message || 'An error occurred.';
+                        qtyError.classList.remove('d-none');
+                        // Automatically adjust to the available quantity and update cart
+                        if (result.max_qty || result.min_qty) {
+                            const adjustedQty = result.max_qty || result.min_qty;
+
+                            // Update the input field to reflect adjusted quantity
+                            qtyInput.value = adjustedQty;
+
+                            // Update the cart package and user cart with the adjusted quantity
+                            const adjustResult = await updateCart(rowId, productId, variantId, adjustedQty);
+
+                            if (adjustResult.success) {
+                                // Update the total price in the UI
+                                const unitPrice = parseFloat(unitPriceElement.textContent.replace(/,/g, ''));
+                                totalPriceElement.textContent = (unitPrice * adjustedQty).toLocaleString(undefined, {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                });
+
+                                // Reload the page after a delay
+                                setTimeout(() => {
+                                    location.reload(true);
+                                }, 500); // Reload after 2 seconds
+                            }
+                        }
+                        setTimeout(() => {
+                            location.reload(true);
+                        }, 500);
+                    }
+
+                    // Check if checkout button can be enabled
+                    validateCart();
+                }, 300)); // Debounced to reduce frequent server calls
+            });
+
+            async function updateCart(rowId, productId, variantId, quantity) {
+                try {
+                    const response = await fetch('{{ route('cart.update') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                .content,
+                        },
+                        body: JSON.stringify({
+                            row_id: rowId,
+                            product_id: productId,
+                            variant_id: variantId,
+                            quantity: quantity
+                        }),
+                    });
+                    const data = await response.json();
+                    return data; // Return success or error data
+                } catch (error) {
+                    console.error('Error:', error);
+                    return {
+                        success: false,
+                        message: 'A network error occurred. Please try again.'
+                    };
+                }
+            }
+
+            removeButtons.forEach(button => {
+                button.closest('a').addEventListener('click', async function (event) {
+                    event.preventDefault(); // Prevent default anchor click behavior
+                    const row = button.closest('.cart-item');
+                    const rowId = row.dataset.rowId;
+
+                    if (confirm(
+                        'Are you sure you want to remove this item from the cart?')) {
+                        try {
+                            const response = await fetch(
+                                '{{ route('cart.remove') }}', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': document.querySelector(
+                                            'meta[name="csrf-token"]').content,
+                                    },
+                                    body: JSON.stringify({
+                                        row_id: rowId
+                                    }),
+                                });
+
+                            const data = await response.json();
+
+                            if (data.success) {
+                                toastr.success(data.message);
+                                // row.remove();
+                                setTimeout(() => {
+                                    location.reload(true);
+                                }, 500);
+                            } else {
+                                toastr.error(data.message ||
+                                    'Failed to remove item. Please try again.');
+                            }
+                        } catch (error) {
+                            console.error('Error removing item:', error);
+                            toastr.error('An error occurred. Please try again.');
+                        }
+                    }
+                });
+            });
+
+            async function checkStockForCartItems() {
+                const cartItems = document.querySelectorAll('.cart-item');
+                if (cartItems.length === 0) {
+                    return; // Skip stock validation if the cart is empty
+                }
+                try {
+                    const response = await fetch('{{ route('cart.check-stock') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        },
+                        body: JSON.stringify({
+                            cart_items: Array.from(cartItems).map(row => ({
+                                row_id: row.dataset.rowId,
+                                product_id: row.dataset.productId,
+                                variant_id: row.dataset.variantId,
+                                quantity: parseInt(row.querySelector('.carqty').value) || 1,
+                            })),
+                        }),
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        data.items.forEach(item => {
+                            const row = document.querySelector(`.cart-item[data-row-id="${item.row_id}"]`);
+                            const qtyInput = row.querySelector('.carqty');
+                            const qtyError = row.querySelector('.qty-error');
+                            const removeButton = row.querySelector('.fa-trash-alt');
+                            const userType = "{{ auth()->check() ? auth()->user()->role : 'user' }}"; // Fetch user type
+
+                            if (userType === 'user' && item.available_qty === 0) {
+                                // Out of stock for users
+                                qtyError.textContent = 'Out of Stock. Please remove this item.';
+                                qtyError.classList.remove('d-none');
+                                qtyInput.disabled = true;
+                                removeButton.closest('a').classList.add('highlight-remove'); // Highlight remove button
+                            } else if (userType === 'user' && item.requested_qty > item.available_qty) {
+                                // Max quantities apply to user only
+                                qtyError.textContent = `Only ${item.available_qty} left in stock. Reduce the quantity.`;
+                                qtyError.classList.remove('d-none');
+                            } else if (userType !== 'user' && item.requested_qty < item.min_order_qty) {
+                                // Min quantities apply to distributors
+                                qtyError.textContent = `Minimum order quantity is ${item.min_order_qty}.`;
+                                qtyError.classList.remove('d-none');
+                            } else {
+                                // Valid stock
+                                qtyError.classList.add('d-none');
+                                qtyInput.disabled = false;
+                            }
+                        });
+                    } else {
+                        toastr.error('Failed to validate stock availability.');
+                    }
+                } catch (error) {
+                    console.error('Error checking stock:', error);
+                    toastr.error('An error occurred while validating stock. Please try again.');
+                }
+            }
+
+            function disableCheckoutButton(disable) {
+                if (proceedCheckoutButton) {
+                    proceedCheckoutButton.disabled = disable;
+                    proceedCheckoutButton.style.opacity = disable ? '0.5' : '1';
+                }
+            }
+
+            function validateCart() {
+                const errors = document.querySelectorAll('.qty-error:not(.d-none)');
+                disableCheckoutButton(errors.length > 0);
+            }
+
+            (async function initializeStockCheck() {
+                await checkStockForCartItems();
+                validateCart();
+            })();
+
+            function debounce(func, delay) {
+                let timeout;
+                return function (...args) {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(this, args), delay);
+                };
+            }
+
+            if (proceedCheckoutButton) {
+                proceedCheckoutButton.addEventListener('click', async function () {
+                    try {
+                        const response = await fetch('{{ route('cart.validateBeforeCheckout') }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            },
+                        });
+
+                        const data = await response.json();
+
+                        if (data.success) {
+                            // Redirect to checkout page
+                            window.location.href = '{{ route('checkout.index') }}';
+                        } else {
+                            // Display validation errors
+                            handleValidationErrors(data.errors);
+                        }
+                    } catch (error) {
+                        console.error('Error validating cart:', error);
+                        alert('An error occurred while validating the cart. Please try again.');
+                    }
+                });
+            }
+
+            function handleValidationErrors(errors) {
+                errors.forEach(error => {
+                    const row = document.querySelector(`.cart-item[data-row-id="${error.row_id}"]`);
+                    const qtyError = row.querySelector('.qty-error');
+
+                    if (qtyError) {
+                        qtyError.textContent = error.message;
+                        qtyError.classList.remove('d-none');
+                    }
+                });
+
+                alert('Please fix the errors before proceeding to checkout.');
+            }
+        });
+    </script>
 @endpush

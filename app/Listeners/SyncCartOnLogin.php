@@ -47,8 +47,8 @@ class SyncCartOnLogin
                     'price' => $dbItem->price,
                     'qty' => $dbItem->quantity,
                     'weight' => $dbItem->weight,
-                    'tax' => $dbItem->tax,
                     'options' => [
+                        'tax' => $dbItem->tax,
                         'image' => $dbItem->image,
                         'variant_id' => $dbItem->variant_id,
                         'sale_price' => $dbItem->sale_price,
