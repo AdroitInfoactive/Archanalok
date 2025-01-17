@@ -106,11 +106,8 @@ class CheckoutController extends BaseController
                     $orderItem->total = $item->qty * $item->price;
                     $orderItem->save();
                 }
-                if ($userType !== "user")
-                {
-                    Cart::destroy();
-                    UserCart::where('user_id', $userId)->delete();
-                }
+                Cart::destroy();
+                UserCart::where('user_id', $userId)->delete();
             }
 
             return response()->json([
