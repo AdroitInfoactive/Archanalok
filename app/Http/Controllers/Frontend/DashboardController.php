@@ -164,7 +164,6 @@ class DashboardController extends BaseController
         }
         return response()->json(['success' => true, 'message' => 'Default address updated successfully.']);
     }
-
     
     function destroyAddress(string $id) {
         $address = Address::findOrFail($id);

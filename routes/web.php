@@ -37,7 +37,10 @@ Route::group(['middleware' => 'auth'], function () {
   Route::post('/cart/validate-before-checkout', [CartController::class, 'validateBeforeCheckout'])->name('cart.validateBeforeCheckout');
   Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
   Route::post('/checkout', [CheckoutController::class, 'processCheckout'])->name('checkout.process');
-
+  Route::get('/order/success/{order_id}', [CheckoutController::class, 'orderSuccess'])->name('order.success');
+  Route::get('/payment/{order_id}', [CheckoutController::class, 'showPaymentGateway'])->name('payment.gateway');
+  Route::post('/payment/process', [CheckoutController::class, 'processPayment'])->name('payment.process');
+  Route::post('/payment/callback', [CheckoutController::class, 'paymentCallback'])->name('payment.callback');
 });
 
 require __DIR__ . '/auth.php';
