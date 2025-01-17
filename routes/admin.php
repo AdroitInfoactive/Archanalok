@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\HomeInfoController;
 use App\Http\Controllers\Admin\MainCategoryBannerController;
 use App\Http\Controllers\Admin\MainCategoryController;
 use App\Http\Controllers\Admin\NewsLetterController;
+use App\Http\Controllers\Admin\PaymentGatewaySettingController;
 use App\Http\Controllers\Admin\PrivacyPolicyController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProfileController;
@@ -124,4 +125,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
   Route::put('/appearance-setting', [SettingController::class, 'UpdateAppearanceSetting'])->name('appearance-setting.update');
   Route::put('/seo-setting', [SettingController::class, 'UpdateSeoSetting'])->name('seo-setting.update');
 
+    /* Payment Gateway Setting Routes */
+    Route::get('/payment-gateway-setting', [PaymentGatewaySettingController::class, 'index'])->name('payment-setting.index');
+    Route::put('/payu-setting', [PaymentGatewaySettingController::class, 'payuSettingUpdate'])->name('payu-setting.update');
+    Route::put('/razorpay-setting', [PaymentGatewaySettingController::class, 'razorpaySettingUpdate'])->name('razorpay-setting.update');
 });

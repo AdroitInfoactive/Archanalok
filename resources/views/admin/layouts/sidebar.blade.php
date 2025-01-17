@@ -135,7 +135,9 @@
             <li class="{{ setSidebarActive(['admin.setting.index']) }}"><a class="nav-link"
                     href="{{ route('admin.setting.index') }}"><i class="fas fa-cogs"></i>
                     <span>Settings</span></a></li>
-                   
+                    <li class="{{ setSidebarActive(['admin.payment-setting.index']) }}"><a class="nav-link"
+                        href="{{ route('admin.payment-setting.index') }}"><i class="fas fa-credit-card"></i><span>Payment Gateways</span></a>
+                </li>
         </ul>
 
     </aside>

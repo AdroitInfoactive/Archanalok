@@ -8,4 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class PaymentGatewaySetting extends Model
 {
     use HasFactory;
+    protected $fillable = ['key', 'value'];
 }
