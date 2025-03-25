@@ -21,15 +21,15 @@ class OrderController extends Controller
         $orderStats = DB::selectOne("
             SELECT
                 COUNT(*) AS total_orders,
-                SUM(CASE WHEN order_status = 'Pending' THEN 1 ELSE 0 END) AS pending_count,
-                SUM(CASE WHEN order_status = 'Placed' THEN 1 ELSE 0 END) AS placed_count,
-                SUM(CASE WHEN order_status = 'Payment Received' THEN 1 ELSE 0 END) AS payment_received_count,
-                SUM(CASE WHEN order_status = 'Shipped' THEN 1 ELSE 0 END) AS shipped_count,
-                SUM(CASE WHEN order_status = 'Delivered' THEN 1 ELSE 0 END) AS delivered_count,
-                SUM(CASE WHEN order_status = 'Cancelled' THEN 1 ELSE 0 END) AS cancelled_count,
-                SUM(CASE WHEN order_status = 'Returned' THEN 1 ELSE 0 END) AS returned_count,
-                SUM(CASE WHEN payment_status = 0 THEN 1 ELSE 0 END) AS payment_pending_count
-            FROM orders
+                IFNULL(SUM(CASE WHEN order_status = 'Pending' THEN 1 ELSE 0 END), 0) AS pending_count,
+                IFNULL(SUM(CASE WHEN order_status = 'Placed' THEN 1 ELSE 0 END), 0) AS placed_count,
+                IFNULL(SUM(CASE WHEN order_status = 'Payment Received' THEN 1 ELSE 0 END), 0) AS payment_received_count,
+                IFNULL(SUM(CASE WHEN order_status = 'Shipped' THEN 1 ELSE 0 END), 0) AS shipped_count,
+                IFNULL(SUM(CASE WHEN order_status = 'Delivered' THEN 1 ELSE 0 END), 0) AS delivered_count,
+                IFNULL(SUM(CASE WHEN order_status = 'Cancelled' THEN 1 ELSE 0 END), 0) AS cancelled_count,
+                IFNULL(SUM(CASE WHEN order_status = 'Returned' THEN 1 ELSE 0 END), 0) AS returned_count,
+                IFNULL(SUM(CASE WHEN payment_status = 0 THEN 1 ELSE 0 END), 0) AS payment_pending_count
+            FROM orders;
         ");
         return $dataTable->with('status', $status)->render('admin.order.index', compact('orderStats', 'status'));
     }

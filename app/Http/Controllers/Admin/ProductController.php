@@ -36,13 +36,13 @@ class ProductController extends Controller
         $mainCategories = MainCategory::where('status', 1)
         ->whereHas('categories', function ($query) {
         $query->where('status', 1);
-    })
-    ->with(['categories' => function ($query) {
-        $query->where('status', 1)
-            ->with(['subcategories' => function ($query) {
-                $query->where('status', 1);
-            }]);
-    }])->get();
+        })
+        ->with(['categories' => function ($query) {
+            $query->where('status', 1)
+                ->with(['subcategories' => function ($query) {
+                    $query->where('status', 1);
+                }]);
+        }])->get();
         $brands = Brand::where('status', 1)->get();
         $variantMasters = VariantMaster::whereNotIn('name', ['Material', 'Units', 'Weight Type'])
             ->with('details')
@@ -177,7 +177,6 @@ class ProductController extends Controller
                 }
             }
         }
-
         if ($request->hasFile('media')) {
             $images = $request->file('media');
             $productSlug = $product->slug; // Assuming the product slug is already set
