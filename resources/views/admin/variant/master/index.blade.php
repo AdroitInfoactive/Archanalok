@@ -93,25 +93,26 @@
                     },
                     success: function (response) {
                         $('#variantsTable tbody').append(`
-                        <tr data-id="${response.id}">
-                            <td contenteditable="true" class="editable-cell">${response.name}</td>
-                          
-                                <td>
-                                <select class="form-control status" data-id="{{ @$variant->id }}">
-                                    <option value="1" {{ @$variant->status == 1 ? 'selected' : '' }}>Active</option>
-                                    <option value="0" {{ @$variant->status == 0 ? 'selected' : '' }}>Inactive</option>
-                                </select>
-                            </td>
- <td>
-    <a href="{{ route('admin.variant-master.destroy', @$variant->id) }}"  class="btn btn-danger btn-sm delete-link"> <i class="fa fa-trash"></i> </a>
-</td>
+                            <tr data-id="${response.id}">
+                                <td contenteditable="true" class="editable-cell">${response.name}</td>
 
-                        </tr>
-                    `);
+                                <td>
+                                    <select class="form-control status" data-id="${response.id}">
+                                        <option value="1" ${response.status == 1 ? 'selected' : ''}>Active</option>
+                                        <option value="0" ${response.status == 0 ? 'selected' : ''}>Inactive</option>
+                                    </select>
+                                </td>
+
+                                <td>
+                                    <a href="${deleteVariantRoute(response.id)}" class="btn btn-danger btn-sm delete-link">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        `);
                         $('#variantName').val(''); // Clear the input field after submission
                         toastr.success(
                         'Variant added successfully!'); // Show success message
-
                     },
                     error: function (xhr) {
                         // Check for validation errors
@@ -131,6 +132,10 @@
                     }
                 });
             });
+
+            function deleteVariantRoute(variantId) {
+                return "{{ route('admin.variant-master.destroy', ':id') }}".replace(':id', variantId);
+            }
 
             // Handle inline editing
             $('#variantsTable').on('blur', '.editable-cell', function () {

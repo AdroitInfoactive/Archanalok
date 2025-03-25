@@ -5,6 +5,7 @@ use App\Http\Controllers\Frontend\CartController;
 use App\Http\Controllers\Frontend\CheckoutController;
 use App\Http\Controllers\Frontend\DashboardController;
 use App\Http\Controllers\Frontend\FrontendController;
+use App\Http\Controllers\Frontend\OrderController;
 use App\Http\Controllers\Frontend\ProfileController;
 use App\Http\Controllers\Frontend\WishlistController;
 use Illuminate\Support\Facades\Route;
@@ -38,9 +39,12 @@ Route::group(['middleware' => 'auth'], function () {
   Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
   Route::post('/checkout', [CheckoutController::class, 'processCheckout'])->name('checkout.process');
   Route::get('/order/success/{order_id}', [CheckoutController::class, 'orderSuccess'])->name('order.success');
-  Route::get('/payment/{order_id}', [CheckoutController::class, 'showPaymentGateway'])->name('payment.gateway');
-  Route::post('/payment/process', [CheckoutController::class, 'processPayment'])->name('payment.process');
-  Route::post('/payment/callback', [CheckoutController::class, 'paymentCallback'])->name('payment.callback');
+  Route::get('/order/failure/{order_id}', [CheckoutController::class, 'orderFailure'])->name('order.failure');
+  // Route::get('/payment/{order_id}', [CheckoutController::class, 'showPaymentGateway'])->name('payment.payu_gateway');
+  Route::get('/payment/{order_id}', [CheckoutController::class, 'showPaymentGateway'])->name('payment.icici_gateway');
+  Route::get('/paymentstatus/callback', [CheckoutController::class, 'paymentCallback'])->name('paymentstatus.callback');
+  // Route::match(['get', 'post'], '/order/failure/{order_id}', [CheckoutController::class, 'orderFailure'])->name('order.failure');
+  Route::resource('orders', OrderController::class);
 });
 
 require __DIR__ . '/auth.php';

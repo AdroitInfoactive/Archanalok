@@ -4,7 +4,7 @@
     <a href="{{ route('cart.index') }}" class="btn-cart">
         <i class="nss-shopping-cart1"></i>
         <span class="cart-count">
-            @if($cartDetails)
+            @if(@$cartDetails)
                 {{ $cartDetails->count() }}
             @else
                 0

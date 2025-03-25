@@ -5463,3 +5463,98 @@ blockquote:after {
 /*Filters End*/
 
 
+.account-section {
+    padding: 50px 0; /* Add padding to the section */
+}
+
+.account-box {
+    border: 1px solid #ccc; /* Border for the boxes */
+    border-radius: 8px; /* Rounded corners */
+    padding: 20px; /* Padding inside the box */
+    text-align: center; /* Center text */
+    background-color: #fff; /* Background color */
+    transition: box-shadow 0.3s; /* Transition for hover effect */
+}
+
+.account-box:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Shadow effect on hover */
+}
+
+.icon {
+    font-size: 40px; /* Icon size */
+    color: #545454; /* Icon color */
+    margin-bottom: 10px; /* Space below the icon */
+}
+
+h4 {
+    font-size: 1.2rem; /* Smaller heading size */
+    margin: 10px 0; /* Space above and below the heading */
+}
+
+.btn {
+    background-color: #f36e2d; /* Button background color */
+    color: white; /* Button text color */
+    border: none; /* Remove default border */
+    padding: 10px 15px; /* Button padding */
+    border-radius: 5px; /* Rounded corners */
+    text-decoration: none; /* Remove underline */
+    transition: background-color 0.3s; /* Transition for hover */
+}
+
+.btn:hover {
+    background-color: #E2EEFF; /* Darker color on hover */
+    color:#222F5A;
+}
+
+
+.table {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.table th, .table td {
+    text-align: center;
+    padding: 12px;
+}
+
+.table th {
+    background-color: #f8f9fa;
+}
+
+.product-image {
+    width: 50px; /* Set a fixed width for the images */
+    height: auto; /* Maintain aspect ratio */
+    border-radius: 4px;
+}
+
+.badge {
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.badge-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.badge-warning {
+    background-color: #ffc107;
+    color: white;
+}
+
+.badge-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .table th, .table td {
+        font-size: 12px; /* Smaller text for mobile */
+        padding: 8px; /* Reduced padding */
+    }
+
+    .product-image {
+        width: 40px; /* Smaller images on mobile */
+    }
+}

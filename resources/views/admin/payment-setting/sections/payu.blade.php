@@ -1,4 +1,4 @@
-<div class="tab-pane fade show active" id="payu-setting" role="tabpanel" aria-labelledby="home-tab4">
+<div class="tab-pane fade show" id="payu-setting" role="tabpanel" aria-labelledby="home-tab4">
     <div class="card">
         <div class="card-body border">
             <form action="{{ route('admin.payu-setting.update') }}" method="POST" enctype="multipart/form-data">

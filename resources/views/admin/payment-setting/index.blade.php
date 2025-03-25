@@ -15,9 +15,11 @@
                     <div class="col-12 col-sm-12 col-md-2">
                       <ul class="nav nav-pills flex-column" id="myTab4" role="tablist">
                         <li class="nav-item">
-                          <a class="nav-link active" id="home-tab4" data-toggle="tab" href="#payu-setting" role="tab" aria-controls="home" aria-selected="true">payu</a>
+                          <a class="nav-link active" id="home-tab4" data-toggle="tab" href="#icici-setting" role="tab" aria-controls="home" aria-selected="true">ICICI</a>
                         </li>
-                       
+                        <li class="nav-item">
+                          <a class="nav-link" id="home-tab4" data-toggle="tab" href="#payu-setting" role="tab" aria-controls="home" aria-selected="false">Payu</a>
+                        </li>
                         <li class="nav-item">
                           <a class="nav-link" id="contact-tab4" data-toggle="tab" href="#razorpay-setting" role="tab" aria-controls="contact" aria-selected="false">Razorpay</a>
                         </li>
@@ -25,11 +27,9 @@
                     </div>
                     <div class="col-12 col-sm-12 col-md-10">
                       <div class="tab-content no-padding" id="myTab2Content">
+                        @include('admin.payment-setting.sections.icici')
                         @include('admin.payment-setting.sections.payu')
-
                         @include('admin.payment-setting.sections.razorpay')
-
-
                       </div>
                     </div>
                   </div>

@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\HomeInfoController;
 use App\Http\Controllers\Admin\MainCategoryBannerController;
 use App\Http\Controllers\Admin\MainCategoryController;
 use App\Http\Controllers\Admin\NewsLetterController;
+use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PaymentGatewaySettingController;
 use App\Http\Controllers\Admin\PrivacyPolicyController;
 use App\Http\Controllers\Admin\ProductController;
@@ -125,8 +126,23 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
   Route::put('/appearance-setting', [SettingController::class, 'UpdateAppearanceSetting'])->name('appearance-setting.update');
   Route::put('/seo-setting', [SettingController::class, 'UpdateSeoSetting'])->name('seo-setting.update');
 
-    /* Payment Gateway Setting Routes */
-    Route::get('/payment-gateway-setting', [PaymentGatewaySettingController::class, 'index'])->name('payment-setting.index');
-    Route::put('/payu-setting', [PaymentGatewaySettingController::class, 'payuSettingUpdate'])->name('payu-setting.update');
-    Route::put('/razorpay-setting', [PaymentGatewaySettingController::class, 'razorpaySettingUpdate'])->name('razorpay-setting.update');
+  /* Payment Gateway Setting Routes */
+  Route::get('/payment-gateway-setting', [PaymentGatewaySettingController::class, 'index'])->name('payment-setting.index');
+  Route::put('/payu-setting', [PaymentGatewaySettingController::class, 'payuSettingUpdate'])->name('payu-setting.update');
+  Route::put('/razorpay-setting', [PaymentGatewaySettingController::class, 'razorpaySettingUpdate'])->name('razorpay-setting.update');
+
+  // order routes
+  Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
+  Route::get('orders/{id}', [OrderController::class, 'show'])->name('orders.show');
+  Route::delete('orders/{id}', [OrderController::class, 'destroy'])->name('orders.destroy');
+
+  /* Route::get('pending-orders', [OrderController::class, 'pendingOrderIndex'])->name('pending-orders');
+  Route::get('inprocess-orders', [OrderController::class, 'inProcessOrderIndex'])->name('inprocess-orders');
+  Route::get('delivered-orders', [OrderController::class, 'deliveredOrderIndex'])->name('delivered-orders');
+  Route::get('declined-orders', [OrderController::class, 'declinedOrderIndex'])->name('declined-orders'); */
+
+  // Route::get('orders/{status}', [OrderController::class, 'statusWiseIndex'])->name('orders.status');
+
+  Route::get('orders/status/{id}', [OrderController::class, 'getOrderStatus'])->name('orders.status');
+  Route::put('orders/status-update/{id}', [OrderController::class, 'orderStatusUpdate'])->name('orders.status-update');
 });

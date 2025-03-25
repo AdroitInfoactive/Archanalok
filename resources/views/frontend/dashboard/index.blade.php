@@ -30,7 +30,7 @@
                     <div class="account-box">
                         <i class="fas fa-box icon"></i>
                         <h4>My Orders</h4>
-                        <a href="myorders.html" class="btn">View Orders</a>
+                        <a href="{{ route('orders.index') }}" class="btn">View Orders</a>
                     </div>
                 </div>
 

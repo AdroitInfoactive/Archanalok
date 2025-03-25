@@ -2,7 +2,11 @@
 
 namespace App\Providers;
 
+use App\Events\OrderNotificationEvent;
+use App\Events\QuantityReduceEvent;
 use App\Events\UrlRedirectCreateEvent;
+use App\Listeners\OrderNotificationListener;
+use App\Listeners\QuantityReduceListener;
 use App\Listeners\SaveUrlRedirectListener;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -22,6 +26,12 @@ class EventServiceProvider extends ServiceProvider
         ],
         UrlRedirectCreateEvent::class => [
             SaveUrlRedirectListener::class,
+        ],
+        OrderNotificationEvent::class => [
+            OrderNotificationListener::class,
+        ],
+        QuantityReduceEvent::class=> [
+            QuantityReduceListener::class,
         ],
         \Illuminate\Auth\Events\Login::class => [
             \App\Listeners\SyncCartOnLogin::class,

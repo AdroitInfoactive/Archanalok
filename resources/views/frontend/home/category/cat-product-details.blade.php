@@ -178,7 +178,7 @@
                             @endif
                         </div>
 
-                        <div class="metatext"><span>Code:</span> #196DB6{{ $product->sku ?? 'N/A' }}</div>
+                        <div class="metatext"><span>Code:</span> {{ $product->sku ?? 'N/A' }}</div>
                         <div class="metatext"><span>Material:</span> {{ $product->materialDetail->name ?? 'N/A' }}</div>
                         <div class="metatext"><span>Units:</span> {{ $product->unitDetail->name ?? 'N/A' }}</div>
                         <div class="metatext"><span>weight type:</span> {{ $product->weightTypeDetail->name ?? 'N/A' }}</div>
