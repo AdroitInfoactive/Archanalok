@@ -118,10 +118,10 @@ class SubCategoryController extends Controller
     public function destroy(string $id)
     {
         try {
-            $category = Category::findOrFail($id);
-            $this->removeImage($category->image);
-            $category->delete();
-            return response(['status' => 'success', 'message' => 'Product Category deleted successfully']);
+            $subCategory = SubCategory::findOrFail($id);
+            $this->removeImage($subCategory->image);
+            $subCategory->delete();
+            return response(['status' => 'success', 'message' => 'Product Sub Category deleted successfully']);
         } catch (\Exception $e) {
             return response(['status' => 'error', 'message' => 'Something went wrong']);
 
