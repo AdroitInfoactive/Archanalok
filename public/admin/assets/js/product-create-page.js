@@ -229,7 +229,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Group selected details by their master
         checkboxes.forEach(checkbox => {
-            debugger;
             const masterId = checkbox.dataset.masterid; // Master ID
             const masterName = checkbox.dataset.master; // Master Name
             const detailId = checkbox.dataset.detailid; // Detail ID

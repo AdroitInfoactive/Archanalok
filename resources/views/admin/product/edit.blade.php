@@ -1,5 +1,4 @@
 @extends('admin.layouts.master')
-
 @section('content')
 <link rel="stylesheet" href="{{ asset('admin/assets/css/product-page.css') }}">
 <section class="section">
@@ -9,7 +8,6 @@
         <h1>Edit Product</h1>
     </div>
 </section>
-
 <div class="container container-custom">
     <form action="{{ route('admin.products.update', $product->id) }}" id="product-form"
         method="POST" enctype="multipart/form-data">
@@ -154,7 +152,6 @@
                                 </p>
                             @endif
                         </div>
-
                         <div class="form-group row">
                             <div class="col-md-6">
                                 <label for="sku">SKU *</label>
@@ -167,7 +164,6 @@
                                     value="{{ old('other_code', $product->other_code) }}">
                             </div>
                         </div>
-
                         <div class="form-group row">
                             <div class="col-md-4">
                                 <label for="gst">GST %</label>
@@ -210,93 +206,8 @@
                         </div>
                     </div>
                 </div>
-                <!-- Variations -->
-                @if($product->has_variants)
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h4>Variation Details</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="form-group">
-                                <label>Select Applicable Variations</label>
-                                <div id="variant-options" class="row">
-                                    @foreach($variantMasters as $variantMaster)
-                                        <div class="col-md-2 mb-3">
-                                            <div class="card p-2" style="height: 250px; overflow-y: auto;">
-                                                <strong>{{ $variantMaster->name }}</strong>
-                                                <hr>
-                                                @foreach($variantMaster->details as $detail)
-                                                    <div class="form-check">
-                                                        <label class="form-check-label">
-                                                            <input type="checkbox"
-                                                                class="form-check-input variant-checkbox"
-                                                                data-master="{{ $variantMaster->name }}"
-                                                                data-detail="{{ $detail->name }}"
-                                                                value="{{ $detail->id }}"
-                                                                {{ in_array($detail->id, $product->variants->pluck('variation_code')->toArray()) ? 'checked' : '' }}>
-                                                            {{ $detail->name }}
-                                                        </label>
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-
-                            <!-- Existing Variations Table -->
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-striped custom-table">
-                                    <thead class="table-header">
-                                        <tr>
-                                            <th>Image</th>
-                                            <th>Variation</th>
-                                            <th>SKU</th>
-                                            <th>Sale Price</th>
-                                            <th>Offer Price</th>
-                                            <th>Distributor Price</th>
-                                            <th>Min Order Qty</th>
-                                            <th>Wholesale Price</th>
-                                            <th>Weight</th>
-                                            <th>Available Quantity</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($product->variants as $variant)
-                                            <tr>
-                                                <td>
-                                                    @if($variant->images->isNotEmpty())
-                                                        <img src="{{ asset($variant->images->first()->image_path) }}"
-                                                            alt="Variant Image"
-                                                            style="width: 50px; height: 50px; object-fit: cover;"
-                                                            class="img-thumbnail">
-                                                    @else
-                                                        <span>No Image</span>
-                                                    @endif
-                                                </td>
-                                                <td>{{ $variant->variation_code }}</td>
-                                                <td>{{ $variant->sku }}</td>
-                                                <td>{{ number_format($variant->sale_price, 2) }}</td>
-                                                <td>{{ number_format($variant->offer_price, 2) }}</td>
-                                                <td>{{ number_format($variant->distributor_price, 2) }}</td>
-                                                <td>{{ $variant->min_order_qty }}</td>
-                                                <td>{{ number_format($variant->wholesale_price, 2) }}</td>
-                                                <td>{{ $variant->weight }}</td>
-                                                <td>{{ $variant->qty }}</td>
-                                                <td>{{ $variant->status ? 'Active' : 'Inactive' }}
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                @endif
-
-                <!-- Pricing Details if no variants -->
-                @if(!$product->has_variants)
+                <div
+                    class="card mb-4 variation-no {{ $product->has_variants ? 'd-none' : '' }}">
                     <div class="card mb-4">
                         <div class="card-header">
                             <h4>Pricing Details</h4>
@@ -314,9 +225,181 @@
                                         value="{{ $product->offer_price }}" step="0.01">
                                 </div>
                             </div>
+
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <label for="distributor_price">Distributor Price</label>
+                                    <input type="number" name="distributor_price" id="distributor_price"
+                                        class="form-control no-arrows" step="0.01" placeholder="0 or 0.00"
+                                        value="{{ $product->distributor_price }}">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="wholesale_price">Wholesale Price</label>
+                                    <input type="number" name="wholesale_price" id="wholesale_price"
+                                        class="form-control no-arrows" step="0.01" placeholder="0 or 0.00"
+                                        value="{{ $product->wholesale_price }}">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="form-group col-md-4">
+                                    <label for="min_order_qty">Minimum Order Quantity</label>
+                                    <input type="number" name="min_order_qty" id="min_order_qty"
+                                        class="form-control no-arrows" min="1" placeholder="0"
+                                        value="{{ $product->min_order_qty }}">
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="weight">Weight</label>
+                                    <input type="number" name="weight" id="weight" class="form-control no-arrows"
+                                        min="1" placeholder="0 or 0.00" value="{{ $product->weight }}">
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="qty">Available Quantity</label>
+                                    <input type="number" name="qty" id="qty" class="form-control no-arrows" min="1"
+                                        placeholder="0" value="{{ $product->qty }}">
+                                </div>
+                            </div>
                         </div>
                     </div>
-                @endif
+                </div>
+                @php
+                    $usedDetailIds = collect($product->variants)
+                    ->pluck('variation_ids')
+                    ->map(fn($v) => json_decode($v, true)) // convert JSON strings to arrays
+                    ->flatten()
+                    ->unique()
+                    ->toArray();
+                @endphp
+                <div
+                    class="card mb-4 variation-yes {{ !$product->has_variants ? 'd-none' : '' }}">
+                    <div class="card-header">
+                        <h4>Variation Details</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Select Applicable Variations</label>
+                            <div id="variant-options" class="row">
+                                @foreach($variantMasters as $variantMaster)
+                                    <div class="col-md-2 mb-3">
+                                        <div class="card p-2" style="height: 250px; overflow-y: auto;">
+                                            <strong>{{ $variantMaster->name }}</strong>
+                                            <hr>
+                                            @foreach($variantMaster->details as $detail)
+                                                <div class="form-check">
+                                                    <label class="form-check-label">
+                                                        <input type="checkbox" class="form-check-input variant-checkbox"
+                                                            data-masterid="{{ $variantMaster->id }}"
+                                                            data-master="{{ $variantMaster->name }}"
+                                                            data-detailid="{{ $detail->id }}"
+                                                            data-detail="{{ $detail->name }}"
+                                                            value="{{ $detail->id }}"
+                                                            {{ in_array($detail->id, $usedDetailIds) ? 'checked' : '' }}>{{ $detail->name }}
+                                                    </label>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                        <input type="hidden" id="variant-master-detail" name="variant_master_detail">
+                        <button type="button" id="generate-variations" class="btn btn-primary">Generate
+                            Variations</button>
+                        <div class="table-responsive {{ $product->variants->isNotEmpty() ? '' : 'd-none' }}"
+                            id="variations-table">
+                            <table class="table table-bordered table-striped custom-table">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="select-all"></th>
+                                        <th>Image</th>
+                                        <th>Variation</th>
+                                        <th>SKU</th>
+                                        <th>Sale Price</th>
+                                        <th>Offer Price</th>
+                                        <th>Distributor Price</th>
+                                        <th>Min Order Qty</th>
+                                        <th>Wholesale Price</th>
+                                        <th>Weight</th>
+                                        <th>Qty</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="variations-body">
+                                    @foreach($product->variants as $variant)
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" class="delete-checkbox">
+                                            </td>
+                                            <td>
+                                                <div class="image-upload-box">
+                                                    <label for="image-upload-{{ $variant->id }}" class="image-label">
+                                                        @if($variant->images->isNotEmpty())
+                                                            <img src="{{ asset($variant->images->first()->image_path) }}"
+                                                                alt="Preview" class="uploaded-image"
+                                                                id="preview-{{ $variant->id }}"
+                                                                style="width: 60px; height: 60px; object-fit: cover;">
+                                                        @else
+                                                            <img src="" alt="Preview" class="uploaded-image d-none"
+                                                                id="preview-{{ $variant->id }}">
+                                                        @endif
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                            fill="none" stroke="currentColor" stroke-width="2"
+                                                            stroke-linecap="round" stroke-linejoin="round" class="icon">
+                                                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2">
+                                                            </rect>
+                                                            <line x1="12" y1="8" x2="12" y2="16"></line>
+                                                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                                                        </svg>
+                                                    </label>
+                                                    <input type="file" id="image-upload-{{ $variant->id }}"
+                                                        name="variation_images[]" class="d-none" accept="image/*"
+                                                        onchange="previewImage(event, '{{ $variant->id }}')">
+                                                </div>
+                                            </td>
+                                            <td>{{ implode('/', json_decode($variant->variation_ids, true)) }}
+                                            </td>
+                                            <td>
+                                                <input type="text" name="skus[]" class="form-control"
+                                                    value="{{ $variant->sku }}">
+                                                <input type="hidden" name="variation_codes[]"
+                                                    value="{{ implode('/', json_decode($variant->variation_ids, true)) }}">
+                                            </td>
+                                            <td><input type="number" name="sale_prices[]" class="form-control"
+                                                    step="0.01" value="{{ $variant->sale_price }}"></td>
+                                            <td><input type="number" name="offer_prices[]" class="form-control"
+                                                    step="0.01" value="{{ $variant->offer_price }}"></td>
+                                            <td><input type="number" name="distributor_prices[]" class="form-control"
+                                                    step="0.01" value="{{ $variant->distributor_price }}"></td>
+                                            <td><input type="number" name="min_order_qtys[]" class="form-control"
+                                                    min="1" value="{{ $variant->min_order_qty }}"></td>
+                                            <td><input type="number" name="wholesale_prices[]" class="form-control"
+                                                    step="0.01" value="{{ $variant->wholesale_price }}"></td>
+                                            <td><input type="number" name="weights[]" class="form-control" step="0.01"
+                                                    value="{{ $variant->weight }}">
+                                            </td>
+                                            <td><input type="number" name="qtys[]" class="form-control"
+                                                    value="{{ $variant->qty }}"></td>
+                                            <td>
+                                                <select name="statuses[]" class="form-control">
+                                                    <option value="1"
+                                                        {{ $variant->status == 1 ? 'selected' : '' }}>
+                                                        Active</option>
+                                                    <option value="0"
+                                                        {{ $variant->status == 0 ? 'selected' : '' }}>
+                                                        Inactive</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-3">
+                            <button type="button" id="delete-selected-variations" class="btn btn-danger d-none">Delete
+                                Selected</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <hr>
@@ -331,6 +414,7 @@
     <script>
         const isEditPage = true;
         const level = 0;
+
     </script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="{{ asset('admin/assets/js/product-edit-page.js') }}"></script>
