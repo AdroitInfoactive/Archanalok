@@ -134,7 +134,7 @@ class FrontendController extends BaseController
             ->limit(10)
             ->with('images') // Eager load images
             ->get();
-        $variants = ProductVariant::where('product_id', $product->id)->get();
+        $variants = ProductVariant::where('product_id', $product->id)->where('status', 1)->get();
 
         // Fetch images for the variants
         $images = ProductImage::where('product_id', $product->id)->where('status', 1)
