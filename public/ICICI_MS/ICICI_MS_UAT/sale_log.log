@@ -86,3 +86,9 @@ Request:[06-03-2025 10:45:23]["SecureHash||99cdee06c5a85fbb43d2eb6900feecf26021c
 
 Response:[06-03-2025 10:45:52]{"ResponseCode":"00","RespDate":"06-03-2025","Message":"Transaction Successful","Amount":"125000","RetRefNo":"139602831902221129","MerchantId":"100000000005837","MCC":"8661","PassCode":"ABCD1234","SecureHash":"50152BFAA9227468310292BA190005D5093DD77935C4A27E1C9F156DC76467C9","Version":"1","Currency":"356","RespTime":"15:15","TerminalId":"EG000481","TxnRefNo":"6UQHXKI2CA","BankId":"24520"}
 
+Request:[11-04-2025 09:17:57]["SecureHash||2c4ccde3873d2c519ab4d35b5e4cc296338437e6c03dfb99e7660e70ae8b6c07","Amount||25000","BankId||24520","Currency||356","MCC||8661","MerchantId||100000000005837","PassCode||ABCD1234","ReturnURL||http:\/\/127.0.0.1:8000\/ICICI_MS\/ICICI_MS_UAT\/responseSale.php","TerminalId||EG000481","TxnRefNo||24YSWJ3FCX","TxnType||Pay","Version||1","email||test@gmail.com","orderInfo||Payment for Order #25","phone||7894561235"]
+
+Request:[11-04-2025 09:19:08]["SecureHash||faa5ff7862004233b445dd957334fd7e5c5acd917350b335c4e98d89a1bec65e","Amount||25000","BankId||24520","Currency||356","MCC||8661","MerchantId||100000000005837","PassCode||ABCD1234","ReturnURL||http:\/\/127.0.0.1:8000\/ICICI_MS\/ICICI_MS_UAT\/responseSale.php","TerminalId||EG000481","TxnRefNo||LB48I37A6Y","TxnType||Pay","Version||1","email||test@gmail.com","orderInfo||Payment for Order #26","phone||7894561235"]
+
+Response:[11-04-2025 09:19:51]{"ResponseCode":"00","RespDate":"11-04-2025","Message":"Transaction Successful","Amount":"25000","RetRefNo":"139635736056140425","MerchantId":"100000000005837","MCC":"8661","PassCode":"ABCD1234","SecureHash":"360164589382FFF9D9B9CDA2FF50580ADBB39C8754B285FEF1A1F9B212AA8225","Version":"1","Currency":"356","RespTime":"14:49","TerminalId":"EG000481","TxnRefNo":"LB48I37A6Y","BankId":"24520"}
+

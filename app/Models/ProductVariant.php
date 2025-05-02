@@ -13,5 +13,20 @@ class ProductVariant extends Model
     {
     return $this->hasMany(ProductImage::class, 'variant_id', 'id');
     }
+    protected $fillable = [
+        'product_id',
+        'variation_code',
+        'sku',
+        'sale_price',
+        'offer_price',
+        'distributor_price',
+        'min_order_qty',
+        'wholesale_price',
+        'weight',
+        'qty',
+        'status',
+        'variation_ids',
+        // etc…
+      ];
 
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\DataTables\ProductDataTable;
+use App\Events\UrlRedirectCreateEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ProductCreateRequest;
 use App\Models\Brand;
@@ -328,6 +329,23 @@ class ProductController extends Controller
                 }
             ])
             ->get();
+            $existingVariants = $product->variants
+    ->mapWithKeys(fn($v) => [
+        $v->variation_code => [
+            'sku'               => $v->sku,
+            'sale_price'        => $v->sale_price,
+            'offer_price'       => $v->offer_price,
+            'distributor_price' => $v->distributor_price,
+            'min_order_qty'     => $v->min_order_qty,
+            'wholesale_price'   => $v->wholesale_price,
+            'weight'            => $v->weight,
+            'qty'               => $v->qty,
+            'status'            => $v->status,
+            'image_path'        => $v->images->first()
+                                      ? asset($v->images->first()->image_path)
+                                      : null,
+        ]
+    ]);
 
         $brands = Brand::where('status', 1)->get();
 
@@ -360,18 +378,237 @@ class ProductController extends Controller
             'variantMasters',
             'materials',
             'units',
-            'weightTypes'
+            'weightTypes',
+            'existingVariants'
         ));
+
     }
 
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
-        //
+    public function update(Request $request, $id)
+{
+    // dd($request->all());
+    // 1) Load & update Product
+    $product = Product::findOrFail($id);
+    [$main, $cat, $sub] = explode('-', $request->category);
+    $product->sku                = $request->sku;
+    $product->name               = $request->name;
+    // $product->slug               = $request->slug;
+    if ($request->create_url_redirect) {
+        $product->slug = $request->new_slug;
     }
+    else
+    {
+        $product->slug = $request->old_slug;
+    }
+    $product->seo_title          = $request->seo_title;
+    $product->seo_description    = $request->seo_description;
+    $product->main_category_id   = $main;
+    $product->category_id        = $cat;
+    $product->sub_category_id    = $sub ?: null;
+    $product->description        = $request->description;
+    $product->specification      = $request->specification;
+    $product->brand              = $request->brand;
+    $product->material           = $request->material;
+    $product->units              = $request->units;
+    $product->weight_type        = $request->weight_type;
+    $product->other_code         = $request->other_code;
+    $product->gst                = $request->gst;
+    $product->status             = $request->status;
+    $product->priority           = $request->priority;
+    $product->has_variants       = $request->has_variants;
+   
+     // 2) Handle variation_ids JSON wrapping
+     if ($request->has_variants) {
+        $raw = json_decode($request->variant_master_detail, true) ?: [];
+        $wrapped = [];
+        foreach ($raw as $masterId => $detailList) {
+            // look up the VariantMaster name
+            $vm = VariantMaster::find($masterId);
+            if (! $vm) continue;
+            $wrapped[$masterId] = [
+                'name'    => $vm->name,
+                'details' => $detailList,
+            ];
+        }
+        $product->variation_ids = json_encode($wrapped);
+    } else {
+        $product->variation_ids = null;
+    }
+    // PDF upload
+    if ($request->hasFile('file')) {
+        $product->file = $this->uploadImage(
+            $request, 'file', '', '/uploads/products'
+        );
+    }
+
+    $product->save();
+
+    // 2) Gather old variants & their first images
+    $oldVariants = $product->variants()->with('images')->get();
+    $oldCodeToId = $oldVariants->pluck('id','variation_code')->all();
+    $oldImages   = [];
+    foreach ($oldVariants as $v) {
+        if ($img = $v->images->first()) {
+            $oldImages[$v->variation_code] = $img;
+        }
+    }
+
+    // 3) Determine which variant‐IDs to delete
+    $newCodes = $request->input('variation_codes', []);
+    $toDelete = [];
+    foreach ($oldCodeToId as $code => $vid) {
+        if (! in_array($code, $newCodes, true)) {
+            $toDelete[] = $vid;
+        }
+    }
+
+    // 4) Delete dropped variants & unlink their images
+    if ($toDelete) {
+        $imgs = ProductImage::whereIn('variant_id', $toDelete)->get();
+        foreach ($imgs as $img) {
+            @unlink(public_path($img->image_path));
+            $img->delete();
+        }
+        ProductVariant::whereIn('id', $toDelete)->delete();
+    }
+
+    // 5) Loop incoming variants: update existing or create new
+    foreach ($newCodes as $i => $code) {
+        $isExisting = isset($oldCodeToId[$code]);
+        $variant = $isExisting
+            ? ProductVariant::find($oldCodeToId[$code])
+            : new ProductVariant(['product_id' => $product->id, 'variation_code' => $code]);
+
+        // fill fields
+        $variant->sku               = $request->input("skus.$i", '');
+        $variant->sale_price        = $request->input("sale_prices.$i");
+        $variant->offer_price       = $request->input("offer_prices.$i");
+        $variant->distributor_price = $request->input("distributor_prices.$i");
+        $variant->min_order_qty     = $request->input("min_order_qtys.$i");
+        $variant->wholesale_price   = $request->input("wholesale_prices.$i");
+        $variant->weight            = $request->input("weights.$i");
+        $variant->qty               = $request->input("qtys.$i");
+        $variant->status            = $request->input("statuses.$i", 1);
+
+        // compute its variation_ids JSON
+        $names = explode('/', $code);
+        $ids   = VariantDetail::whereIn('name', $names)->pluck('id')->toArray();
+        $variant->variation_ids = json_encode($ids);
+
+        $variant->save();
+        ProductImage::where('variant_id', $variant->id)
+        ->update(['status' => 1]);
+        // 6) Handle variant‐image upload / cleanup
+        if ($file = $request->file("variation_images.$i")) {
+            // delete old
+            if (isset($oldImages[$code])) {
+                @unlink(public_path($oldImages[$code]->image_path));
+                $oldImages[$code]->delete();
+            }
+            // save new
+            $ext      = $file->getClientOriginalExtension();
+            $filename = "{$product->slug}_" . uniqid() . ".{$ext}";
+            $file->move(public_path('uploads/products'), $filename);
+            ProductImage::create([
+                'product_id' => $product->id,
+                'variant_id' => $variant->id,
+                'image_path' => "uploads/products/{$filename}",
+                'order'      => 0,
+                'status'     => 1,
+            ]);
+        }
+        // else if no new upload but old existed → re‐assign to this variant
+        elseif (isset($oldImages[$code])) {
+            $oldImages[$code]->update([
+                'variant_id' => $variant->id,
+                'status'     => 1,
+        ]);
+        }
+    }
+
+    // 7) If no variants, save flat pricing back on Product
+    if (! $request->has_variants) {
+         // 1) Mark every variant as inactive
+         $product->variants()->update(['status' => 0]);
+         ProductImage::whereIn('variant_id', $product->variants()->pluck('id'))
+        ->update(['status' => 0]);
+        //1.b)delete varients adn images
+       /*  $variantIds = $product->variants()->pluck('id');
+        ProductImage::whereIn('variant_id', $variantIds)
+        ->each(function(ProductImage $img) {
+            @unlink(public_path($img->image_path));
+            $img->delete();
+        });
+        ProductVariant::whereIn('id', $variantIds)->delete(); */
+        //end delete varients adn images
+        // 2) Save flat pricing back on Product
+        $product->sale_price        = $request->sale_price;
+        $product->offer_price       = $request->offer_price;
+        $product->distributor_price = $request->distributor_price;
+        $product->wholesale_price   = $request->wholesale_price;
+        $product->min_order_qty     = $request->min_order_qty;
+        $product->weight            = $request->weight;
+        $product->qty               = $request->qty;
+        $product->save();
+    }
+
+    // 8) Finally, handle your main media[] images exactly as before
+    if ($request->filled('deleted_media')) {
+        foreach ($request->deleted_media as $imageId) {
+            if ($img = ProductImage::find($imageId)) {
+                @unlink(public_path($img->image_path));
+                $img->delete();
+            }
+        }
+    }
+    
+    // 2) Re-order the remaining ones
+    $ids    = $request->input('existing_media_ids', []);
+    $orders = $request->input('existing_media_order', []);
+    foreach ($ids as $i => $imageId) {
+        ProductImage::where('id', $imageId)
+                    ->update(['order' => $orders[$i]]);
+    }
+    
+    // 3) Save brand-new uploads
+    $uploads = collect($request->file('media', []))
+        ->filter(fn($f) => $f instanceof \Illuminate\Http\UploadedFile && $f->isValid());
+    
+    if ($uploads->isNotEmpty()) {
+        $uploadDir = public_path('uploads/products');
+        if (! file_exists($uploadDir)) mkdir($uploadDir, 0755, true);
+    
+        foreach ($uploads->values() as $index => $file) {
+            $order    = $request->input('media_order')[$index] ?? $index;
+            $ext      = $file->getClientOriginalExtension();
+            $filename = "{$product->slug}_" . uniqid() . "_{$index}.{$ext}";
+            $file->move($uploadDir, $filename);
+    
+            ProductImage::create([
+                'product_id' => $product->id,
+                'image_path' => "uploads/products/{$filename}",
+                'order'      => $order,
+            ]);
+        }
+    }
+  /*   if ($request->create_url_redirect) {
+        $from_url = $request->full_old_slug;
+        $to_url = $request->full_new_slug;
+
+        event(new UrlRedirectCreateEvent($from_url, $to_url));
+    } */
+
+    return response(['status' => 'success', 'message' => 'Product updated successfully','path' => route('admin.products.index')]);
+        }
+
+    
+
+
+    
 
     /**
      * Remove the specified resource from storage.

@@ -172,7 +172,7 @@ class CheckoutController extends BaseController
         $billingAddress = json_decode($order->billing_address, true);
 
         // ------------ test config ------------
-        require_once(public_path('ICICI_MS/ICICI_MS_UAT/lib/Config.php'));
+        require_once(public_path('ICICI_MS/ICICI_MS_UAT/lib/config.php'));
         // ------------ live config ------------
         // require_once(public_path('ICICI_MS/ICICI_MS_LIVE/lib/Config.php'));
 

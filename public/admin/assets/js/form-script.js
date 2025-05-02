@@ -23,6 +23,7 @@ window.addEventListener('beforeunload', (event) => {
     if (isFormChanged && !isSubmitting && !suppressUnloadWarning) {
         const confirmationMessage = 'You have unsaved changes. Are you sure you want to leave?';
         event.returnValue = confirmationMessage; // For most browsers
+
         return confirmationMessage; // For compatibility with some browsers
     }
 });

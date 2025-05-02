@@ -137,7 +137,7 @@ class FrontendController extends BaseController
         $variants = ProductVariant::where('product_id', $product->id)->get();
 
         // Fetch images for the variants
-        $images = ProductImage::where('product_id', $product->id)
+        $images = ProductImage::where('product_id', $product->id)->where('status', 1)
             ->orderBy('order', 'asc')
             ->get();
 

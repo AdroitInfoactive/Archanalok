@@ -105,16 +105,16 @@
                                 <th>Shipping Address</th>
                                 <td data-title="Subtotal">
                                     @php
-                                        $defaultShippingAddress = $addresses->firstWhere('is_default_shipping', 1);
+                                        @$defaultShippingAddress = $addresses->firstWhere('is_default_shipping', 1);
                                     @endphp
 
-                                    @if($defaultShippingAddress)
-                                        <strong>{{ $defaultShippingAddress->name }}</strong>
+                                    @if(@$defaultShippingAddress)
+                                        <strong>{{ @$defaultShippingAddress->name }}</strong>
                                         <br>
-                                        {{ $defaultShippingAddress->address }}, {{ $defaultShippingAddress->city }},
-                                        {{ $defaultShippingAddress->state }},
-                                        {{ $defaultShippingAddress->country }},
-                                        {{ $defaultShippingAddress->zip }}
+                                        {{ @$defaultShippingAddress->address }}, {{ @$defaultShippingAddress->city }},
+                                        {{ @$defaultShippingAddress->state }},
+                                        {{ @$defaultShippingAddress->country }},
+                                        {{ @$defaultShippingAddress->zip }}
                                     @else
                                         <p>No default shipping address found.</p>
                                     @endif
@@ -178,33 +178,33 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($addresses as $address)
+                        @foreach(@$addresses as $address)
                             <tr>
                                 <td>
-                                    <strong>{{ $address->name }}</strong>
+                                    <strong>{{ @$address->name }}</strong>
                                     <br>
-                                    {{ $address->address }}, {{ $address->city }}, {{ $address->state }}, {{ $address->country }}, {{ $address->zip }}
+                                    {{ @$address->address }}, {{ @$address->city }}, {{ @$address->state }}, {{ @$address->country }}, {{ @$address->zip }}
                                 </td>
                                 <td class="text-center">
                                     <input 
                                         type="radio" 
                                         name="billing_address" 
-                                        value="{{ $address->id }}" 
-                                        {{ $address->is_default_billing ? 'checked' : '' }}>
+                                        value="{{ @$address->id }}" 
+                                        {{ @$address->is_default_billing ? 'checked' : '' }}>
                                 </td>
                                 <td class="text-center">
                                     <input 
                                         type="radio" 
                                         name="shipping_address" 
-                                        value="{{ $address->id }}" 
-                                        {{ $address->is_default_shipping ? 'checked' : '' }}>
+                                        value="{{ @$address->id }}" 
+                                        {{ @$address->is_default_shipping ? 'checked' : '' }}>
                                 </td>
                             </tr>
                         @endforeach
                         <tr>
                             <td colspan="3" class="text-right">
-                                <button type="button" class="btn btn-secondary edit-address-btn" data-id="{{ $address->id }}">Add / Edit</button>
-                                <button type="button" class="btn btn-secondary confirm-address-btn" data-id="{{ $address->id }}">Confirm</button>
+                                <button type="button" class="btn btn-secondary edit-address-btn" data-id="{{ @$address->id }}">Add / Edit</button>
+                                <button type="button" class="btn btn-secondary confirm-address-btn" data-id="{{ @$address->id }}">Confirm</button>
                             </td>
                         </tr>
                     </tbody>
@@ -372,7 +372,19 @@
             const confirmOrderBtn = document.getElementById('confirmOrder');
 
             if (confirmOrderBtn) {
+                
                 confirmOrderBtn.addEventListener('click', async function () {
+                    const shippingAddress = document.querySelector('input[name="shipping_address"]:checked');
+                    const billingAddress = document.querySelector('input[name="billing_address"]:checked');
+        
+                    if (!shippingAddress || !billingAddress) {
+                        toastr.error('Please select your shipping and billing address.');
+                        // Optional: delay for user to read message before redirecting
+                        setTimeout(() => {
+                            window.location.href = '{{ route("address.index") }}';
+                        }, 2000);
+                        return; // Prevent further execution of the checkout process
+                    }
                     confirmOrderBtn.disabled = true; // Disable button to prevent multiple clicks
 
                     try {
@@ -427,7 +439,8 @@
                     }
                 } catch (error) {
                     console.error('Error storing checkout data:', error);
-                    toastr.error('An error occurred while storing checkout data.');
+                    // toastr.error('An error occurred while storing checkout data.');
+                    toastr.error('Please Add Shipping Address.');
                 }
             }
         });
